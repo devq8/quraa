@@ -14,8 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.contrib.auth.views import LogoutView
+from django.urls import path, include
+
+
+def admin_logout_redirect(request, extra_context=None):
+    """Redirect admin logout to the landing page."""
+    return LogoutView.as_view(next_page="/")(request)
+
+
+admin.site.logout = admin_logout_redirect
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("", include("core.urls")),
 ]
