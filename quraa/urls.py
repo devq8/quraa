@@ -13,20 +13,35 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 from django.urls import path, include
+
+from core import views as core_views
+
+
+def logout_redirect_landing(request):
+    """Log out and always redirect to the landing page (no 'Logged out' template)."""
+    logout(request)
+    return redirect("/")
 
 
 def admin_logout_redirect(request, extra_context=None):
-    """Redirect admin logout to the landing page."""
-    return LogoutView.as_view(next_page="/")(request)
+    """Log out and always redirect to the landing page (no 'Logged out' template)."""
+    return logout_redirect_landing(request)
 
 
 admin.site.logout = admin_logout_redirect
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("accounts/login/", core_views.login_view, name="login"),
+    path("accounts/logout/", logout_redirect_landing, name="logout"),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("", include("core.urls")),
+    path("", include("landing.urls")),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

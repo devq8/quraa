@@ -1,0 +1,895 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <!-- <meta name="author" content="INSPIRO" /> -->
+    <!-- <meta name="description" content="Themeforest Template Polo, html template"> -->
+    <link rel="icon" type="image/png" href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'images/favicon.png' %}{% endif %}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Document title -->
+    <title>Quraa | {% if site_settings %}{{ site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}</title>
+    <!-- RTL and language: default Arabic -->
+    <script>
+    (function(){
+        var lang = localStorage.getItem('quraa-lang') || 'ar';
+        var d = document.documentElement;
+        d.setAttribute('lang', lang);
+        d.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        window.quraaLang = lang;
+        if (lang === 'ar') {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '{% static "css/rtl.css" %}';
+            document.head.appendChild(link);
+        }
+    })();
+    </script>
+    <!-- Stylesheets & Fonts -->
+    <link href="{% static 'css/plugins.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        /* Sand color buttons (override blue) */
+        .btn-primary, .btn-inverted:hover, a.btn-primary, a.btn-inverted:hover {
+            background-color: #c4a574 !important;
+            border-color: #c4a574 !important;
+        }
+        .btn-primary:hover, .btn-inverted, a.btn-primary:hover, a.btn-inverted {
+            background-color: #a68b5c !important;
+            border-color: #a68b5c !important;
+        }
+        /* All sections: line below heading matches button color */
+        #welcome .heading-text.heading-section h2::before,
+        #services .heading-text.heading-section h2::before,
+        #blog-section .heading-text.heading-section h2::before,
+        #clients .heading-text.heading-section h2::before,
+        #team .heading-text.heading-section h2::before {
+            background-color: #c4a574 !important;
+        }
+        /* Scroll top button: hover color matches primary button */
+        #scrollTop:after,
+        #scrollTop:hover:after {
+            background-color: #c4a574 !important;
+        }
+        /* Blog section: post category badge matches site accent */
+        #blog-section .post-item .post-image .post-meta-category {
+            background-color: #c4a574 !important;
+            color: #fff !important;
+        }
+        #blog-section .post-item .post-image .post-meta-category a {
+            color: #fff !important;
+        }
+        /* Blog section: post title hover matches site accent */
+        #blog-section .post-item .post-item-description h2 a:hover {
+            color: #c4a574 !important;
+        }
+        /* Blog section: Read more link hover */
+        #blog-section .post-item .post-item-description a.item-link:hover {
+            color: #c4a574 !important;
+        }
+        /* Main menu hover and current state: site accent */
+        #header #mainMenu nav > ul > li:hover > a,
+        #header #mainMenu nav > ul > li:hover > span,
+        #header #mainMenu nav > ul > li.hover-active > a,
+        #header #mainMenu nav > ul > li.hover-active > span,
+        #header #mainMenu nav > ul > li.current > a,
+        #header #mainMenu nav > ul > li.current > span {
+            color: #c4a574 !important;
+        }
+        #header #mainMenu nav > ul > li .dropdown-menu > li > a:hover,
+        #header #mainMenu nav > ul > li .dropdown-menu > li > span:hover,
+        #header #mainMenu nav > ul > li .dropdown-menu > li:hover > a,
+        #header #mainMenu nav > ul > li .dropdown-menu > li:hover > span {
+            color: #c4a574 !important;
+        }
+        /* Language switcher in header: hover matches site accent */
+        #header .header-extras .p-dropdown > a:hover,
+        #header .header-extras .p-dropdown > a:hover i,
+        #header .header-extras .p-dropdown > a:hover span {
+            color: #c4a574 !important;
+        }
+        #header .header-extras .p-dropdown .p-dropdown-content li a:hover {
+            color: #c4a574 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Body Inner -->
+    <div class="body-inner">
+        <!-- Header -->
+        <header id="header" data-transparent="true" data-fullwidth="true" class="dark submenu-light">
+            <div class="header-inner">
+                <div class="container">
+                    <!--Logo-->
+                    <div id="logo">
+                        <a href="/">
+                            <img class="logo-default" src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'images/old_book_logo.png' %}{% endif %}" alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-ar-alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-en-alt="{% if site_settings %}{{ site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}">
+                            <img class="logo-dark" src="{% if site_settings.logo_dark %}{{ site_settings.logo_dark.url }}{% elif site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'images/old_book_logo.png' %}{% endif %}" alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-ar-alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-en-alt="{% if site_settings %}{{ site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}">
+                        </a>
+                    </div>
+                    <!--End: Logo-->
+                    <!-- Search -->
+                    <div id="search"><a id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i class="icon-x"></i></a>
+                        <form class="search-form" action="search-results-page.html" method="get">
+                            <input class="form-control" name="q" type="text" placeholder="" data-ar-placeholder="ابحث..." data-en-placeholder="Type & Search..." />
+                            <span class="text-muted" data-ar="ابدأ بالكتابة ثم اضغط Enter أو ESC للإغلاق" data-en="Start typing & press &quot;Enter&quot; or &quot;ESC&quot; to close"></span>
+                        </form>
+                    </div>
+                    <!-- end: search -->
+                    <!--Header Extras-->
+                    <div class="header-extras">
+                        <ul>
+                            <li>
+                                <a id="btn-search" href="#"> <i class="icon-search"></i></a>
+                            </li>
+                            <li>
+                                <div class="p-dropdown">
+                                    <a href="#"><i class="icon-globe"></i><span id="lang-label" data-ar=" " data-en=" ">العربية</span></a>
+                                    <ul class="p-dropdown-content">
+                                        <li><a href="#" data-lang="ar">عربي</a></li>
+                                        <li><a href="#" data-lang="en">English</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--end: Header Extras-->
+                    <!--Navigation Resposnive Trigger-->
+                    <div id="mainMenu-trigger">
+                        <a class="lines-button x"><span class="lines"></span></a>
+                    </div>
+                    <!--end: Navigation Resposnive Trigger-->
+                    <!--Navigation-->
+                    <div id="mainMenu">
+                        <div class="container">
+                            <nav>
+                                <ul>
+                                    <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                                    <li class="dropdown"><a href="#" data-ar="خدماتنا" data-en="Services">خدماتنا</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="dropdown-submenu"><a href="#">Topbar</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="header-topbar.html">Light</a></li>
+                                                    <li><a href="header-topbar-dark.html">Dark</a></li>
+                                                    <li><a href="header-topbar-transparent.html">Transparent</a></li>
+                                                    <li><a href="header-topbar-colored.html">Colored</a></li>
+                                                    <li><a href="header-topbar-fullwidth.html">Fullwidth</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Header</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="header.html">Light</a></li>
+                                                    <li><a href="header-dark.html">Dark</a></li>
+                                                    <li><a href="header-transparent.html">Transparent</a></li>
+                                                    <li><a href="header-fullwidth.html">Fullwidth</a></li>
+                                                    <li class="dropdown-submenu"><a href="#">Modern</a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="header-modern.html">Light</a></li>
+                                                            <li><a href="header-modern-dark.html">Dark</a></li>
+                                                            <li><a href="header-modern-transparent.html">Transparent</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li><a href="header-mini.html">Mini</a></li>
+                                                    <li><a href="header-alternative.html">Alternative</a></li>
+                                                    <li><a href="header-always-fixed.html">Always Fixed</a></li>
+                                                    <li><a href="header-disable-fixed.html">Disable Fixed</a></li>
+                                                    <li><a href="header-responsive-fixed.html">Responsive Fixed</a></li>
+                                                    <li class="dropdown-submenu"><a href="#">Logo</a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="header-logo.html">Left</a></li>
+                                                            <li><a href="header-logo-right.html">Right</a></li>
+                                                            <li><a href="header-logo-center.html">Center</a></li>
+                                                            <li><a href="header-logo-fixed-header.html">Header Fixed Logo</a></li>
+                                                            <li><a href="header-logo-responsive.html">Header Responsive Logo</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="dropdown-submenu"><a href="#">Menu Positions</a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="header-menu-left.html">Left</a></li>
+                                                            <li><a href="header-menu-right.html">Right</a></li>
+                                                            <li><a href="header-menu-center.html">Center</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Main Menu<span class="badge bg-danger">NEW</span></a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="menu.html">Default</a></li>
+                                                    <li><a href="menu-lowercase.html">Lowercase</a></li>
+                                                    <li><a href="menu-split.html">Split Menu</a></li>
+                                                    <li><a href="menu-sub-title.html">Sub Title Menu</a></li>
+                                                    <li><a href="menu-overlay.html">Overlay Menu</a></li>
+                                                    <li><a href="menu-creative.html">Creative Menu</a></li>
+                                                    <li><a href="menu-lines.html">Lines Menu</a></li>
+                                                    <li class="dropdown-submenu"><a href="#">Outline</a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="menu-outline.html">Default</a></li>
+                                                            <li><a href="menu-outline-dark.html">Dark</a></li>
+                                                            <li><a href="menu-outline-light.html">Light</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="dropdown-submenu"><a href="#">Rounded</a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="menu-rounded.html">Default</a></li>
+                                                            <li><a href="menu-rounded-dark.html">Dark</a></li>
+                                                            <li><a href="menu-rounded-light.html">Light</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="dropdown-submenu"><a href="#">Positions</a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="menu-left.html">Left Aligned</a></li>
+                                                            <li><a href="menu-center.html">Center Aligned</a></li>
+                                                            <li><a href="menu-right.html">Right Aligned</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li><a href="menu-dots.html">Dots Menu</a></li>
+                                                    <li><a href="menu-one-page.html">One Page Menu</a></li>
+                                                    <li><a href="menu-hover-background.html">Hover Background</a></li>
+                                                    <li><a href="menu-button.html">Button Version</a></li>
+                                                    <li><a href="menu-social-icons.html">Social Icons Version</a></li>
+                                                    <li><a href="menu-onclick.html">OnClick Open</a></li>
+                                                    <li><a href="menu-rounded-dropdown.html">Rounded Dropdown</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Page Title</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-title.html">Default</a></li>
+                                                    <li><a href="page-title-image.html">Image background</a></li>
+                                                    <li><a href="page-title-video.html">Video background</a></li>
+                                                    <li><a href="page-title-particle.html">Particle animation</a></li>
+                                                    <li><a href="page-title-pattern.html">Pattern background</a></li>
+                                                    <li><a href="page-title-background-color.html">Colored background</a></li>
+                                                    <li><a href="page-title-parallax.html">Parallax</a></li>
+                                                    <li><a href="page-title-animated.html">Animated</a></li>
+                                                    <li><a href="page-title-right.html">Right Aligned</a></li>
+                                                    <li><a href="page-title-left.html">Left Aligned</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Page Menu<span class="badge bg-danger">NEW</span></a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-menu.html">Default</a></li>
+                                                    <li><a href="page-menu-sticky.html">Sticky</a></li>
+                                                    <li><a href="page-menu-rounded.html">Rounded</a></li>
+                                                    <li><a href="page-menu-outline.html">Outline</a></li>
+                                                    <li><a href="page-menu-lines.html">Lines</a></li>
+                                                    <li><a href="page-menu-solid.html">Solid</a></li>
+                                                    <li><a href="page-menu-light.html">Light</a></li>
+                                                    <li><a href="page-menu-dark.html">Dark</a></li>
+                                                    <li><a href="page-menu-creative.html">Creative</a></li>
+                                                    <li><a href="page-menu.html">Dropdown</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Sidebars</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="sidebar-sticky.html">Sticky version</a></li>
+                                                    <li><a href="sidebar.html">Left aligned</a></li>
+                                                    <li><a href="sidebar-right.html">Right aligned</a></li>
+                                                    <li><a href="sidebar-both.html">Both Sidebars</a></li>
+                                                    <li><a href="sidebar-modern.html">Modern</a></li>
+                                                    <li><a href="sidebar-modern-right.html">Modern Right</a></li>
+                                                    <li><a href="sidebar-modern-both.html">Modern Both Sidebars</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Footers</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="footer.html#footer">Default</a></li>
+                                                    <li><a href="footer-dark.html#footer">Dark</a></li>
+                                                    <li><a href="footer-1.html#footer">Footer 1</a></li>
+                                                    <li><a href="footer-2.html#footer">Footer 2</a></li>
+                                                    <li><a href="footer-3.html#footer">Footer 3</a></li>
+                                                    <li><a href="footer-4.html#footer">Footer 4</a></li>
+                                                    <li><a href="footer-5.html#footer">Footer 5</a></li>
+                                                    <li><a href="footer-6.html#footer">Footer 6</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Options</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="layout-boxed.html">Boxed</a></li>
+                                                    <li><a href="layout-modern.html">Modern</a></li>
+                                                    <li><a href="layout-frame.html">Frame</a></li>
+                                                    <li><a href="layout-wide.html">Wide (default)</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown"><a href="#" data-ar="المقالات" data-en="Blog">المقالات</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="dropdown-submenu"><a href="#">Sliders</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="slider-revolution-slider.html">Revolution Slider</a></li>
+                                                    <li><a href="slider-inspiro-slider.html">Inspiro Slider</a></li>
+                                                    <li><a href="slider-static-media-image.html">Fullscreen Image</a></li>
+                                                    <li><a href="slider-static-media-parallax.html">Fullscreen Parallax</a></li>
+                                                    <li><a href="slider-static-media-text-rotator.html">Fullscreen Text Rotator</a></li>
+                                                    <li><a href="slider-static-media-video.html">Fullscreen HTML5 Video</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="widgets.html">Widgets</a></li>
+                                            <li><a href="page-loaders.html">Page Loaders<span class="badge bg-danger">NEW</span></a></li>
+                                            <li class="dropdown-submenu"><a href="#">Modal Auto Open<span class="badge bg-danger">NEW</span></a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="modal-auto-open-subscription.html">Subscription</a></li>
+                                                    <li><a href="modal-auto-open-shop.html">Shop Promotion</a></li>
+                                                    <li><a href="modal-auto-open-login.html">Login Form</a></li>
+                                                    <li><a href="modal-auto-open-audio.html">Audio Player</a></li>
+                                                    <li><a href="modal-auto-open-video.html">HTML5 Video</a></li>
+                                                    <li><a href="modal-auto-open-youtube.html">YouTube Video</a></li>
+                                                    <li><a href="modal-auto-open-vimeo.html">Vimeo Video</a></li>
+                                                    <li><a href="modal-auto-open-iframe.html">Iframe</a></li>
+                                                    <li><a href="modal-auto-open.html">Sample Text</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><a href="#">Cookie Notify<span class="badge bg-danger">NEW</span></a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="cookie-notify.html">Top position</a></li>
+                                                    <li><a href="cookie-notify-bottom.html">Bottom position</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="shape-dividers.html">Shape Dividers<span class="badge bg-danger">NEW</span></a></li>
+                                            <li class="dropdown-submenu"><a href="#">Menu Labels</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="#">Label (new)<span class="badge bg-danger">NEW</span></a></li>
+                                                    <li><a href="#">Label (hot)<span class="badge bg-danger">HOT</span></a></li>
+                                                    <li><a href="#">Label (popular)<span class="badge bg-success">POPULAR</span></a></li>
+                                                    <li><a href="#">Label (sale)<span class="badge bg-warning">SALE</span></a></li>
+                                                    <li><a href="#">Label (info)<span class="badge bg-info">INFO</span></a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown mega-menu-item"><a href="#" data-ar="إصداراتنا" data-en="Publications">إصداراتنا</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="mega-menu-content">
+                                                <div class="row">
+                                                    <div class="col-lg-2">
+                                                        <ul>
+                                                            <li><a href="shortcode-according.html">Accordions</a></li>
+                                                            <li><a href="shortcode-alerts.html">Alerts</a></li>
+                                                            <li><a href="shortcode-animations.html">Animations</a></li>
+                                                            <li><a href="shortcode-avatar.html">Avatar</a></li>
+                                                            <li><a href="shortcode-audio-video.html">Audio & Video</a></li>
+                                                            <li><a href="shortcode-blockquotes.html">Blockquotes</a></li>
+                                                            <li><a href="component-bootstrap-switch.html">BS Switch<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="component-bootstrap-notify.html">BS Notify<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-breadcrumbs.html">Breadcrumbs</a></li>
+                                                            <li><a href="shortcode-buttons.html">Buttons</a></li>
+                                                            <li><a href="shortcode-background-image.html">Background Image</a></li>
+                                                            <li><a href="shortcode-background-overlays.html">Background Overlays</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <ul>
+                                                            <li><a href="component-charts-chartjs.html">Charts<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="component-calendar.html">Calendar<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-client-logo.html">Clients logos</a></li>
+                                                            <li><a href="shortcode-calltoaction.html">Call to action</a></li>
+                                                            <li><a href="shortcode-carousel.html">Carousel</a></li>
+                                                            <li><a href="shortcode-code.html">Code</a></li>
+                                                            <li><a href="shortcode-countdown-timer.html">Countdown Timers</a></li>
+                                                            <li><a href="shortcode-countdown.html">Countdown<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-counters.html">Counter Numbers</a></li>
+                                                            <li><a href="component-clipboard.html">Clipboard<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="component-datatable.html">Data Tables<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="component-daterangepicker.html">Date & Time Pickers</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <ul>
+                                                            <li><a href="shortcode-dropcat-highlight.html">Dropcat & Highlight</a></li>
+                                                            <li><a href="shortcode-dropdowns.html">Dropdowns</a></li>
+                                                            <li><a href="shortcode-team-members.html">Team members</a></li>
+                                                            <li><a href="shortcode-forms.html">Form Controls</a></li>
+                                                            <li><a href="shortcode-form-validation.html">Form Validation</a></li>
+                                                            <li><a href="shortcode-form-layouts.html">Form Layouts</a></li>
+                                                            <li><a href="shortcode-file-upload.html">File upload</a></li>
+                                                            <li><a href="shortcode-grid.html">Grid System</a></li>
+                                                            <li><a href="shortcode-heading-styles.html">Heading Styles</a></li>
+                                                            <li><a href="shortcode-icon-boxes.html">Icon Boxes</a></li>
+                                                            <li><a href="shortcode-icon-lists.html">Icons</a></li>
+                                                            <li><a href="shortcode-images.html">Images</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <ul>
+                                                            <li><a href="shortcode-lightbox.html">Lightbox</a></li>
+                                                            <li><a href="shortcode-lists.html">Lists</a></li>
+                                                            <li><a href="shortcode-labels-badgets.html">Labels & Badges</a></li>
+                                                            <li><a href="shortcode-maps.html">Maps</a></li>
+                                                            <li><a href="shortcode-modal.html">Modal</a></li>
+                                                            <li><a href="shortcode-modal-strip.html">Modal Strip</a></li>
+                                                            <li><a href="shortcode-navs.html">Navbar & Navs</a></li>
+                                                            <li><a href="shortcode-paginations.html">Pagination & Pager</a></li>
+                                                            <li><a href="shortcode-panels.html">Panels</a></li>
+                                                            <li><a href="shortcode-pie-chart.html">Pie charts</a></li>
+                                                            <li><a href="shortcode-popover.html">Popover</a></li>
+                                                            <li><a href="shortcode-milestone-stats.html">Milestone & Stats</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <ul>
+                                                            <li><a href="shortcode-pricing-table.html">Pricing tables</a></li>
+                                                            <li><a href="shortcode-progress-bar.html">Progress bars</a></li>
+                                                            <li><a href="shortcode-parallax.html">Parallax</a></li>
+                                                            <li><a href="shortcode-particles.html">Particles<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-responsive-utilities.html">Responsive utilities</a></li>
+                                                            <li><a href="component-ion-range-slider.html">Range Slider<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-sections.html">Sections</a></li>
+                                                            <li><a href="shortcode-smooth-scrolling.html">Smooth Scrolling</a></li>
+                                                            <li><a href="shortcode-social-icons.html">Social Icons</a></li>
+                                                            <li><a href="shortcode-spinners.html">Spinners<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="component-toggles-radio-checkboxes.html">Switch Toggle<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-shape-dividers.html">Shape Dividers<span class="badge bg-danger">NEW</span></a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <ul>
+                                                            <li><a href="shortcode-ratings.html">Ratings<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-tables.html">Tables</a></li>
+                                                            <li><a href="shortcode-textbox.html">Text Boxes</a></li>
+                                                            <li><a href="shortcode-tabs.html">Tabs</a></li>
+                                                            <li><a href="shortcode-testimonial.html">Testimonials</a></li>
+                                                            <li><a href="shortcode-toggles.html">Toggles</a></li>
+                                                            <li><a href="shortcode-tooltips.html">Tooltips</a></li>
+                                                            <li><a href="shortcode-typography.html">Typography</a></li>
+                                                            <li><a href="shortcode-text-rotator.html">Text Rotator</a></li>
+                                                            <li><a href="shortcode-timeline.html">Timeline<span class="badge bg-danger">NEW</span></a></li>
+                                                            <li><a href="shortcode-video-background.html">Video Background</a></li>
+                                                            <li><a href="shortcode-wizard.html">Wizard<span class="badge bg-danger">NEW</span></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown"><a href="#" data-ar="عن المركز" data-en="About Us">عن المركز</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="dropdown-submenu"><span class="dropdown-menu-title-only">About us</span>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-about-basic.html">Basic</a></li>
+                                                    <li><a href="page-about-extended.html">Extended</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><span class="dropdown-menu-title-only">About me</span>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-about-me-creative.html">Creative<span class="badge bg-danger">NEW</span></a></li>
+                                                    <li><a href="page-about-me-basic.html">Basic</a></li>
+                                                    <li><a href="page-about-me-extended.html">Extended</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><span class="dropdown-menu-title-only">Contact us</span>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-contact-classic.html">Classic</a></li>
+                                                    <li><a href="page-contact-advanced.html">Advanced</a> </li>
+                                                    <li><a href="page-contact-fullwidth-map.html">Fullwidth Map</a></li>
+                                                    <li><a href="page-contact-fullscreen-map.html">Fullscreen Map</a></li>
+                                                    <li><a href="page-contact-map-bottom.html">Map bottom</a></li>
+                                                    <li><a href="page-contact-sidebar-left.html">Sidebar Left</a></li>
+                                                    <li><a href="page-contact-sidebar-right.html">Sidebar Right</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><span class="dropdown-menu-title-only">Gallery</span>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-gallery-2.html">Two Columns</a></li>
+                                                    <li><a href="page-gallery-3.html">Three Columns</a></li>
+                                                    <li><a href="page-gallery-4.html">Four Columns</a></li>
+                                                    <li><a href="page-gallery-5.html">Five Columns</a></li>
+                                                    <li><a href="page-gallery-6.html">Six Columns</a></li>
+                                                    <li><a href="page-gallery-sidebar.html">Sidebar version</a></li>
+                                                    <li><a href="page-gallery-wide.html">Wide version</a></li>
+                                                    <li><a href="page-gallery-load-more.html">Load more</a></li>
+                                                    <li><a href="page-gallery-infinite-scroll.html">Infinity Scroll</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="dropdown-submenu"><span class="dropdown-menu-title-only">User pages</span>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-user-login.html">Login</a></li>
+                                                    <li><a href="page-user-login-cover.html">Login - Side Cover</a></li>
+                                                    <li><a href="page-user-login-classic.html">Login - Classic</a></li>
+                                                    <li><a href="page-user-register-cover.html">Register - Side Cover</a></li>
+                                                    <li><a href="page-user-register.html">Register</a></li>
+                                                    <li><a href="page-user-register-classic.html">Register - Classic</a></li>
+                                                    <li><a href="page-user-password-recovery.html">Recovery Password</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="page-services.html">Services</a></li>
+                                            <li><a href="page-our-team.html">Our team</a></li>
+                                            <li><a href="page-our-clients.html">Our clients</a></li>
+                                            <li><a href="page-maintenance.html">Maintenance</a></li>
+                                            <li><a href="page-404.html">404 Page</a></li>
+                                            <li><a href="page-404-parallax.html">404 Page - Parallax</a></li>
+                                            <li><a href="page-500.html">500 Page</a></li>
+                                            <li><a href="page-fullwidth.html">Fullwidth page</a></li>
+                                            <li><a href="page-fullwidth-wide.html">Fullwidth page - Wide</a></li>
+                                            <li class="dropdown-submenu"><span class="dropdown-menu-title-only">Page with Sidebar</span>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="page-sidebar.html">Sidebar Left</a></li>
+                                                    <li><a href="page-sidebar-right.html">Sidebar Right</a></li>
+                                                    <li><a href="page-sidebar-both.html">Sidebar Both</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="page-site-map.html">Site Map</a></li>
+                                            <li><a href="page-faq.html">FAQ</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown mega-menu-item"><a href="#" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="mega-menu-content">
+                                                <div class="row">
+                                                    <div class="col-lg-2-5">
+                                                        <ul>
+                                                            <li class="mega-menu-title">Grids</li>
+                                                            <li><a href="portfolio-2.html">Two Columns</a></li>
+                                                            <li><a href="portfolio-3.html">Three Columns</a></li>
+                                                            <li><a href="portfolio-4.html">Four Columns</a></li>
+                                                            <li><a href="portfolio-5.html">Five Columns</a></li>
+                                                            <li><a href="portfolio-6.html">Six Columns</a></li>
+                                                            <li><a href="portfolio-sidebar.html">Sidebar version</a></li>
+                                                            <li><a href="portfolio-wide-3.html">Wide version</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2-5">
+                                                        <ul>
+                                                            <li class="mega-menu-title">Masonry</li>
+                                                            <li><a href="portfolio-masonry-2.html">Two Columns</a></li>
+                                                            <li><a href="portfolio-masonry-3.html">Three Columns<span class="badge bg-danger">HOT</span></a></li>
+                                                            <li><a href="portfolio-masonry-4.html">Four Columns</a></li>
+                                                            <li><a href="portfolio-masonry-5.html">Five Columns</a></li>
+                                                            <li><a href="portfolio-masonry-6.html">Six Columns</a></li>
+                                                            <li><a href="portfolio-masonry-sidebar.html">Sidebar version</a></li>
+                                                            <li><a href="portfolio-masonry-wide-3.html">Wide version</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2-5">
+                                                        <ul>
+                                                            <li class="mega-menu-title">Styles</li>
+                                                            <li><a href="portfolio-filter-styles.html">Filter Styles</a></li>
+                                                            <li><a href="portfolio-load-more.html">Load more</a></li>
+                                                            <li><a href="portfolio-load-more-sidebar.html">Load more - Sidebar</a></li>
+                                                            <li><a href="portfolio-infinite-scroll.html">Infinity Scroll</a></li>
+                                                            <li><a href="portfolio-ajax.html">Portfolio Ajax</a></li>
+                                                            <li><a href="portfolio-gallery-modal.html">Gallery Modal</a></li>
+                                                            <li><a href="portfolio-video-modal.html">Video Modal</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2-5">
+                                                        <ul>
+                                                            <li class="mega-menu-title">Layouts</li>
+                                                            <li><a href="portfolio-sidebar-left.html">Left Sidebar</a></li>
+                                                            <li><a href="portfolio-sidebar-right.html">Right Sidebar</a></li>
+                                                            <li><a href="portfolio-sidebar-both.html">Both Sidebars</a></li>
+                                                            <li><a href="portfolio-slider-3.html">Slider Default</a></li>
+                                                            <li><a href="portfolio-no-page-title.html">No Page Title</a></li>
+                                                            <li><a href="portfolio-no-page-title-sidebar.html">No Page Title - Sidebar</a></li>
+                                                            <li><a href="portfolio-hover-styles.html">Hover Styles</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-lg-2-5">
+                                                        <ul>
+                                                            <li class="mega-menu-title">Single Project</li>
+                                                            <li><a href="portfolio-page-grid-gallery.html">Grid Gallery</a></li>
+                                                            <li><a href="portfolio-page-particles.html">Particles Wide Project</a></li>
+                                                            <li><a href="portfolio-page-floating-sidebar.html">Floating Sidebar</a></li>
+                                                            <li><a href="portfolio-page-slider.html">Slider version</a></li>
+                                                            <li><a href="portfolio-page-background-image.html">Fullscreen image</a></li>
+                                                            <li><a href="portfolio-page-background-video.html">Fullscreen Video</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-md-12 no-padding">
+                                                        <div class="d-none d-lg-block m-t-40 m-b-10">
+                                                            <div class="container">
+                                                                <div class="row">
+                                                                    <div class="col-lg-9 m-t-10">
+                                                                        <div class="text-center center">
+                                                                            <div class="heading-creative"><strong>20+</strong> Amazing Hover Styles</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-3"><a href="portfolio-hover-styles.html" class="btn m-l-20 btn-light btn-shadow btn-light-hover btn-light-hover">View All Hover Styles</a></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <ul class="d-block d-lg-none">
+                                                            <li><a class="mega-menu-title" href="portfolio-hover-styles.html">20+ Amazing Hover Styles</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    {% if user.is_authenticated %}
+                                    {% if user.is_staff %}<li><a href="{% url 'admin:index' %}" data-ar="الإدارة" data-en="Admin">الإدارة</a></li>{% endif %}
+                                    <li><a href="{% url 'logout' %}" data-ar="تسجيل الخروج" data-en="Logout">تسجيل الخروج</a></li>
+                                    {% else %}
+                                    <li><a href="{% url 'login' %}" data-ar="حسابي" data-en="My Account">حسابي</a></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <!--end: Navigation-->
+                </div>
+            </div>
+        </header>
+        <!-- end: Header -->
+        <!-- Inspiro Slider -->
+        <div id="slider" class="inspiro-slider slider-fullscreen dots-creative" data-fade="true">
+            {% for slide in hero_slides %}
+            <div class="slide" {% if slide.video_url %}{% if 'http' in slide.video_url %}data-bg-video="{{ slide.video_url }}"{% else %}data-bg-video="{% static slide.video_url %}"{% endif %}{% elif slide.image %}data-bg-image="{{ slide.image.url }}"{% else %}data-bg-video="{% static 'video/quran_video.mp4' %}"{% endif %}>
+                <div class="bg-overlay"></div>
+                <div class="container">
+                    <div class="slide-captions text-center text-light">
+                        <h1 data-caption-animate="zoom-out" data-ar="{{ slide.title_ar }}" data-en="{{ slide.title_en }}">{{ slide.title_ar }}</h1>
+                        <p data-ar="{{ slide.subtitle_ar }}" data-en="{{ slide.subtitle_en }}">{{ slide.subtitle_ar }}</p>
+                        <div><a href="{{ slide.button_link }}" class="btn btn-primary scroll-to" data-ar="{{ slide.button_text_ar }}" data-en="{{ slide.button_text_en }}">{{ slide.button_text_ar }}</a></div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="slide" data-bg-video="{% static 'video/quran_video.mp4' %}">
+                <div class="bg-overlay"></div>
+                <div class="container">
+                    <div class="slide-captions text-center text-light">
+                        <h1 data-caption-animate="zoom-out" data-ar="المركز العالمي لتاريخ ووثائق القرآء" data-en="The International Center for the History and Documentation of Quran Reciters">مرحباً بكم في قُراء</h1>
+                        <p data-ar="التميز عالمياً في جمع وتوثيق تاريخ القراء" data-en="Excellence globally in collecting and documenting the history of Quran reciters.">منصة متكاملة لتعلم القرآن وتلاوته. ابدأ رحلتك مع كتاب الله.</p>
+                        <div><a href="#welcome" class="btn btn-primary scroll-to" data-ar="اكتشف المزيد" data-en="Explore more">اكتشف المزيد</a></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!--end: Inspiro Slider -->
+        <!-- WELCOME -->
+        <section id="welcome" class="p-b-0">
+            <div class="container">
+                <div class="heading-text heading-section text-center m-b-40" data-animate="fadeInUp">
+                    <h2 data-ar="{% if sections.welcome %}{{ sections.welcome.heading_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}" data-en="{% if sections.welcome %}{{ sections.welcome.heading_en }}{% else %}We are dedicated to the heritage of the people of the Qur'an{% endif %}">{% if welcome_section %}{{ welcome_section.heading_ar }}{% elif sections.welcome %}{{ sections.welcome.heading_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}</h2>
+                    <span class="lead" data-ar="{% if welcome_section %}{{ welcome_section.lead_ar }}{% elif sections.welcome %}{{ sections.welcome.lead_ar }}{% else %}التميز في جمع وتوثيق تاريخ القراء{% endif %}" data-en="{% if welcome_section %}{{ welcome_section.lead_en }}{% elif sections.welcome %}{{ sections.welcome.lead_en }}{% else %}Excellence in the collection and documentation of the history of Qur'an reciters{% endif %}">{% if welcome_section %}{{ welcome_section.lead_ar }}{% elif sections.welcome %}{{ sections.welcome.lead_ar }}{% else %}التميز في جمع وتوثيق تاريخ القراء{% endif %}</span>
+                </div>
+                <div class="row" data-animate="fadeInUp">
+                    <div class="col-lg-12">
+                        <img class="img-fluid" src="{% if welcome_section.image %}{{ welcome_section.image.url }}{% else %}{% static 'images/other/old_quran_2.jpg' %}{% endif %}" alt="{% if welcome_section %}{{ welcome_section.heading_ar }}{% else %}Old Quran Image{% endif %}">
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- end: WELCOME -->
+        
+        <!-- SERVICES -->
+        <section id="services" class="background-grey">
+            <div class="container">
+                <div class="heading-text heading-section text-center">
+                    <h2 data-ar="{% if sections.services %}{{ sections.services.heading_ar }}{% else %}خدماتنا{% endif %}" data-en="{% if sections.services %}{{ sections.services.heading_en }}{% else %}OUR SERVICES{% endif %}">{% if sections.services %}{{ sections.services.heading_ar }}{% else %}خدماتنا{% endif %}</h2>
+                    <p data-ar="{% if sections.services %}{{ sections.services.lead_ar }}{% else %}خدماتنا المتنوعة للباحثين وأهل القرآن{% endif %}" data-en="{% if sections.services %}{{ sections.services.lead_en }}{% else %}Our diverse services for researchers and the people of the Qur'an{% endif %}">{% if sections.services %}{{ sections.services.lead_ar }}{% else %}خدماتنا المتنوعة للباحثين وأهل القرآن{% endif %}</p>
+                </div>
+                <div class="row">
+                    {% for service in services %}
+                    <div class="col-lg-4" data-animate="fadeInUp" data-animate-delay="{% widthratio forloop.counter0 1 200 %}">
+                        <div class="icon-box effect medium border small">
+                            <div class="icon">
+                                <a href="{% if service.link %}{{ service.link }}{% else %}#{% endif %}"><i class="{{ service.icon }}"></i></a>
+                            </div>
+                            <h3 data-ar="{{ service.title_ar }}" data-en="{{ service.title_en }}">{{ service.title_ar }}</h3>
+                            <p data-ar="{{ service.description_ar }}" data-en="{{ service.description_en }}">{{ service.description_ar }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-lg-4" data-animate="fadeInUp"><div class="icon-box effect medium border small"><div class="icon"><a href="#"><i class="fa fa-book"></i></a></div><h3 data-ar="جمع ترجمة" data-en="Collecting biographies">جمع ترجمة</h3><p data-ar="لمقرئ" data-en="For reciters">لمقرئ</p></div></div>
+                    <div class="col-lg-4" data-animate="fadeInUp"><div class="icon-box effect medium border small"><div class="icon"><a href="#"><i class="fa fa-clipboard-check"></i></a></div><h3 data-ar="مراجعة تراجم" data-en="Reviewing biographies">مراجعة تراجم</h3><p data-ar="قراء من إعداد الآخرين" data-en="Of reciters prepared by others">قراء من إعداد الآخرين</p></div></div>
+                    <div class="col-lg-4" data-animate="fadeInUp"><div class="icon-box effect medium border small"><div class="icon"><a href="#"><i class="fa fa-file-alt"></i></a></div><h3 data-ar="توثيق ترجمة" data-en="Documenting biographies">توثيق ترجمة</h3><p data-ar="مقرئ" data-en="Of reciters">مقرئ</p></div></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <!-- end: SERVICES -->
+        <!-- COUNTERS -->
+        <section class="text-light p-t-150 p-b-150 " data-bg-parallax="{% static 'images/parallax/12.jpg' %}">
+            <div class="bg-overlay"></div>
+            <div class="container">
+                <div class="row">
+                    {% for stat in stat_counters %}
+                    <div class="col-lg-3">
+                        <div class="text-center">
+                            <div class="icon"><i class="{{ stat.icon }}"></i></div>
+                            <div class="counter"> <span data-speed="1500" data-refresh-interval="50" data-to="{{ stat.value_to }}" data-from="{{ stat.value_from }}" data-seperator="true"></span> </div>
+                            <div class="seperator seperator-small"></div>
+                            <p data-ar="{{ stat.label_ar }}" data-en="{{ stat.label_en }}">{{ stat.label_ar }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-lg-3"><div class="text-center"><div class="icon"><i class="fa fa-3x fa-book"></i></div><div class="counter"> <span data-speed="1500" data-to="12416" data-from="600" data-seperator="true"></span> </div><div class="seperator seperator-small"></div><p data-ar="عدد تراجم القراء" data-en="Reciters' biographies">عدد تراجم القراء</p></div></div>
+                    <div class="col-lg-3"><div class="text-center"><div class="icon"><i class="fa fa-3x fa-file-alt"></i></div><div class="counter"> <span data-speed="1500" data-to="365" data-from="100" data-seperator="true"></span> </div><div class="seperator seperator-small"></div><p data-ar="المخطوطات المتاحة" data-en="Available manuscripts">المخطوطات المتاحة</p></div></div>
+                    <div class="col-lg-3"><div class="text-center"><div class="icon"><i class="fa fa-3x fa-check-circle"></i></div><div class="counter"> <span data-speed="1500" data-to="114" data-from="50" data-seperator="true"></span> </div><div class="seperator seperator-small"></div><p data-ar="تراجم تم مراجعتها" data-en="Reviewed biographies">تراجم تم مراجعتها</p></div></div>
+                    <div class="col-lg-3"><div class="text-center"><div class="icon"><i class="fa fa-3x fa-archive"></i></div><div class="counter"> <span data-speed="1500" data-to="14825" data-from="48" data-seperator="true"></span> </div><div class="seperator seperator-small"></div><p data-ar="عدد الوثائق المتاحة" data-en="Available documents">عدد الوثائق المتاحة</p></div></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <!-- end: COUNTERS -->
+        <!-- BLOG -->
+        <section id="blog-section" class="content background-grey">
+            <div class="container">
+                <div class="heading-text heading-section">
+                    <h2 data-ar="{% if sections.blog %}{{ sections.blog.heading_ar }}{% else %}المدونة{% endif %}" data-en="{% if sections.blog %}{{ sections.blog.heading_en }}{% else %}OUR BLOG{% endif %}">{% if sections.blog %}{{ sections.blog.heading_ar }}{% else %}المدونة{% endif %}</h2>
+                    <span class="lead" data-ar="{% if sections.blog %}{{ sections.blog.lead_ar }}{% else %}أحدث المقالات والموارد حول القرآن والتلاوة.{% endif %}" data-en="{% if sections.blog %}{{ sections.blog.lead_en }}{% else %}Latest articles and resources on the Quran and recitation.{% endif %}">{% if sections.blog %}{{ sections.blog.lead_ar }}{% else %}أحدث المقالات والموارد حول القرآن والتلاوة.{% endif %}</span>
+                </div>
+                <div id="blog" class="grid-layout post-3-columns m-b-30" data-item="post-item">
+                    {% for post in featured_posts %}
+                    <div class="post-item border">
+                        <div class="post-item-wrap">
+                            <div class="post-image">
+                                <a href="{% if post.url %}{{ post.url }}{% else %}#{% endif %}">
+                                    <img alt="{{ post.title_ar }}" src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/blog/12.jpg' %}{% endif %}">
+                                </a>
+                                {% if post.category_ar or post.category_en %}<span class="post-meta-category"><a href="{% if post.url %}{{ post.url }}{% else %}#{% endif %}" data-ar="{{ post.category_ar }}" data-en="{{ post.category_en|default:post.category_ar }}">{{ post.category_ar|default:post.category_en }}</a></span>{% endif %}
+                            </div>
+                            <div class="post-item-description">
+                                {% if post.published_at %}<span class="post-meta-date"><i class="fa fa-calendar-o"></i><span class="post-date-formatted" data-date="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"M d, Y" }}</span></span>{% endif %}
+                                <h2><a href="{% if post.url %}{{ post.url }}{% else %}#{% endif %}" data-ar="{{ post.title_ar }}" data-en="{{ post.title_en|default:post.title_ar }}">{{ post.title_ar }}</a></h2>
+                                <p data-ar="{{ post.excerpt_ar }}" data-en="{{ post.excerpt_en|default:post.excerpt_ar }}">{{ post.excerpt_ar }}</p>
+                                <a href="{% if post.url %}{{ post.url }}{% else %}#{% endif %}" class="item-link"><span data-ar="اقرأ المزيد" data-en="Read More">Read More</span> <i class="icon-chevron-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="post-item border"><div class="post-item-wrap"><div class="post-image"><a href="#"><img alt="" src="{% static 'images/blog/12.jpg' %}"></a><span class="post-meta-category"><a href="">Lifestyle</a></span></div><div class="post-item-description"><span class="post-meta-date"><i class="fa fa-calendar-o"></i><span class="post-date-formatted" data-date="2017-01-21">Jan 21, 2017</span></span><h2><a href="#">Standard post with a single image</a></h2><p>Curabitur pulvinar euismod ante, ac sagittis ante posuere ac.</p><a href="#" class="item-link"><span data-ar="اقرأ المزيد" data-en="Read More">Read More</span> <i class="icon-chevron-right"></i></a></div></div></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <!-- end: BLOG -->
+        <!-- CLIENTS -->
+        <section id="clients" class="p-t-60">
+            <div class="container">
+                <div class="heading-text heading-section text-center">
+                    <h2 data-ar="{% if sections.clients %}{{ sections.clients.heading_ar }}{% else %}عملاؤنا{% endif %}" data-en="{% if sections.clients %}{{ sections.clients.heading_en }}{% else %}CLIENTS{% endif %}">{% if sections.clients %}{{ sections.clients.heading_ar }}{% else %}عملاؤنا{% endif %}</h2>
+                    <span class="lead" data-ar="{% if sections.clients %}{{ sections.clients.lead_ar }}{% else %}شركاؤنا الذين نفخر بالعمل معهم.{% endif %}" data-en="{% if sections.clients %}{{ sections.clients.lead_en }}{% else %}Our awesome clients we've had the pleasure to work with!{% endif %}">{% if sections.clients %}{{ sections.clients.lead_ar }}{% else %}شركاؤنا الذين نفخر بالعمل معهم.{% endif %}</span>
+                </div>
+                <div class="carousel client-logos" data-items="6" data-items-sm="4" data-items-xs="3" data-items-xxs="2" data-margin="20" data-arrows="false" data-autoplay="true" data-autoplay="3000" data-loop="true">
+                    {% for client in clients %}
+                    <div>
+                        <a href="{% if client.link %}{{ client.link }}{% else %}#{% endif %}"><img alt="{{ client.name }}" src="{{ client.logo.url }}"> </a>
+                    </div>
+                    {% empty %}
+                    <div><a href="#"><img alt="" src="{% static 'images/clients/1.png' %}"> </a></div>
+                    <div><a href="#"><img alt="" src="{% static 'images/clients/2.png' %}"> </a></div>
+                    <div><a href="#"><img alt="" src="{% static 'images/clients/3.png' %}"> </a></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <!-- end: CLIENTS -->
+        <!-- TEAM -->
+        <section id="team" class="background-grey">
+            <div class="container">
+                <div class="heading-text heading-section text-center">
+                    <h2 data-ar="{% if sections.team %}{{ sections.team.heading_ar }}{% else %}تعرف على فريقنا{% endif %}" data-en="{% if sections.team %}{{ sections.team.heading_en }}{% else %}MEET OUR TEAM{% endif %}">{% if sections.team %}{{ sections.team.heading_ar }}{% else %}تعرف على فريقنا{% endif %}</h2>
+                    <p data-ar="{% if sections.team %}{{ sections.team.lead_ar }}{% else %}فريقنا المتخصص في تطوير منصة قُراء.{% endif %}" data-en="{% if sections.team %}{{ sections.team.lead_en }}{% else %}Our team specialized in developing the Quraa platform.{% endif %}">{% if sections.team %}{{ sections.team.lead_ar }}{% else %}فريقنا المتخصص في تطوير منصة قُراء.{% endif %}</p>
+                </div>
+                <div class="row team-members">
+                    {% for member in team_members %}
+                    <div class="col-lg-3">
+                        <div class="team-member">
+                            <div class="team-image">
+                                <img src="{% if member.image %}{{ member.image.url }}{% else %}{% static 'images/team/6.jpg' %}{% endif %}" alt="{{ member.name }}">
+                            </div>
+                            <div class="team-desc">
+                                <h3>{{ member.name }}</h3>
+                                <span>{{ member.role }}</span>
+                                <p>{{ member.bio }}</p>
+                                <div class="align-center">
+                                    {% if member.facebook_url %}<a class="btn btn-xs btn-slide btn-light" href="{{ member.facebook_url }}"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>{% endif %}
+                                    {% if member.twitter_url %}<a class="btn btn-xs btn-slide btn-light" href="{{ member.twitter_url }}" data-width="100"><i class="fab fa-twitter"></i><span>Twitter</span></a>{% endif %}
+                                    {% if member.instagram_url %}<a class="btn btn-xs btn-slide btn-light" href="{{ member.instagram_url }}" data-width="118"><i class="fab fa-instagram"></i><span>Instagram</span></a>{% endif %}
+                                    {% if member.email %}<a class="btn btn-xs btn-slide btn-light" href="mailto:{{ member.email }}" data-width="80"><i class="icon-mail"></i><span>Mail</span></a>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-lg-3"><div class="team-member"><div class="team-image"><img src="{% static 'images/team/6.jpg' %}"></div><div class="team-desc"><h3>Alea Smith</h3><span>Software Developer</span><p>Lorem ipsum dolor sit amet.</p></div></div></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <!-- end: TEAM -->
+        <!-- Footer -->
+        <footer id="footer">
+            <div class="footer-content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="widget">
+                                <div class="widget-title" data-ar="{% if site_settings %}{{ site_settings.footer_title_ar|default:site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_title_en|default:site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}">{% if site_settings and site_settings.footer_title_ar %}{{ site_settings.footer_title_ar }}{% elif site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}</div>
+                                <p class="mb-5" data-ar="{% if site_settings %}{{ site_settings.footer_description_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_description_en }}{% else %}We are dedicated to the heritage of the people of the Qur'an{% endif %}">{% if site_settings %}{{ site_settings.footer_description_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}</p>
+                                <a href="{% if site_settings and site_settings.footer_button_link %}{{ site_settings.footer_button_link }}{% else %}#{% endif %}" class="btn btn-inverted" target="_blank" data-ar="{% if site_settings %}{{ site_settings.footer_button_text_ar }}{% else %}سجّل الآن{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_button_text_en }}{% else %}Register Now{% endif %}">{% if site_settings %}{{ site_settings.footer_button_text_ar }}{% else %}سجّل الآن{% endif %}</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="row">
+                                {% for column in footer_columns %}
+                                <div class="col-lg-3">
+                                    <div class="widget">
+                                        <div class="widget-title" data-ar="{% firstof column.title_ar column.title %}" data-en="{% firstof column.title_en column.title %}">{% firstof column.title_ar column.title %}</div>
+                                        <ul class="list">
+                                            {% for link in column.links.all %}
+                                            <li><a href="{% if link.url %}{{ link.url }}{% else %}#{% endif %}" data-ar="{% firstof link.label_ar link.label %}" data-en="{% firstof link.label_en link.label %}">{% firstof link.label_ar link.label %}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-lg-3"><div class="widget"><div class="widget-title" data-ar="اكتشف" data-en="Discover">اكتشف</div><ul class="list"><li><a href="#" data-ar="المميزات" data-en="Features">المميزات</a></li><li><a href="#" data-ar="التخطيطات" data-en="Layouts">التخطيطات</a></li></ul></div></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright-content">
+                <div class="container">
+                    <div class="copyright-text text-center">© <span id="copyright-year"></span> <span data-ar="{% if site_settings %}{{ site_settings.copyright_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.{% endif %}" data-en="{% if site_settings %}{{ site_settings.copyright_en }}{% else %}The International Center for the History and Documentation of Quran Reciters. All rights reserved.{% endif %}">{% if site_settings %}{{ site_settings.copyright_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.{% endif %}</span></div>
+                </div>
+            </div>
+        </footer>
+        <!-- end: Footer -->
+    </div>
+    <!-- end: Body Inner -->
+    <!-- Scroll top -->
+    <a id="scrollTop"><i class="icon-chevron-up"></i><i class="icon-chevron-up"></i></a>
+    <!--Plugins-->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <!--Template functions-->
+    <script src="{% static 'js/functions.js' %}"></script>
+    <!-- i18n: apply language and language switcher -->
+    <script>
+    (function() {
+        var lang = window.quraaLang || 'ar';
+        var attr = lang === 'ar' ? 'data-ar' : 'data-en';
+        var placeholderAttr = lang === 'ar' ? 'data-ar-placeholder' : 'data-en-placeholder';
+
+        function applyLanguage() {
+            document.querySelectorAll('[' + attr + ']').forEach(function(el) {
+                var val = el.getAttribute(attr);
+                if (val !== null && val !== '') el.textContent = val;
+            });
+            document.querySelectorAll('[' + placeholderAttr + ']').forEach(function(el) {
+                var val = el.getAttribute(placeholderAttr);
+                if (val !== null) el.placeholder = val;
+            });
+            // Format dates by locale (Arabic vs English)
+            document.querySelectorAll('.post-date-formatted').forEach(function(el) {
+                var dateStr = el.getAttribute('data-date');
+                if (dateStr) {
+                    var d = new Date(dateStr);
+                    if (!isNaN(d.getTime())) {
+                        var opts = lang === 'ar' ? { year: 'numeric', month: 'long', day: 'numeric' } : { year: 'numeric', month: 'short', day: 'numeric' };
+                        el.textContent = d.toLocaleDateString(lang === 'ar' ? 'ar' : 'en-US', opts);
+                    }
+                }
+            });
+        }
+
+        applyLanguage();
+
+        // Dynamic copyright year
+        var yearEl = document.getElementById('copyright-year');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+        document.querySelectorAll('[data-lang]').forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                var newLang = this.getAttribute('data-lang');
+                if (newLang && newLang !== lang) {
+                    localStorage.setItem('quraa-lang', newLang);
+                    window.location.reload();
+                }
+            });
+        });
+    })();
+    </script>
+</body>
+
+</html>

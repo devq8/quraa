@@ -1,133 +1,78 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log in – Quraa</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #eee;
-        }
-        .container {
-            width: 100%;
-            max-width: 360px;
-            padding: 2rem;
-        }
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
-        .tagline {
-            font-size: 0.95rem;
-            opacity: 0.85;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.35rem;
-        }
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 0.65rem 0.75rem;
-            font-size: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.08);
-            color: #eee;
-        }
-        input:focus {
-            outline: none;
-            border-color: #e94560;
-        }
-        .errorlist {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 1rem 0;
-            font-size: 0.9rem;
-            color: #e94560;
-        }
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 0.75rem 1.5rem;
-            margin-top: 1rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-align: center;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        .btn-primary {
-            background: #e94560;
-            color: #fff;
-        }
-        .back {
-            display: inline-block;
-            margin-top: 1.25rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-        }
-        .back:hover {
-            color: #fff;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="INSPIRO" />
+    <meta name="description" content="Themeforest Template Polo, html template">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Document title -->
+    <title>POLO | The Multi-Purpose HTML5 Template</title>
+    <!-- Stylesheets & Fonts -->
+    <link href="{% static 'css/plugins.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container">
-        <h1>Quraa</h1>
-        <p class="tagline">Sign in to your account.</p>
+    <!-- Body Inner -->
+    <div class="body-inner">
+        <!-- Section -->
+        <section class="pt-5 pb-5" data-bg-image="{% static 'images/pages/quran_sanad_background.png' %}">
+            <div class="container-fluid d-flex flex-column">
+                <div class="row align-items-center min-vh-100">
+                    <div class="col-md-6 col-lg-4 col-xl-3 mx-auto">
+                          <div class="card">
+                            <div class="card-body py-5 px-sm-5">
+                                <div class="mb-5 text-center">
+                                    <h6 class="h3 mb-1">Login</h6>
+                                    <p class="text-muted mb-0">Sign in to your account to continue.</p>
+                                </div><span class="clearfix"></span>
+                                {% if messages %}
+                                <div class="alert alert-danger" role="alert">
+                                    {% for message in messages %}{{ message }}{% endfor %}
+                                </div>
+                                {% endif %}
+                                <form class="form-validate" method="post" action="{% url 'login' %}">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="email">Email address</label>
+                                        <div class="input-group">
+                                            <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email" value="{{ request.POST.email }}" required>
+                                            <span class="input-group-text"><i class="icon-user"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <label for="password">Password</label>
+                                        <div class="input-group show-hide-password">
+                                            <input class="form-control" name="password" id="password" placeholder="Enter password" type="password" required>
+                                            <span class="input-group-text"><i class="icon-eye-off" aria-hidden="true" style="cursor: pointer;"></i></span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+                                    <div class="mt-4"><button type="submit" class="btn btn-primary btn-block btn-primary">Sign in</button></div>
+                                </form>
+                                <div class="mt-4 text-center"><small>Not registered?</small> <a href="page-user-register.html" class="small fw-bold">Create account</a>
+                                </div>
 
-        {% if form.non_field_errors %}
-            <ul class="errorlist">
-                {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ next }}">
-            <div class="form-group">
-                <label for="id_username">Username</label>
-                {{ form.username }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="id_password">Password</label>
-                {{ form.password }}
-            </div>
-            <button type="submit" class="btn btn-primary">Log in</button>
-        </form>
-
-        <a href="{% url 'core:landing' %}" class="back">← Back to home</a>
+        </section>
+        <!-- end: Section -->
     </div>
+    <!-- end: Body Inner -->
+    <!-- Scroll top -->
+    <a id="scrollTop"><i class="icon-chevron-up"></i><i class="icon-chevron-up"></i></a>
+    <!--Plugins-->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <!--Template functions-->
+    <script src="{% static 'js/functions.js' %}"></script>
 </body>
+
 </html>
