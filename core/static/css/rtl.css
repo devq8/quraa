@@ -93,6 +93,18 @@ var {
 #mainMenu nav>ul>li .dropdown-menu>li>span,
 #mainMenu nav>ul>li .dropdown-menu>li [class*="col-"]>ul>li>a {
   text-align: right;
+@media (min-width: 1025px) {
+  #header .header-extras,
+  #header:not(.header-logo-center):not(.menu-split) #mainMenu {
+	  float: left;
+  } 
+}
+
+
+#mainMenu nav>ul>li .dropdown-menu>li>a,
+#mainMenu nav>ul>li .dropdown-menu>li>span,
+#mainMenu nav>ul>li .dropdown-menu>li [class*="col-"]>ul>li>a {
+  text-align: right;
 }
 
 #mainMenu nav>ul>li .dropdown-submenu:before {

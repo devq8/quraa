@@ -7,4 +7,6 @@ app_name = "landing"
 
 urlpatterns = [
     path("", views.landing, name="landing"),
+    path("contact-us/", views.contact_us, name="contact_us"),
+    path("post/<int:pk>/", views.post_detail, name="post_detail"),
 ]

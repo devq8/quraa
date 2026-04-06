@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 from .models import (
     SiteSettings,
     LandingSection,
@@ -22,8 +23,8 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         return not SiteSettings.objects.exists()
     fieldsets = (
         (None, {"fields": ("site_name_ar", "site_name_en", "logo", "logo_dark", "favicon")}),
-        ("Footer main block", {"fields": ("footer_title_ar", "footer_title_en", "footer_description_ar", "footer_description_en", "footer_button_text_ar", "footer_button_text_en", "footer_button_link")}),
-        ("Copyright", {"fields": ("copyright_ar", "copyright_en")}),
+        (_("Footer main block"), {"fields": ("footer_title_ar", "footer_title_en", "footer_description_ar", "footer_description_en", "footer_button_text_ar", "footer_button_text_en", "footer_button_link")}),
+        (_("Copyright"), {"fields": ("copyright_ar", "copyright_en")}),
     )
 
 

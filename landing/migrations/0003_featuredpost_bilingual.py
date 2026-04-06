@@ -18,7 +18,7 @@ def noop(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("landing", "0002_footer_column_bilingual"),
+        ("landing", "0001_initial"),
     ]
 
     operations = [

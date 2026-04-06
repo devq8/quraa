@@ -1,0 +1,531 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-03 23:01+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+#: core/admin.py:18
+msgid "Birth & origin"
+msgstr "الميلاد والأصل"
+
+#: core/admin.py:22
+msgid "Readings & path"
+msgstr "القراءات والطريق"
+
+#: core/admin.py:25
+msgid "Students & works"
+msgstr "الطلاب والأعمال"
+
+#: core/admin.py:27
+msgid "Death & source"
+msgstr "الوفاة والمصدر"
+
+#: core/admin.py:30
+msgid "Meta"
+msgstr "البيانات الوصفية"
+
+#: core/models.py:10 landing/models.py:197
+msgid "Name"
+msgstr "الاسم"
+
+#: core/models.py:12
+msgid "Title"
+msgstr "اللقب"
+
+#: core/models.py:15
+msgid "e.g. علاَّمة كبير، إمام في القراءات بلا نظير"
+msgstr "مثال: علاَّمة كبير، إمام في القراءات بلا نظير"
+
+#: core/models.py:17
+msgid "Birth year"
+msgstr "سنة الميلاد"
+
+#: core/models.py:18
+msgid "Birthplace"
+msgstr "مكان الميلاد"
+
+#: core/models.py:19
+msgid "Home town"
+msgstr "المدينة"
+
+#: core/models.py:20
+msgid "School"
+msgstr "المدرسة"
+
+#: core/models.py:24
+msgid "Teachers"
+msgstr "الشيوخ"
+
+#: core/models.py:26
+msgid "Comma-separated list of teachers."
+msgstr "قائمة الشيوخ مفصولة بفواصل."
+
+#: core/models.py:29
+msgid "Readings"
+msgstr "القراءات"
+
+#: core/models.py:31
+msgid "e.g. القراءات العشر الصغرى والكبرى، القراءات الشاذة"
+msgstr "مثال: القراءات العشر الصغرى والكبرى، القراءات الشاذة"
+
+#: core/models.py:34
+msgid "Path"
+msgstr "الطريق"
+
+#: core/models.py:36
+msgid "e.g. الشاطبية، الدرة، طيبة النشر"
+msgstr "مثال: الشاطبية، الدرة، طيبة النشر"
+
+#: core/models.py:39
+msgid "Location of reading"
+msgstr "مكان القراءة"
+
+#: core/models.py:42
+msgid "e.g. الأزهر، الجامعة الإسلامية بالمدينة، منزله"
+msgstr "مثال: الأزهر، الجامعة الإسلامية بالمدينة، منزله"
+
+#: core/models.py:45
+msgid "Students"
+msgstr "الطلاب"
+
+#: core/models.py:47
+msgid "Comma-separated list of students."
+msgstr "قائمة الطلاب مفصولة بفواصل."
+
+#: core/models.py:50
+msgid "Authored books"
+msgstr "المؤلفات"
+
+#: core/models.py:52
+msgid "e.g. تنقيح فتح الكريم، شرح تنقيح فتح الكريم، تحقيق عمدة العرفان"
+msgstr "مثال: تنقيح فتح الكريم، شرح تنقيح فتح الكريم، تحقيق عمدة العرفان"
+
+#: core/models.py:55
+msgid "Death year"
+msgstr "سنة الوفاة"
+
+#: core/models.py:56
+msgid "Age (at death)"
+msgstr "العمر (عند الوفاة)"
+
+#: core/models.py:57
+msgid "Death location"
+msgstr "مكان الوفاة"
+
+#: core/models.py:59
+msgid "Source"
+msgstr "المصدر"
+
+#: core/models.py:62
+msgid "Reference source, e.g. كتاب هداية القاري إلى تجويد كلام الباري"
+msgstr "المصدر المرجعي، مثال: كتاب هداية القاري إلى تجويد كلام الباري"
+
+#: core/models.py:69 users/models.py:43
+msgid "Reciter"
+msgstr "القارئ"
+
+#: core/models.py:70
+msgid "Reciters"
+msgstr "القراء"
+
+#: landing/admin.py:26
+msgid "Footer main block"
+msgstr "الكتلة الرئيسية للتذييل"
+
+#: landing/admin.py:27
+msgid "Copyright"
+msgstr "حقوق النشر"
+
+#: landing/models.py:7
+msgid "Site name (Arabic)"
+msgstr "اسم الموقع (عربي)"
+
+#: landing/models.py:8
+msgid "Site name (English)"
+msgstr "اسم الموقع (إنجليزي)"
+
+#: landing/models.py:9 landing/models.py:182
+msgid "Logo"
+msgstr "الشعار"
+
+#: landing/models.py:10
+msgid "Logo (dark)"
+msgstr "الشعار (داكن)"
+
+#: landing/models.py:11
+msgid "Favicon"
+msgstr "أيقونة المفضلة"
+
+#: landing/models.py:14
+msgid "Footer title (Arabic)"
+msgstr "عنوان التذييل (عربي)"
+
+#: landing/models.py:15
+msgid "Footer title (English)"
+msgstr "عنوان التذييل (إنجليزي)"
+
+#: landing/models.py:16
+msgid "Footer description (Arabic)"
+msgstr "وصف التذييل (عربي)"
+
+#: landing/models.py:17
+msgid "Footer description (English)"
+msgstr "وصف التذييل (إنجليزي)"
+
+#: landing/models.py:18
+msgid "Footer button (Arabic)"
+msgstr "زر التذييل (عربي)"
+
+#: landing/models.py:19
+msgid "Footer button (English)"
+msgstr "زر التذييل (إنجليزي)"
+
+#: landing/models.py:20
+msgid "Footer button URL"
+msgstr "رابط زر التذييل"
+
+#: landing/models.py:23
+msgid "Copyright (Arabic)"
+msgstr "حقوق النشر (عربي)"
+
+#: landing/models.py:24
+msgid "Copyright (English)"
+msgstr "حقوق النشر (إنجليزي)"
+
+#: landing/models.py:27 landing/models.py:28
+msgid "Site settings"
+msgstr "إعدادات الموقع"
+
+#: landing/models.py:42
+msgid "Welcome"
+msgstr "الترحيب"
+
+#: landing/models.py:43 landing/models.py:129
+msgid "Services"
+msgstr "الخدمات"
+
+#: landing/models.py:44
+msgid "Blog"
+msgstr "المدونة"
+
+#: landing/models.py:45 landing/models.py:189
+msgid "Clients"
+msgstr "العملاء"
+
+#: landing/models.py:46
+msgid "Team"
+msgstr "الفريق"
+
+#: landing/models.py:49 landing/models.py:93
+msgid "Heading (Arabic)"
+msgstr "العنوان (عربي)"
+
+#: landing/models.py:50 landing/models.py:94
+msgid "Heading (English)"
+msgstr "العنوان (إنجليزي)"
+
+#: landing/models.py:51
+msgid "Lead / subtitle (Arabic)"
+msgstr "المقدمة / العنوان الفرعي (عربي)"
+
+#: landing/models.py:52
+msgid "Lead / subtitle (English)"
+msgstr "المقدمة / العنوان الفرعي (إنجليزي)"
+
+#: landing/models.py:55
+msgid "Section"
+msgstr "القسم"
+
+#: landing/models.py:56
+msgid "Sections"
+msgstr "الأقسام"
+
+#: landing/models.py:64 landing/models.py:119 landing/models.py:162
+msgid "Title (Arabic)"
+msgstr "العنوان (عربي)"
+
+#: landing/models.py:65 landing/models.py:120 landing/models.py:163
+msgid "Title (English)"
+msgstr "العنوان (إنجليزي)"
+
+#: landing/models.py:66
+msgid "Subtitle (Arabic)"
+msgstr "العنوان الفرعي (عربي)"
+
+#: landing/models.py:67
+msgid "Subtitle (English)"
+msgstr "العنوان الفرعي (إنجليزي)"
+
+#: landing/models.py:68
+msgid "Button text (Arabic)"
+msgstr "نص الزر (عربي)"
+
+#: landing/models.py:69
+msgid "Button text (English)"
+msgstr "نص الزر (إنجليزي)"
+
+#: landing/models.py:70
+msgid "Button link (URL or #anchor)"
+msgstr "رابط الزر (URL أو #anchor)"
+
+#: landing/models.py:73
+msgid "Video URL or path"
+msgstr "رابط أو مسار الفيديو"
+
+#: landing/models.py:76
+msgid "e.g. path under static like 'video/quran_video.mp4' or full URL"
+msgstr "مثال: مسار تحت static مثل 'video/quran_video.mp4' أو رابط كامل"
+
+#: landing/models.py:78
+msgid "Image (if no video)"
+msgstr "الصورة (إن لم يكن فيديو)"
+
+#: landing/models.py:79 landing/models.py:124 landing/models.py:146
+#: landing/models.py:168 landing/models.py:184 landing/models.py:205
+#: landing/models.py:221 landing/models.py:239
+msgid "Order"
+msgstr "الترتيب"
+
+#: landing/models.py:80
+msgid "Active"
+msgstr "نشط"
+
+#: landing/models.py:84
+msgid "Hero slide"
+msgstr "شريحة البطل"
+
+#: landing/models.py:85
+msgid "Hero slides"
+msgstr "شرائح البطل"
+
+#: landing/models.py:95
+msgid "Lead (Arabic)"
+msgstr "المقدمة (عربي)"
+
+#: landing/models.py:96
+msgid "Lead (English)"
+msgstr "المقدمة (إنجليزي)"
+
+#: landing/models.py:97 landing/models.py:159
+msgid "Image"
+msgstr "الصورة"
+
+#: landing/models.py:100 landing/models.py:101
+msgid "Welcome section"
+msgstr "قسم الترحيب"
+
+#: landing/models.py:115 landing/models.py:138
+msgid "Icon class (FontAwesome)"
+msgstr "فئة الأيقونة (FontAwesome)"
+
+#: landing/models.py:117
+msgid "e.g. fa fa-book, fa fa-clipboard-check"
+msgstr "مثال: fa fa-book, fa fa-clipboard-check"
+
+#: landing/models.py:121
+msgid "Description (Arabic)"
+msgstr "الوصف (عربي)"
+
+#: landing/models.py:122
+msgid "Description (English)"
+msgstr "الوصف (إنجليزي)"
+
+#: landing/models.py:123 landing/models.py:166 landing/models.py:183
+msgid "Link"
+msgstr "الرابط"
+
+#: landing/models.py:128
+msgid "Service"
+msgstr "الخدمة"
+
+#: landing/models.py:140
+msgid "e.g. fa fa-3x fa-book"
+msgstr "مثال: fa fa-3x fa-book"
+
+#: landing/models.py:142
+msgid "Animate from"
+msgstr "التحريك من"
+
+#: landing/models.py:143
+msgid "Value to display"
+msgstr "القيمة المعروضة"
+
+#: landing/models.py:144 landing/models.py:236
+msgid "Label (Arabic)"
+msgstr "التسمية (عربي)"
+
+#: landing/models.py:145 landing/models.py:237
+msgid "Label (English)"
+msgstr "التسمية (إنجليزي)"
+
+#: landing/models.py:150
+msgid "Stat counter"
+msgstr "عداد إحصائي"
+
+#: landing/models.py:151
+msgid "Stat counters"
+msgstr "عدادات إحصائية"
+
+#: landing/models.py:160
+msgid "Category (Arabic)"
+msgstr "الفئة (عربي)"
+
+#: landing/models.py:161
+msgid "Category (English)"
+msgstr "الفئة (إنجليزي)"
+
+#: landing/models.py:164
+msgid "Excerpt (Arabic)"
+msgstr "المقتطف (عربي)"
+
+#: landing/models.py:165
+msgid "Excerpt (English)"
+msgstr "المقتطف (إنجليزي)"
+
+#: landing/models.py:167
+msgid "Date"
+msgstr "التاريخ"
+
+#: landing/models.py:172
+msgid "Featured post"
+msgstr "مقال مميز"
+
+#: landing/models.py:173
+msgid "Featured posts"
+msgstr "مقالات مميزة"
+
+#: landing/models.py:181
+msgid "Name (alt text)"
+msgstr "الاسم (نص بديل)"
+
+#: landing/models.py:188
+msgid "Client"
+msgstr "العميل"
+
+#: landing/models.py:198
+msgid "Role / title"
+msgstr "الدور / المسمى"
+
+#: landing/models.py:199
+msgid "Short bio"
+msgstr "نبذة قصيرة"
+
+#: landing/models.py:200
+msgid "Photo"
+msgstr "الصورة"
+
+#: landing/models.py:201
+msgid "Facebook"
+msgstr "فيسبوك"
+
+#: landing/models.py:202
+msgid "Twitter"
+msgstr "تويتر"
+
+#: landing/models.py:203
+msgid "Instagram"
+msgstr "إنستغرام"
+
+#: landing/models.py:204
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#: landing/models.py:209
+msgid "Team member"
+msgstr "عضو الفريق"
+
+#: landing/models.py:210
+msgid "Team members"
+msgstr "أعضاء الفريق"
+
+#: landing/models.py:218
+msgid "Column title (legacy)"
+msgstr "عنوان العمود (قديم)"
+
+#: landing/models.py:218 landing/models.py:235
+msgid "Fallback if Arabic/English not set"
+msgstr "احتياطي إذا لم يُضبط العربي/الإنجليزي"
+
+#: landing/models.py:219
+msgid "Column title (Arabic)"
+msgstr "عنوان العمود (عربي)"
+
+#: landing/models.py:220
+msgid "Column title (English)"
+msgstr "عنوان العمود (إنجليزي)"
+
+#: landing/models.py:225 landing/models.py:229
+msgid "Footer column"
+msgstr "عمود التذييل"
+
+#: landing/models.py:226
+msgid "Footer columns"
+msgstr "أعمدة التذييل"
+
+#: landing/models.py:235
+msgid "Label (legacy)"
+msgstr "التسمية (قديم)"
+
+#: landing/models.py:238
+msgid "URL"
+msgstr "الرابط"
+
+#: landing/models.py:243
+msgid "Footer link"
+msgstr "رابط التذييل"
+
+#: landing/models.py:244
+msgid "Footer links"
+msgstr "روابط التذييل"
+
+#: users/admin.py:18
+msgid "Personal info"
+msgstr "المعلومات الشخصية"
+
+#: users/admin.py:20
+msgid "Role & permissions"
+msgstr "الدور والصلاحيات"
+
+#: users/admin.py:24
+msgid ""
+"User type: Admin (full access), Staff (manage via groups above), Reciter "
+"(limited)."
+msgstr "نوع المستخدم: مدير (صلاحية كاملة)، موظف (إدارة عبر المجموعات أعلاه)، قارئ (محدود)."
+
+#: users/admin.py:28
+msgid "Important dates"
+msgstr "التواريخ المهمة"
+
+#: users/models.py:41
+msgid "Admin"
+msgstr "مدير"
+
+#: users/models.py:42
+msgid "Staff"
+msgstr "موظف"
+
+#: users/models.py:45
+msgid "email address"
+msgstr "البريد الإلكتروني"
+
+#: users/models.py:58
+msgid "user"
+msgstr "مستخدم"
+
+#: users/models.py:59
+msgid "users"
+msgstr "المستخدمون"

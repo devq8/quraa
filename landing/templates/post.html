@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link rel="icon" type="image/png" href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'images/favicon.png' %}{% endif %}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% if site_settings %}{{ site_settings.site_name_en }}{% else %}Quraa{% endif %} | {{ post.title_ar|default:post.title_en }}</title>
+    <meta name="description" content="{{ post.excerpt_ar|striptags|truncatewords:30|default:post.excerpt_en|striptags|truncatewords:30 }}">
+    <script>
+    (function(){
+        var lang = localStorage.getItem('quraa-lang') || 'ar';
+        var d = document.documentElement;
+        d.setAttribute('lang', lang);
+        d.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        window.quraaLang = lang;
+        if (lang === 'ar') {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '{% static "css/rtl.css" %}';
+            document.head.appendChild(link);
+        }
+    })();
+    </script>
+    <link href="{% static 'css/plugins.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        .btn-primary, .btn-inverted:hover, a.btn-primary, a.btn-inverted:hover { background-color: #c4a574 !important; border-color: #c4a574 !important; }
+        .btn-primary:hover, .btn-inverted, a.btn-primary:hover, a.btn-inverted { background-color: #a68b5c !important; border-color: #a68b5c !important; }
+        #scrollTop:after, #scrollTop:hover:after { background-color: #c4a574 !important; }
+        #header #mainMenu nav > ul > li:hover > a, #header #mainMenu nav > ul > li.hover-active > a, #header #mainMenu nav > ul > li.current > a { color: #c4a574 !important; }
+        #header #mainMenu nav > ul > li .dropdown-menu > li > a:hover { color: #c4a574 !important; }
+        #header .header-extras .p-dropdown > a:hover, #header .header-extras .p-dropdown > a:hover i { color: #c4a574 !important; }
+    </style>
+</head>
+
+<body>
+    <div class="body-inner">
+        <!-- Header -->
+        <header id="header" data-transparent="true" data-fullwidth="true" class="dark submenu-light">
+            <div class="header-inner">
+                <div class="container">
+                    <div id="logo">
+                        <a href="/">
+                            <img class="logo-default" src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'images/old_book_logo.png' %}{% endif %}" alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}">
+                            <img class="logo-dark" src="{% if site_settings.logo_dark %}{{ site_settings.logo_dark.url }}{% elif site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'images/old_book_logo.png' %}{% endif %}" alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}">
+                        </a>
+                    </div>
+                    <div id="search"><a id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i class="icon-x"></i></a>
+                        <form class="search-form" action="#" method="get">
+                            <input class="form-control" name="q" type="text" placeholder="" data-ar-placeholder="ابحث..." data-en-placeholder="Type & Search..." />
+                            <span class="text-muted" data-ar="ابدأ بالكتابة ثم اضغط Enter أو ESC للإغلاق" data-en="Start typing &amp; press &quot;Enter&quot; or &quot;ESC&quot; to close"></span>
+                        </form>
+                    </div>
+                    <div class="header-extras">
+                        <ul>
+                            <li><a id="btn-search" href="#"><i class="icon-search"></i></a></li>
+                            <li>
+                                <div class="p-dropdown">
+                                    <a href="#"><i class="icon-globe"></i><span id="lang-label" data-ar=" " data-en=" ">العربية</span></a>
+                                    <ul class="p-dropdown-content">
+                                        <li><a href="#" data-lang="ar">عربي</a></li>
+                                        <li><a href="#" data-lang="en">English</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="mainMenu-trigger">
+                        <a class="lines-button x"><span class="lines"></span></a>
+                    </div>
+                    <div id="mainMenu">
+                        <div class="container">
+                            <nav>
+                                <ul>
+                                    <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                                    <li class="dropdown"><a href="/#services" data-ar="خدماتنا" data-en="Services">خدماتنا</a></li>
+                                    <li class="dropdown current"><a href="/#blog-section" data-ar="المقالات" data-en="Blog">المقالات</a></li>
+                                    <li class="dropdown mega-menu-item"><a href="#" data-ar="إصداراتنا" data-en="Publications">إصداراتنا</a></li>
+                                    <li class="dropdown"><a href="/#welcome" data-ar="عن المركز" data-en="About Us">عن المركز</a></li>
+                                    <li><a href="{% url 'landing:contact_us' %}" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a></li>
+                                    {% if user.is_authenticated %}
+                                    {% if user.is_staff %}<li><a href="{% url 'admin:index' %}" data-ar="الإدارة" data-en="Admin">الإدارة</a></li>{% endif %}
+                                    <li><a href="{% url 'logout' %}" data-ar="تسجيل الخروج" data-en="Logout">تسجيل الخروج</a></li>
+                                    {% else %}
+                                    <li><a href="{% url 'login' %}" data-ar="حسابي" data-en="My Account">حسابي</a></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- end: Header -->
+        <!-- Page title -->
+        <section id="page-title" class="page-title-center text-light" {% if post.image %}data-bg-image="{{ post.image.url }}"{% else %}data-bg-parallax="{% static 'images/parallax/paper_texture.jpg' %}"{% endif %}>
+            <div class="bg-overlay"></div>
+            <div class="container">
+                <div class="page-title">
+                    {% if post.category_ar or post.category_en %}
+                    <span class="post-meta-category"><a href="/#blog-section" data-ar="{{ post.category_ar|default:post.category_en }}" data-en="{{ post.category_en|default:post.category_ar }}">{{ post.category_ar|default:post.category_en }}</a></span>
+                    {% endif %}
+                    <h1 data-ar="{{ post.title_ar }}" data-en="{{ post.title_en|default:post.title_ar }}">{{ post.title_ar }}</h1>
+                    {% if post.published_at %}
+                    <div class="small m-b-20">
+                        <span class="post-date-formatted" data-date="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"d M Y" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <!--
+                <div class="breadcrumb">
+                    <ul>
+                        <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                        <li><a href="/#blog-section" data-ar="المقالات" data-en="Blog">المقالات</a></li>
+                        <li class="active"><span data-ar="{{ post.title_ar }}" data-en="{{ post.title_en|default:post.title_ar }}">{{ post.title_ar }}</span></li>
+                    </ul>
+                </div>
+                -->
+            </div>
+        </section>
+        <!-- end: Page title -->
+        <!-- Page Content -->
+        <section id="page-content" class="sidebar-right">
+            <div class="container">
+                <div id="blog" class="single-post col-lg-10 center">
+                    <div class="post-item">
+                        <div class="post-item-wrap">
+                            <!--
+                            {% if post.image %}
+                            <div class="post-image m-b-30">
+                                <img alt="{{ post.title_ar }}" src="{{ post.image.url }}" class="img-fluid">
+                            </div>
+                            {% endif %}
+                            -->
+                            <div class="post-item-description">
+                                <div class="post-content">
+                                    <span data-ar="{{ post.excerpt_ar|striptags|escape }}" data-en="{{ post.excerpt_en|striptags|default:post.excerpt_ar|striptags|escape }}">{{ post.excerpt_ar|default:post.excerpt_en|linebreaks }}</span>
+                                </div>
+                            </div>
+                            <div class="post-navigation m-t-40">
+                                <a href="/#blog-section" class="btn btn-primary">
+                                    <i class="icon-chevron-right"></i>
+                                    <span data-ar="العودة للمقالات" data-en="Back to Blog">العودة للمقالات</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- end: Page Content -->
+        <!-- Footer -->
+        <footer id="footer">
+            <div class="footer-content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="widget">
+                                <div class="widget-title" data-ar="{% if site_settings %}{{ site_settings.footer_title_ar|default:site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_title_en|default:site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}">{% if site_settings and site_settings.footer_title_ar %}{{ site_settings.footer_title_ar }}{% elif site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}</div>
+                                <p class="mb-5" data-ar="{% if site_settings %}{{ site_settings.footer_description_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_description_en }}{% else %}We are dedicated to the heritage of the people of the Qur'an{% endif %}">{% if site_settings %}{{ site_settings.footer_description_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}</p>
+                                <a href="{% if site_settings and site_settings.footer_button_link %}{{ site_settings.footer_button_link }}{% else %}#{% endif %}" class="btn btn-inverted" target="_blank" data-ar="{% if site_settings %}{{ site_settings.footer_button_text_ar }}{% else %}سجّل الآن{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_button_text_en }}{% else %}Register Now{% endif %}">{% if site_settings %}{{ site_settings.footer_button_text_ar }}{% else %}سجّل الآن{% endif %}</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="row">
+                                {% for column in footer_columns %}
+                                <div class="col-lg-3">
+                                    <div class="widget">
+                                        <div class="widget-title" data-ar="{% firstof column.title_ar column.title %}" data-en="{% firstof column.title_en column.title %}">{% firstof column.title_ar column.title %}</div>
+                                        <ul class="list">
+                                            {% for link in column.links.all %}
+                                            <li><a href="{% if link.url %}{{ link.url }}{% else %}#{% endif %}" data-ar="{% firstof link.label_ar link.label %}" data-en="{% firstof link.label_en link.label %}">{% firstof link.label_ar link.label %}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-lg-3"><div class="widget"><div class="widget-title" data-ar="اكتشف" data-en="Discover">اكتشف</div><ul class="list"><li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li><li><a href="{% url 'landing:contact_us' %}" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a></li></ul></div></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright-content">
+                <div class="container">
+                    <div class="copyright-text text-center">© <span id="copyright-year"></span> <span data-ar="{% if site_settings %}{{ site_settings.copyright_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.{% endif %}" data-en="{% if site_settings %}{{ site_settings.copyright_en }}{% else %}The International Center for the History and Documentation of Quran Reciters. All rights reserved.{% endif %}">{% if site_settings %}{{ site_settings.copyright_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.{% endif %}</span></div>
+                </div>
+            </div>
+        </footer>
+        <!-- end: Footer -->
+    </div>
+    <!-- end: Body Inner -->
+    <a id="scrollTop"><i class="icon-chevron-up"></i><i class="icon-chevron-up"></i></a>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <script src="{% static 'js/functions.js' %}"></script>
+    <script>
+    (function() {
+        var lang = window.quraaLang || 'ar';
+        var attr = lang === 'ar' ? 'data-ar' : 'data-en';
+        var placeholderAttr = lang === 'ar' ? 'data-ar-placeholder' : 'data-en-placeholder';
+
+        function applyLanguage() {
+            document.querySelectorAll('[' + attr + ']').forEach(function(el) {
+                var val = el.getAttribute(attr);
+                if (val !== null && val !== '') el.textContent = val;
+            });
+            document.querySelectorAll('[' + placeholderAttr + ']').forEach(function(el) {
+                var val = el.getAttribute(placeholderAttr);
+                if (val !== null) el.placeholder = val;
+            });
+            document.querySelectorAll('.post-date-formatted').forEach(function(el) {
+                var dateStr = el.getAttribute('data-date');
+                if (dateStr) {
+                    var d = new Date(dateStr);
+                    if (!isNaN(d.getTime())) {
+                        var opts = lang === 'ar' ? { year: 'numeric', month: 'long', day: 'numeric' } : { year: 'numeric', month: 'short', day: 'numeric' };
+                        el.textContent = d.toLocaleDateString(lang === 'ar' ? 'ar' : 'en-US', opts);
+                    }
+                }
+            });
+        }
+
+        applyLanguage();
+
+        var yearEl = document.getElementById('copyright-year');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+        document.querySelectorAll('[data-lang]').forEach(function(a) {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                var newLang = this.getAttribute('data-lang');
+                if (newLang && newLang !== lang) {
+                    localStorage.setItem('quraa-lang', newLang);
+                    window.location.reload();
+                }
+            });
+        });
+    })();
+    </script>
+</body>
+
+</html>

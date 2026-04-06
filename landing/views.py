@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from .models import (
     Client,
@@ -47,4 +47,30 @@ def landing(request):
         "team_members": team_members,
         "footer_columns": footer_columns,
     }
-    return render(request, "landing/landing.html", context)
+    return render(request, "landing.html", context)
+
+
+def contact_us(request):
+    """Contact us page."""
+    site_settings = SiteSettings.objects.first()
+    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
+    context = {
+        "site_settings": site_settings,
+        "footer_columns": footer_columns,
+        "user": request.user,
+    }
+    return render(request, "contact-us.html", context)
+
+
+def post_detail(request, pk):
+    """Single featured post page (FeaturedPost by pk)."""
+    post = get_object_or_404(FeaturedPost, pk=pk)
+    site_settings = SiteSettings.objects.first()
+    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
+    context = {
+        "post": post,
+        "site_settings": site_settings,
+        "footer_columns": footer_columns,
+        "user": request.user,
+    }
+    return render(request, "post.html", context)
