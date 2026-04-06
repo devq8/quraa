@@ -1,27 +1,5 @@
-<<<<<<< HEAD
 asgiref==3.11.1
 Django==6.0.2
-gunicorn==25.3.0
-mysqlclient==2.2.8
-packaging==26.0
 pillow==12.1.1
 python-dotenv==1.2.2
 sqlparse==0.5.5
-=======
-asgiref==3.6.0
-certifi==2022.9.24
-charset-normalizer==2.1.1
-distlib==0.3.6
-Django==4.1.4
-django-environ==0.10.0
-filelock==3.8.0
-idna==3.4
-pipenv==2022.10.9
-platformdirs==2.5.2
-python-dotenv==1.2.2
-requests==2.28.1
-sqlparse==0.4.3
-urllib3==1.26.12
-virtualenv==20.16.5
-virtualenv-clone==0.5.7
->>>>>>> 731eeb3e70d72f61c23b4c0bfddd32bbc830114f
