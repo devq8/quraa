@@ -1,0 +1,27 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block object-tools %}
+{{ block.super }}
+{% if original and esnad_templates %}
+<div class="module" style="margin-bottom:1em;padding:1em;background:#f9f9f9;border:1px solid #ddd;clear:both;">
+  <h2 style="margin:0 0 .6em">{% trans "Load from Template" %}</h2>
+  <form method="post" action="{% url 'admin:core_esnad_apply_template' original.pk %}">
+    {% csrf_token %}
+    <p>
+      <select name="template_id" style="margin-inline-end:.6em;min-width:200px;">
+        <option value="">— {% trans "Select a template" %} —</option>
+        {% for tmpl in esnad_templates %}
+        <option value="{{ tmpl.pk }}">{{ tmpl }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="button"
+        onclick="return confirm('{% trans "This will replace the current chain with the selected template. Continue?" %}')">
+        {% trans "Apply" %}
+      </button>
+    </p>
+    <p class="help">{% trans "The holder biography is automatically excluded if present in the template." %}</p>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

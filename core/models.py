@@ -1,74 +1,378 @@
+import math
+
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 
 
-class Reciter(models.Model):
-    """
-    Scholar/reciter (قارئ) — represents a Quran recitation scholar with biography,
-    teachers, readings, students, and authored works.
-    """
-    name = models.CharField(_("Name"), max_length=255)
-    title = models.CharField(
-        _("Title"),
-        max_length=500,
-        blank=True,
-        help_text=_("e.g. علاَّمة كبير، إمام في القراءات بلا نظير"),
-    )
-    birth_year = models.PositiveIntegerField(_("Birth year"), null=True, blank=True)
-    birthplace = models.CharField(_("Birthplace"), max_length=255, blank=True)
-    hometown = models.CharField(_("Home town"), max_length=255, blank=True)
-    school = models.CharField(_("School"), max_length=255, blank=True)
+class Biography(models.Model):
+    full_name_ar = models.CharField(_("Full Name (Arabic)"), max_length=300)
+    full_name_en = models.CharField(_("Full Name (English)"), max_length=300, blank=True)
+    alias_ar = models.CharField(_("Alias (Arabic)"), max_length=255, blank=True)
+    alias_en = models.CharField(_("Alias (English)"), max_length=255, blank=True)
 
-    # Comma-separated in CSV; stored as text for flexibility
-    teachers = models.TextField(
-        _("Teachers"),
-        blank=True,
-        help_text=_("Comma-separated list of teachers."),
+    birthplace = models.ForeignKey(
+        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="birthplace"
     )
-    readings = models.TextField(
-        _("Readings"),
-        blank=True,
-        help_text=_("e.g. القراءات العشر الصغرى والكبرى، القراءات الشاذة"),
+    birth_hijri_year = models.PositiveIntegerField(_("Birth Year (Hijri)"), null=True, blank=True)
+    birth_hijri_month = models.PositiveSmallIntegerField(_("Birth Month (Hijri)"), null=True, blank=True)
+    birth_hijri_day = models.PositiveSmallIntegerField(_("Birth Day (Hijri)"), null=True, blank=True)
+    birth_greg_year = models.PositiveIntegerField(_("Birth Year (Gregorian)"), null=True, blank=True)
+    birth_greg_month = models.PositiveSmallIntegerField(_("Birth Month (Gregorian)"), null=True, blank=True)
+    birth_greg_day = models.PositiveSmallIntegerField(_("Birth Day (Gregorian)"), null=True, blank=True)
+    birth_date_approximate = models.BooleanField(_("Birth Date Approximate"), default=False)
+
+    hometown = models.ForeignKey(
+        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="hometown"
     )
-    path = models.TextField(
-        _("Path"),
-        blank=True,
-        help_text=_("e.g. الشاطبية، الدرة، طيبة النشر"),
+    death_location = models.ForeignKey(
+        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="death_location"
     )
-    location_of_reading = models.CharField(
-        _("Location of reading"),
-        max_length=255,
+    death_hijri_year = models.PositiveIntegerField(_("Death Year (Hijri)"), null=True, blank=True)
+    death_hijri_month = models.PositiveSmallIntegerField(_("Death Month (Hijri)"), null=True, blank=True)
+    death_hijri_day = models.PositiveSmallIntegerField(_("Death Day (Hijri)"), null=True, blank=True)
+    death_greg_year = models.PositiveIntegerField(_("Death Year (Gregorian)"), null=True, blank=True)
+    death_greg_month = models.PositiveSmallIntegerField(_("Death Month (Gregorian)"), null=True, blank=True)
+    death_greg_day = models.PositiveSmallIntegerField(_("Death Day (Gregorian)"), null=True, blank=True)
+    death_date_approximate = models.BooleanField(_("Death Date Approximate"), default=False)
+
+    attributes = models.ManyToManyField("Attribute", blank=True, related_name="biographies")
+    teachers = models.ManyToManyField(
+        "self",
+        through="TeacherStudentRelationship",
+        symmetrical=False,
         blank=True,
-        help_text=_("e.g. الأزهر، الجامعة الإسلامية بالمدينة، منزله"),
-    )
-    students = models.TextField(
-        _("Students"),
-        blank=True,
-        help_text=_("Comma-separated list of students."),
-    )
-    authored_books = models.TextField(
-        _("Authored books"),
-        blank=True,
-        help_text=_("e.g. تنقيح فتح الكريم، شرح تنقيح فتح الكريم، تحقيق عمدة العرفان"),
+        related_name="students",
     )
 
-    death_year = models.PositiveIntegerField(_("Death year"), null=True, blank=True)
-    age = models.PositiveIntegerField(_("Age (at death)"), null=True, blank=True)
-    death_location = models.CharField(_("Death location"), max_length=255, blank=True)
-    source = models.CharField(
-        _("Source"),
-        max_length=500,
-        blank=True,
-        help_text=_("Reference source, e.g. كتاب هداية القاري إلى تجويد كلام الباري"),
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name="submitted_biographies",
+    )
+    last_modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name="modified_biographies",
+    )
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name="biography",
     )
 
+    published = models.BooleanField(_("Published"), default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("Reciter")
-        verbose_name_plural = _("Reciters")
-        ordering = ["id", "name"]
+        verbose_name = _("Biography")
+        verbose_name_plural = _("Biographies")
+        ordering = ["id", "full_name_ar"]
 
     def __str__(self):
-        return self.name
+        lang = get_language()
+        if lang and lang.startswith("ar"):
+            return self.full_name_ar or self.full_name_en
+        return self.full_name_en or self.full_name_ar
+
+    def clean(self):
+        errors = {}
+        for prefix, label in (("birth", "Birth"), ("death", "Death")):
+            for cal, cal_label in (("hijri", "Hijri"), ("greg", "Gregorian")):
+                year = getattr(self, f"{prefix}_{cal}_year")
+                month = getattr(self, f"{prefix}_{cal}_month")
+                day = getattr(self, f"{prefix}_{cal}_day")
+                if day and not month:
+                    errors[f"{prefix}_{cal}_day"] = _(
+                        f"{label} {cal_label} day requires a month."
+                    )
+                if month and not year:
+                    errors[f"{prefix}_{cal}_month"] = _(
+                        f"{label} {cal_label} month requires a year."
+                    )
+        if errors:
+            raise ValidationError(errors)
+
+    def _fill_date(self, prefix):
+        """Convert whichever calendar was provided into the other one."""
+        from hijri_converter import Gregorian as HijriGregorian, Hijri
+
+        hY = getattr(self, f"{prefix}_hijri_year")
+        hM = getattr(self, f"{prefix}_hijri_month")
+        hD = getattr(self, f"{prefix}_hijri_day")
+        gY = getattr(self, f"{prefix}_greg_year")
+        gM = getattr(self, f"{prefix}_greg_month")
+        gD = getattr(self, f"{prefix}_greg_day")
+
+        # Both calendars already have a year — nothing to derive.
+        if hY and gY:
+            return
+
+        if hY and hM and hD and not gY:
+            # Full Hijri date → precise Gregorian
+            g = Hijri(hY, hM, hD).to_gregorian()
+            setattr(self, f"{prefix}_greg_year", g.year)
+            setattr(self, f"{prefix}_greg_month", g.month)
+            setattr(self, f"{prefix}_greg_day", g.day)
+            setattr(self, f"{prefix}_date_approximate", False)
+
+        elif gY and gM and gD and not hY:
+            # Full Gregorian date → precise Hijri
+            h = HijriGregorian(gY, gM, gD).to_hijri()
+            setattr(self, f"{prefix}_hijri_year", h.year)
+            setattr(self, f"{prefix}_hijri_month", h.month)
+            setattr(self, f"{prefix}_hijri_day", h.day)
+            setattr(self, f"{prefix}_date_approximate", False)
+
+        elif hY and hM and not hD and not gY:
+            # Hijri year + month → approximate Gregorian year + month (via 1st of month)
+            g = Hijri(hY, hM, 1).to_gregorian()
+            setattr(self, f"{prefix}_greg_year", g.year)
+            setattr(self, f"{prefix}_greg_month", g.month)
+            setattr(self, f"{prefix}_date_approximate", True)
+
+        elif gY and gM and not gD and not hY:
+            # Gregorian year + month → approximate Hijri year + month (via 1st of month)
+            h = HijriGregorian(gY, gM, 1).to_hijri()
+            setattr(self, f"{prefix}_hijri_year", h.year)
+            setattr(self, f"{prefix}_hijri_month", h.month)
+            setattr(self, f"{prefix}_date_approximate", True)
+
+        elif hY and not gY:
+            # Hijri year only → approximate Gregorian year
+            setattr(self, f"{prefix}_greg_year", hY + 622 - math.floor(hY / 33))
+            setattr(self, f"{prefix}_date_approximate", True)
+
+        elif gY and not hY:
+            # Gregorian year only → approximate Hijri year
+            setattr(self, f"{prefix}_hijri_year", gY - 622 + math.floor((gY - 622) / 32))
+            setattr(self, f"{prefix}_date_approximate", True)
+
+    def save(self, *args, **kwargs):
+        self._fill_date("birth")
+        self._fill_date("death")
+        super().save(*args, **kwargs)
+
+
+class Location(models.Model):
+    city_ar = models.CharField(_("City (Arabic)"), max_length=255)
+    city_en = models.CharField(_("City (English)"), max_length=255, blank=True)
+    country_ar = models.CharField(_("Country (Arabic)"), max_length=255, unique=True)
+    country_en = models.CharField(_("Country (English)"), max_length=255, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        lang = get_language()
+        if lang and lang.startswith("ar"):
+            return f"{self.city_ar} - {self.country_ar}"
+        city = self.city_en or self.city_ar
+        country = self.country_en or self.country_ar
+        return f"{city} - {country}"
+
+    class Meta:
+        verbose_name = _("Location")
+        verbose_name_plural = _("Locations")
+        ordering = ["id", "country_ar", "city_ar"]
+
+
+# صفات وتصنيفات مثل ١٠ك (القراءات العشر الكبرى) ، ١٠ص (القراءات العشر الصغرى) ... إلخ
+class Attribute(models.Model):
+    short_name_ar = models.CharField(_("Short Name (Arabic)"), max_length=255)
+    short_name_en = models.CharField(_("Short Name (English)"), max_length=255, blank=True)
+    long_name_ar = models.CharField(_("Long Name (Arabic)"), max_length=255)
+    long_name_en = models.CharField(_("Long Name (English)"), max_length=255, blank=True)
+    description_ar = models.TextField(_("Description (Arabic)"), blank=True)
+    description_en = models.TextField(_("Description (English)"), blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        lang = get_language()
+        if lang and lang.startswith("ar"):
+            return self.short_name_ar or self.short_name_en
+        return self.short_name_en or self.short_name_ar
+
+    class Meta:
+        verbose_name = _("Attribute")
+        verbose_name_plural = _("Attributes")
+        ordering = ["id", "short_name_ar"]
+
+
+class Source(models.Model):
+    biography = models.ForeignKey(
+        "Biography", on_delete=models.CASCADE, related_name="sources", verbose_name=_("Biography")
+    )
+    name_ar = models.CharField(_("Name (Arabic)"), max_length=500)
+    name_en = models.CharField(_("Name (English)"), max_length=500, blank=True)
+    link = models.URLField(_("Link"), blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        lang = get_language()
+        if lang and lang.startswith("ar"):
+            return self.name_ar or self.name_en
+        return self.name_en or self.name_ar
+
+    class Meta:
+        verbose_name = _("Source")
+        verbose_name_plural = _("Sources")
+        ordering = ["biography", "id"]
+
+
+class EsnadTemplate(models.Model):
+    name_ar = models.CharField(_("Name (Arabic)"), max_length=500)
+    name_en = models.CharField(_("Name (English)"), max_length=500, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Esnad Template")
+        verbose_name_plural = _("Esnad Templates")
+        ordering = ["name_ar"]
+
+    def __str__(self):
+        lang = get_language()
+        if lang and lang.startswith("ar"):
+            return self.name_ar or self.name_en
+        return self.name_en or self.name_ar
+
+
+class EsnadTemplateLink(models.Model):
+    template = models.ForeignKey(
+        "EsnadTemplate",
+        on_delete=models.CASCADE,
+        related_name="links",
+        verbose_name=_("Template"),
+    )
+    narrator = models.ForeignKey(
+        "Biography",
+        on_delete=models.CASCADE,
+        related_name="template_appearances",
+        verbose_name=_("Narrator"),
+    )
+    order = models.PositiveSmallIntegerField(_("Order"))
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = [("template", "order"), ("template", "narrator")]
+        verbose_name = _("Template Link")
+        verbose_name_plural = _("Template Links")
+        ordering = ["template", "order"]
+
+    def __str__(self):
+        return f"{self.template} → [{self.order}] {self.narrator}"
+
+
+class Esnad(models.Model):
+    biography = models.ForeignKey(
+        "Biography",
+        on_delete=models.CASCADE,
+        related_name="esnads",
+        verbose_name=_("Biography"),
+    )
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Esnad")
+        verbose_name_plural = _("Asanid")
+        ordering = ["biography", "id"]
+
+    def __str__(self):
+        return f"{self.biography} #{self.pk}"
+
+    def chain_display(self):
+        lang = get_language()
+
+        def name(bio):
+            if lang and lang.startswith("ar"):
+                return bio.full_name_ar or bio.full_name_en
+            return bio.full_name_en or bio.full_name_ar
+
+        parts = [name(self.biography)]
+        for link in self.links.select_related("narrator").order_by("order"):
+            parts.append(f"{link.order} {name(link.narrator)}")
+        return " ← ".join(parts)
+
+
+class EsnadLink(models.Model):
+    esnad = models.ForeignKey(
+        "Esnad",
+        on_delete=models.CASCADE,
+        related_name="links",
+        verbose_name=_("Esnad"),
+    )
+    narrator = models.ForeignKey(
+        "Biography",
+        on_delete=models.CASCADE,
+        related_name="esnad_appearances",
+        verbose_name=_("Narrator"),
+    )
+    order = models.PositiveSmallIntegerField(_("Order"))
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = [("esnad", "order"), ("esnad", "narrator")]
+        verbose_name = _("Esnad Link")
+        verbose_name_plural = _("Esnad Links")
+        ordering = ["esnad", "order"]
+
+    def clean(self):
+        if not self.esnad_id or not self.narrator_id:
+            return
+        holder_id = Esnad.objects.values_list("biography_id", flat=True).get(pk=self.esnad_id)
+        if self.narrator_id == holder_id:
+            raise ValidationError(
+                {"narrator": _("The holder of this Esnad cannot appear as a narrator in their own chain.")}
+            )
+        if (
+            EsnadLink.objects.filter(esnad_id=self.esnad_id, narrator_id=self.narrator_id)
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                {"narrator": _("This narrator already appears in this chain.")}
+            )
+
+    def __str__(self):
+        return f"{self.esnad} → [{self.order}] {self.narrator}"
+
+
+class TeacherStudentRelationship(models.Model):
+    teacher = models.ForeignKey(
+        "Biography",
+        on_delete=models.CASCADE,
+        related_name="student_relationships",
+        verbose_name=_("Teacher"),
+    )
+    student = models.ForeignKey(
+        "Biography",
+        on_delete=models.CASCADE,
+        related_name="teacher_relationships",
+        verbose_name=_("Student"),
+    )
+    notes_ar = models.CharField(_("Notes (Arabic)"), max_length=500, blank=True)
+    notes_en = models.CharField(_("Notes (English)"), max_length=500, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("teacher", "student")
+        verbose_name = _("Teacher-Student Relationship")
+        verbose_name_plural = _("Teacher-Student Relationships")
+        ordering = ["teacher", "student"]
+
+    def __str__(self):
+        return f"{self.teacher} → {self.student}"

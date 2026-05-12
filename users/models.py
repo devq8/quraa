@@ -40,13 +40,13 @@ class User(AbstractUser):
     class UserType(models.TextChoices):
         ADMIN = "admin", _("Admin")
         STAFF = "staff", _("Staff")
-        RECITER = "reciter", _("Reciter")
+        BIO = "biography", _("Biography")
 
     email = models.EmailField(_("email address"), unique=True)
     user_type = models.CharField(
         max_length=20,
         choices=UserType.choices,
-        default=UserType.RECITER,
+        default=UserType.BIO,
     )
 
     objects = UserManager()

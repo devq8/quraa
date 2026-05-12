@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block userlinks %}
+{% get_current_language as current_language %}
+{% get_available_languages as available_languages %}
+<span class="language-switcher">
+    <form action="{% url 'set_language' %}" method="post" id="lang-switch-form">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+        <select name="language" onchange="document.getElementById('lang-switch-form').submit()" title="{% trans 'Select language' %}">
+            {% for lang_code, lang_name in available_languages %}
+            <option value="{{ lang_code }}"{% if lang_code == current_language %} selected{% endif %}>{{ lang_name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</span>
+| {{ block.super }}
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .language-switcher {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .language-switcher form {
+        display: inline;
+        margin: 0;
+        padding: 0;
+    }
+    .language-switcher select {
+        background: #205067;
+        border: 1px solid #2d6b8c;
+        border-radius: 3px;
+        color: #f5dd5d;
+        cursor: pointer;
+        font-size: 0.8125rem;
+        padding: 2px 4px;
+        vertical-align: middle;
+    }
+    .language-switcher select:hover,
+    .language-switcher select:focus {
+        background: #2d6b8c;
+        outline: none;
+    }
+    .language-switcher select option {
+        background: #205067;
+        color: #fff;
+    }
+</style>
+{% endblock %}

@@ -37,6 +37,7 @@ def admin_logout_redirect(request, extra_context=None):
 admin.site.logout = admin_logout_redirect
 
 urlpatterns = [
+    path("i18n/", include("django.conf.urls.i18n")),
     path("admin/", admin.site.urls),
     path("accounts/login/", core_views.login_view, name="login"),
     path("accounts/logout/", logout_redirect_landing, name="logout"),
