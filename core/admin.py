@@ -48,7 +48,7 @@ class StudentInline(nested_admin.NestedTabularInline):
 class EsnadLinkNestedInline(nested_admin.NestedTabularInline):
     model = EsnadLink
     extra = 0
-    fields = ("narrator",)
+    fields = ("narrator", "order")
     ordering = ("order",)
     sortable_field_name = "order"
     verbose_name = _("Narrator")
