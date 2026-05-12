@@ -309,6 +309,12 @@ select {
 	ICON BOX
 -------------------------------------------------------------------------*/
 
+.icon-box:not(.icon-box-right):not(.center):not(.text-center) > .icon {
+  position: absolute !important;
+  right: 0 !important;
+  left: auto !important;
+}
+
 /*small size*/
 .icon-box.small:not(.center)>h3,
 .icon-box.small:not(.center)>h4 {

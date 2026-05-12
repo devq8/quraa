@@ -113,45 +113,64 @@ class Biography(models.Model):
         if hY and gY:
             return
 
+        # hijri_converter only supports Hijri ~1356–1500 / Gregorian ~1937–2077.
+        # Outside that window the library raises OverflowError; fall back to the
+        # year-only linear approximation (and mark the date approximate).
+        def approx_greg_from_hijri():
+            setattr(self, f"{prefix}_greg_year", hY + 622 - math.floor(hY / 33))
+            setattr(self, f"{prefix}_greg_month", None)
+            setattr(self, f"{prefix}_greg_day", None)
+            setattr(self, f"{prefix}_date_approximate", True)
+
+        def approx_hijri_from_greg():
+            setattr(self, f"{prefix}_hijri_year", gY - 622 + math.floor((gY - 622) / 32))
+            setattr(self, f"{prefix}_hijri_month", None)
+            setattr(self, f"{prefix}_hijri_day", None)
+            setattr(self, f"{prefix}_date_approximate", True)
+
         if hY and hM and hD and not gY:
-            # Full Hijri date → precise Gregorian
-            g = Hijri(hY, hM, hD).to_gregorian()
-            setattr(self, f"{prefix}_greg_year", g.year)
-            setattr(self, f"{prefix}_greg_month", g.month)
-            setattr(self, f"{prefix}_greg_day", g.day)
-            setattr(self, f"{prefix}_date_approximate", False)
+            try:
+                g = Hijri(hY, hM, hD).to_gregorian()
+                setattr(self, f"{prefix}_greg_year", g.year)
+                setattr(self, f"{prefix}_greg_month", g.month)
+                setattr(self, f"{prefix}_greg_day", g.day)
+                setattr(self, f"{prefix}_date_approximate", False)
+            except (OverflowError, ValueError):
+                approx_greg_from_hijri()
 
         elif gY and gM and gD and not hY:
-            # Full Gregorian date → precise Hijri
-            h = HijriGregorian(gY, gM, gD).to_hijri()
-            setattr(self, f"{prefix}_hijri_year", h.year)
-            setattr(self, f"{prefix}_hijri_month", h.month)
-            setattr(self, f"{prefix}_hijri_day", h.day)
-            setattr(self, f"{prefix}_date_approximate", False)
+            try:
+                h = HijriGregorian(gY, gM, gD).to_hijri()
+                setattr(self, f"{prefix}_hijri_year", h.year)
+                setattr(self, f"{prefix}_hijri_month", h.month)
+                setattr(self, f"{prefix}_hijri_day", h.day)
+                setattr(self, f"{prefix}_date_approximate", False)
+            except (OverflowError, ValueError):
+                approx_hijri_from_greg()
 
         elif hY and hM and not hD and not gY:
-            # Hijri year + month → approximate Gregorian year + month (via 1st of month)
-            g = Hijri(hY, hM, 1).to_gregorian()
-            setattr(self, f"{prefix}_greg_year", g.year)
-            setattr(self, f"{prefix}_greg_month", g.month)
-            setattr(self, f"{prefix}_date_approximate", True)
+            try:
+                g = Hijri(hY, hM, 1).to_gregorian()
+                setattr(self, f"{prefix}_greg_year", g.year)
+                setattr(self, f"{prefix}_greg_month", g.month)
+                setattr(self, f"{prefix}_date_approximate", True)
+            except (OverflowError, ValueError):
+                approx_greg_from_hijri()
 
         elif gY and gM and not gD and not hY:
-            # Gregorian year + month → approximate Hijri year + month (via 1st of month)
-            h = HijriGregorian(gY, gM, 1).to_hijri()
-            setattr(self, f"{prefix}_hijri_year", h.year)
-            setattr(self, f"{prefix}_hijri_month", h.month)
-            setattr(self, f"{prefix}_date_approximate", True)
+            try:
+                h = HijriGregorian(gY, gM, 1).to_hijri()
+                setattr(self, f"{prefix}_hijri_year", h.year)
+                setattr(self, f"{prefix}_hijri_month", h.month)
+                setattr(self, f"{prefix}_date_approximate", True)
+            except (OverflowError, ValueError):
+                approx_hijri_from_greg()
 
         elif hY and not gY:
-            # Hijri year only → approximate Gregorian year
-            setattr(self, f"{prefix}_greg_year", hY + 622 - math.floor(hY / 33))
-            setattr(self, f"{prefix}_date_approximate", True)
+            approx_greg_from_hijri()
 
         elif gY and not hY:
-            # Gregorian year only → approximate Hijri year
-            setattr(self, f"{prefix}_hijri_year", gY - 622 + math.floor((gY - 622) / 32))
-            setattr(self, f"{prefix}_date_approximate", True)
+            approx_hijri_from_greg()
 
     def save(self, *args, **kwargs):
         self._fill_date("birth")
@@ -297,13 +316,27 @@ class Esnad(models.Model):
 
         def name(bio):
             if lang and lang.startswith("ar"):
-                return bio.full_name_ar or bio.full_name_en
-            return bio.full_name_en or bio.full_name_ar
+                return bio.alias_ar or bio.full_name_ar or bio.alias_en or bio.full_name_en
+            return bio.alias_en or bio.full_name_en or bio.alias_ar or bio.full_name_ar
 
         parts = [name(self.biography)]
         for link in self.links.select_related("narrator").order_by("order"):
             parts.append(f"{link.order} {name(link.narrator)}")
         return " ← ".join(parts)
+
+    @property
+    def terminal_link(self):
+        """Last EsnadLink in this chain (highest order), or None if the chain is empty."""
+        return (
+            self.links.select_related("narrator").order_by("-order").first()
+        )
+
+    @property
+    def isnad_rank(self):
+        """Length of this chain: the order of the last link (number of intermediaries
+        between the esnad holder and the terminal narrator). Returns None for empty chains."""
+        last = self.terminal_link
+        return last.order if last else None
 
 
 class EsnadLink(models.Model):
