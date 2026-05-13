@@ -360,7 +360,7 @@ class EsnadLink(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = [("esnad", "order"), ("esnad", "narrator")]
+        unique_together = [("esnad", "narrator")]
         verbose_name = _("Esnad Link")
         verbose_name_plural = _("Esnad Links")
         ordering = ["esnad", "order"]
@@ -383,7 +383,7 @@ class EsnadLink(models.Model):
             )
 
     def __str__(self):
-        return f"{self.esnad} → [{self.order}] {self.narrator}"
+        return f"[{self.order}] {self.narrator}"
 
 
 class TeacherStudentRelationship(models.Model):
