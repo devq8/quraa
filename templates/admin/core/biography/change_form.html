@@ -1,0 +1,54 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block after_related_objects %}
+{{ block.super }}
+
+{% if original and biography_esnads and esnad_templates %}
+<div class="module" style="margin:1em 0;padding:1em;background:#f9f9f9;border:1px solid #ddd;clear:both;">
+  <h2 style="margin:0 0 .6em">{% trans "Load from Template" %}</h2>
+  {% for esnad in biography_esnads %}
+  <form method="post" action="{% url 'admin:core_esnad_apply_template' esnad.pk %}" style="margin-bottom:.6em;">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <p style="margin:.2em 0;">
+      <strong>{% blocktrans with pk=esnad.pk %}Esnad #{{ pk }}{% endblocktrans %}:</strong>
+      <select name="template_id" style="margin-inline:.6em;min-width:200px;">
+        <option value="">— {% trans "Select a template" %} —</option>
+        {% for tmpl in esnad_templates %}
+        <option value="{{ tmpl.pk }}">{{ tmpl }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="button"
+        onclick="return confirm('{% trans "This will replace the current chain with the selected template. Continue?" %}')">
+        {% trans "Apply" %}
+      </button>
+    </p>
+  </form>
+  {% endfor %}
+  <p class="help">{% trans "The holder biography is automatically excluded if present in the template." %}</p>
+</div>
+{% endif %}
+
+{% if original %}
+<fieldset class="module aligned collapse">
+  <h2>{% trans "Audit" %}</h2>
+  <div class="form-row">
+    <div><label>{% trans "Submitted by" %}:</label>
+      <div class="readonly">{{ original.submitted_by|default:"—" }}</div></div>
+  </div>
+  <div class="form-row">
+    <div><label>{% trans "Last modified by" %}:</label>
+      <div class="readonly">{{ original.last_modified_by|default:"—" }}</div></div>
+  </div>
+  <div class="form-row">
+    <div><label>{% trans "Created" %}:</label>
+      <div class="readonly">{{ original.created }}</div></div>
+  </div>
+  <div class="form-row">
+    <div><label>{% trans "Updated" %}:</label>
+      <div class="readonly">{{ original.updated }}</div></div>
+  </div>
+</fieldset>
+{% endif %}
+{% endblock %}

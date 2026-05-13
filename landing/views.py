@@ -1,3 +1,6 @@
+from itertools import groupby
+
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
@@ -177,3 +180,71 @@ def biography_detail(request, pk):
         "user": request.user,
     }
     return render(request, "biography.html", context)
+
+
+def biographies_alphabetical(request):
+    """All published biographies sorted alphabetically by name."""
+    biographies = list(
+        Biography.objects.filter(published=True)
+        .select_related("hometown")
+        .order_by("full_name_ar", "full_name_en")
+    )
+    site_settings = SiteSettings.objects.first()
+    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
+    context = {
+        "biographies": biographies,
+        "site_settings": site_settings,
+        "footer_columns": footer_columns,
+        "user": request.user,
+    }
+    return render(request, "biographies-alphabetical.html", context)
+
+
+def biographies_by_city(request):
+    """Published biographies grouped by hometown city."""
+    qs = (
+        Biography.objects.filter(published=True)
+        .select_related("hometown")
+        .order_by("hometown__city_ar", "hometown__city_en", "full_name_ar")
+    )
+    groups = [
+        {"location": loc, "biographies": list(bios)}
+        for loc, bios in groupby(qs, key=lambda b: b.hometown)
+    ]
+    site_settings = SiteSettings.objects.first()
+    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
+    context = {
+        "groups": groups,
+        "site_settings": site_settings,
+        "footer_columns": footer_columns,
+        "user": request.user,
+    }
+    return render(request, "biographies-by-city.html", context)
+
+
+def search_results(request):
+    """Search published biographies by Arabic/English name and alias."""
+    query = (request.GET.get("q") or "").strip()
+    results = []
+    if query:
+        results = list(
+            Biography.objects.filter(published=True)
+            .filter(
+                Q(full_name_ar__icontains=query)
+                | Q(full_name_en__icontains=query)
+                | Q(alias_ar__icontains=query)
+                | Q(alias_en__icontains=query)
+            )
+            .select_related("hometown")
+            .order_by("full_name_ar")
+        )
+    site_settings = SiteSettings.objects.first()
+    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
+    context = {
+        "query": query,
+        "results": results,
+        "site_settings": site_settings,
+        "footer_columns": footer_columns,
+        "user": request.user,
+    }
+    return render(request, "search-results.html", context)

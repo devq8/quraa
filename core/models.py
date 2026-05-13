@@ -320,8 +320,11 @@ class Esnad(models.Model):
             return bio.alias_en or bio.full_name_en or bio.alias_ar or bio.full_name_ar
 
         parts = [name(self.biography)]
-        for link in self.links.select_related("narrator").order_by("order"):
+        links = list(self.links.select_related("narrator").order_by("order"))
+        for link in links[:-1]:
             parts.append(f"{link.order} {name(link.narrator)}")
+        if links:
+            parts.append(name(links[-1].narrator))
         return " ← ".join(parts)
 
     @property
@@ -333,10 +336,10 @@ class Esnad(models.Model):
 
     @property
     def isnad_rank(self):
-        """Length of this chain: the order of the last link (number of intermediaries
-        between the esnad holder and the terminal narrator). Returns None for empty chains."""
+        """Number of intermediary narrators between the esnad holder and the
+        terminal narrator, excluding both endpoints. Returns None for empty chains."""
         last = self.terminal_link
-        return last.order if last else None
+        return last.order - 1 if last else None
 
 
 class EsnadLink(models.Model):

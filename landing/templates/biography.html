@@ -124,7 +124,7 @@
                         </a>
                     </div>
                     <div id="search"><a id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i class="icon-x"></i></a>
-                        <form class="search-form" action="#" method="get">
+                        <form class="search-form" action="{% url 'landing:search_results' %}" method="get">
                             <input class="form-control" name="q" type="text" placeholder="" data-ar-placeholder="ابحث..." data-en-placeholder="Type & Search..." />
                             <span class="text-muted" data-ar="ابدأ بالكتابة ثم اضغط Enter أو ESC للإغلاق" data-en="Start typing &amp; press &quot;Enter&quot; or &quot;ESC&quot; to close"></span>
                         </form>
@@ -152,7 +152,12 @@
                                 <ul>
                                     <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
                                     <li class="dropdown"><a href="/#services" data-ar="خدماتنا" data-en="Services">خدماتنا</a></li>
-                                    <li class="dropdown current"><a href="#" data-ar="القراء" data-en="Reciters">القراء</a></li>
+                                    <li class="dropdown current"><a href="#" data-ar="التراجم" data-en="Biographies">التراجم</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="{% url 'landing:biographies_alphabetical' %}" data-ar="قائمة أبجدية" data-en="Alphabetical List">قائمة أبجدية</a></li>
+                                            <li><a href="{% url 'landing:biographies_by_city' %}" data-ar="حسب المدينة" data-en="By City">حسب المدينة</a></li>
+                                        </ul>
+                                    </li>
                                     <li class="dropdown"><a href="/#blog-section" data-ar="المقالات" data-en="Blog">المقالات</a></li>
                                     <li class="dropdown mega-menu-item"><a href="#" data-ar="إصداراتنا" data-en="Publications">إصداراتنا</a></li>
                                     <li class="dropdown"><a href="/#welcome" data-ar="عن المركز" data-en="About Us">عن المركز</a></li>
