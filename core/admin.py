@@ -8,7 +8,6 @@ from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
-
 from .models import (
     Attribute, Biography,
     Esnad, EsnadLink,
@@ -47,22 +46,19 @@ class StudentInline(nested_admin.NestedTabularInline):
     verbose_name_plural = _("Students")
 
 
-class EsnadLinkNestedInline(SortableInlineAdminMixin, nested_admin.NestedTabularInline):
+class EsnadLinkNestedInline(nested_admin.SortableHiddenMixin, nested_admin.NestedTabularInline):
     model = EsnadLink
     extra = 0
     fields = ("narrator", "order")
-    ordering = ("order",)
     sortable_field_name = "order"
+    autocomplete_fields = ("narrator",)
     verbose_name = _("Narrator")
     verbose_name_plural = _("Narrators")
 
-    class Media:
-        js = ("admin/js/esnadlink_dragnew.js",)
-
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        if db_field.name == "order":
-            kwargs["widget"] = forms.HiddenInput()
-        return super().formfield_for_dbfield(db_field, request, **kwargs)
+    # def formfield_for_dbfield(self, db_field, request, **kwargs):
+    #     if db_field.name == "order":
+    #         kwargs["widget"] = forms.HiddenInput()
+    #     return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "narrator":
@@ -97,7 +93,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         "birth_date_approximate",
         "death_date_approximate",
     )
-    inlines = [SourceInline, TeacherInline, StudentInline, EsnadInline]
+    inlines = [TeacherInline, StudentInline, EsnadInline, SourceInline]
     change_form_template = "admin/core/biography/change_form.html"
 
     def save_model(self, request, obj, form, change):
@@ -112,7 +108,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             extra_context["biography_esnads"] = (
                 Esnad.objects.filter(biography_id=object_id).order_by("id")
             )
-            extra_context["esnad_templates"] = EsnadTemplate.objects.all()
+            extra_context["esnad_templates"] = EsnadTemplate.objects.only("id", "name_ar", "name_en")
         return super().changeform_view(request, object_id, form_url, extra_context)
 
     fieldsets = (
@@ -175,66 +171,15 @@ class AttributeAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(TeacherStudentRelationship)
-class TeacherStudentRelationshipAdmin(admin.ModelAdmin):
-    list_display = ("id", "teacher", "student", "created")
-    list_filter = ()
-    search_fields = (
-        "teacher__full_name_ar", "teacher__full_name_en",
-        "student__full_name_ar", "student__full_name_en",
-    )
-    ordering = ("teacher", "student")
-    autocomplete_fields = ("teacher", "student")
-    readonly_fields = ("created", "updated")
-    fieldsets = (
-        (None, {
-            "fields": (
-                ("teacher", "student"),
-                ("notes_ar", "notes_en"),
-            ),
-        }),
-        (_("Audit"), {
-            "classes": ("collapse",),
-            "fields": ("created", "updated"),
-        }),
-    )
-
-
-@admin.register(Source)
-class SourceAdmin(admin.ModelAdmin):
-    list_display = ("id", "biography", "name_ar", "name_en", "link")
-    search_fields = (
-        "name_ar", "name_en",
-        "biography__full_name_ar", "biography__full_name_en",
-    )
-    autocomplete_fields = ("biography",)
-    readonly_fields = ("created", "updated")
-    fieldsets = (
-        (None, {
-            "fields": (
-                "biography",
-                ("name_ar", "name_en"),
-                "link",
-            ),
-        }),
-        (_("Audit"), {
-            "classes": ("collapse",),
-            "fields": ("created", "updated"),
-        }),
-    )
-
-
 class EsnadLinkInline(SortableInlineAdminMixin, admin.TabularInline):
     model = EsnadLink
     extra = 0
     fields = ("narrator", "order")
     ordering = ("order",)
     sortable_field_name = "order"
+    autocomplete_fields = ("narrator",)
     verbose_name = _("Narrator")
     verbose_name_plural = _("Narrators")
-
-    class Media:
-        js = ("admin/js/esnadlink_dragnew.js",)
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         if db_field.name == "order":
@@ -245,11 +190,14 @@ class EsnadLinkInline(SortableInlineAdminMixin, admin.TabularInline):
         if db_field.name == "narrator":
             esnad_id = request.resolver_match.kwargs.get("object_id")
             if esnad_id:
-                try:
-                    holder_id = Esnad.objects.values_list("biography_id", flat=True).get(pk=esnad_id)
+                holder_id = (
+                    Esnad.objects
+                    .filter(pk=esnad_id)
+                    .values_list("biography_id", flat=True)
+                    .first()
+                )
+                if holder_id:
                     kwargs["queryset"] = Biography.objects.exclude(pk=holder_id)
-                except Esnad.DoesNotExist:
-                    pass
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -279,10 +227,18 @@ class EsnadAdmin(SortableAdminBase, admin.ModelAdmin):
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         extra_context = extra_context or {}
-        extra_context["esnad_templates"] = EsnadTemplate.objects.all()
+        if object_id:
+            extra_context["esnad_templates"] = EsnadTemplate.objects.only("id", "name_ar", "name_en")
         return super().changeform_view(request, object_id, form_url, extra_context)
 
     def apply_template_view(self, request, object_id):
+        if request.method != "POST":
+            return HttpResponseRedirect(reverse("admin:core_esnad_change", args=[object_id]))
+
+        if not self.has_change_permission(request):
+            messages.error(request, _("You do not have permission to modify this Esnad."))
+            return HttpResponseRedirect(reverse("admin:core_esnad_changelist"))
+
         default_url = reverse("admin:core_esnad_change", args=[object_id])
         next_url = request.POST.get("next") or default_url
         if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
@@ -298,25 +254,31 @@ class EsnadAdmin(SortableAdminBase, admin.ModelAdmin):
             messages.warning(request, _("No template selected."))
             return HttpResponseRedirect(next_url)
 
-        template = EsnadTemplate.objects.filter(pk=template_id).prefetch_related(
-            models.Prefetch(
-                "links",
-                queryset=EsnadTemplateLink.objects.select_related("narrator").order_by("order"),
+        template = (
+            EsnadTemplate.objects
+            .filter(pk=template_id)
+            .prefetch_related(
+                models.Prefetch(
+                    "links",
+                    queryset=EsnadTemplateLink.objects.select_related("narrator").order_by("order"),
+                )
             )
-        ).first()
+            .first()
+        )
         if not template:
             messages.error(request, _("Template not found."))
             return HttpResponseRedirect(next_url)
 
-        links = [
-            link for link in template.links.all()
-            if link.narrator_id != esnad.biography_id
-        ]
-        EsnadLink.objects.filter(esnad=esnad).delete()
-        EsnadLink.objects.bulk_create([
-            EsnadLink(esnad=esnad, narrator=link.narrator, order=i)
-            for i, link in enumerate(links, start=1)
-        ])
+        links = [l for l in template.links.all() if l.narrator_id != esnad.biography_id]
+
+        from django.db import transaction
+        with transaction.atomic():
+            EsnadLink.objects.filter(esnad=esnad).delete()
+            EsnadLink.objects.bulk_create([
+                EsnadLink(esnad=esnad, narrator=link.narrator, order=i)
+                for i, link in enumerate(links, start=1)
+            ])
+
         messages.success(request, _('Template "%(name)s" applied.') % {"name": template})
         return HttpResponseRedirect(next_url)
 
@@ -340,12 +302,17 @@ class EsnadAdmin(SortableAdminBase, admin.ModelAdmin):
 class EsnadTemplateLinkInline(SortableInlineAdminMixin, admin.TabularInline):
     model = EsnadTemplateLink
     extra = 0
-    fields = ("narrator",)
+    fields = ("narrator", "order")
     autocomplete_fields = ("narrator",)
     ordering = ("order",)
+    sortable_field_name = "order"
     verbose_name = _("Narrator")
     verbose_name_plural = _("Narrators")
 
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == "order":
+            kwargs["widget"] = forms.HiddenInput()
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 @admin.register(EsnadTemplate)
 class EsnadTemplateAdmin(SortableAdminBase, admin.ModelAdmin):
