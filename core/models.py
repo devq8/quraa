@@ -13,7 +13,7 @@ class Biography(models.Model):
     alias_en = models.CharField(_("Alias (English)"), max_length=255, blank=True)
 
     birthplace = models.ForeignKey(
-        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="birthplace"
+        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="birthplace", verbose_name=_("Birthplace"),
     )
     birth_hijri_year = models.PositiveIntegerField(_("Birth Year (Hijri)"), null=True, blank=True)
     birth_hijri_month = models.PositiveSmallIntegerField(_("Birth Month (Hijri)"), null=True, blank=True)
@@ -24,10 +24,10 @@ class Biography(models.Model):
     birth_date_approximate = models.BooleanField(_("Birth Date Approximate"), default=False)
 
     hometown = models.ForeignKey(
-        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="hometown"
+        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="hometown", verbose_name=_("Hometown"),
     )
     death_location = models.ForeignKey(
-        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="death_location"
+        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="death_location", verbose_name=_("Death Location"),
     )
     death_hijri_year = models.PositiveIntegerField(_("Death Year (Hijri)"), null=True, blank=True)
     death_hijri_month = models.PositiveSmallIntegerField(_("Death Month (Hijri)"), null=True, blank=True)
@@ -37,7 +37,10 @@ class Biography(models.Model):
     death_greg_day = models.PositiveSmallIntegerField(_("Death Day (Gregorian)"), null=True, blank=True)
     death_date_approximate = models.BooleanField(_("Death Date Approximate"), default=False)
 
-    attributes = models.ManyToManyField("Attribute", blank=True, related_name="biographies")
+    attributes = models.ManyToManyField(
+        "Attribute", blank=True, related_name="biographies",
+        verbose_name=_("Attributes"),
+    )
     teachers = models.ManyToManyField(
         "self",
         through="TeacherStudentRelationship",
@@ -51,18 +54,21 @@ class Biography(models.Model):
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="submitted_biographies",
+        verbose_name=_("Submitted By"),
     )
     last_modified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="modified_biographies",
+        verbose_name=_("Last Modified By"),
     )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name="biography",
+        verbose_name=_("User Account"),
     )
 
     published = models.BooleanField(_("Published"), default=False)
@@ -82,25 +88,22 @@ class Biography(models.Model):
 
     def clean(self):
         errors = {}
-        for prefix, label in (("birth", "Birth"), ("death", "Death")):
-            for cal, cal_label in (("hijri", "Hijri"), ("greg", "Gregorian")):
+        for prefix, label in (("birth", _("Birth")), ("death", _("Death"))):
+            for cal, cal_label in (("hijri", _("Hijri")), ("greg", _("Gregorian"))):
                 year = getattr(self, f"{prefix}_{cal}_year")
                 month = getattr(self, f"{prefix}_{cal}_month")
                 day = getattr(self, f"{prefix}_{cal}_day")
                 if day and not month:
-                    errors[f"{prefix}_{cal}_day"] = _(
-                        f"{label} {cal_label} day requires a month."
-                    )
+                    errors[f"{prefix}_{cal}_day"] = _("%(label)s %(cal)s day requires a month.") % {"label": label, "cal": cal_label}
                 if month and not year:
-                    errors[f"{prefix}_{cal}_month"] = _(
-                        f"{label} {cal_label} month requires a year."
-                    )
+                    errors[f"{prefix}_{cal}_month"] = _("%(label)s %(cal)s month requires a year.") % {"label": label, "cal": cal_label}
+
         if errors:
             raise ValidationError(errors)
 
     def _fill_date(self, prefix):
         """Convert whichever calendar was provided into the other one."""
-        from hijri_converter import Gregorian as HijriGregorian, Hijri
+        from hijridate import Gregorian as HijriGregorian, Hijri
 
         hY = getattr(self, f"{prefix}_hijri_year")
         hM = getattr(self, f"{prefix}_hijri_month")
@@ -113,7 +116,7 @@ class Biography(models.Model):
         if hY and gY:
             return
 
-        # hijri_converter only supports Hijri ~1356–1500 / Gregorian ~1937–2077.
+        # hijridate only supports Hijri ~1356–1500 / Gregorian ~1937–2077.
         # Outside that window the library raises OverflowError; fall back to the
         # year-only linear approximation (and mark the date approximate).
         def approx_greg_from_hijri():
@@ -181,7 +184,7 @@ class Biography(models.Model):
 class Location(models.Model):
     city_ar = models.CharField(_("City (Arabic)"), max_length=255)
     city_en = models.CharField(_("City (English)"), max_length=255, blank=True)
-    country_ar = models.CharField(_("Country (Arabic)"), max_length=255, unique=True)
+    country_ar = models.CharField(_("Country (Arabic)"), max_length=255,)
     country_en = models.CharField(_("Country (English)"), max_length=255, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
@@ -199,6 +202,8 @@ class Location(models.Model):
         verbose_name = _("Location")
         verbose_name_plural = _("Locations")
         ordering = ["id", "country_ar", "city_ar"]
+        constraints = [ models.UniqueConstraint(fields=["country_ar", "city_ar"], name="unique_location_ar") ]
+
 
 
 # صفات وتصنيفات مثل ١٠ك (القراءات العشر الكبرى) ، ١٠ص (القراءات العشر الصغرى) ... إلخ
@@ -284,7 +289,9 @@ class EsnadTemplateLink(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = [("template", "order"), ("template", "narrator")]
+        constraints = [
+            models.UniqueConstraint(fields=["template", "narrator"], name="unique_template_narrator"),
+        ]
         verbose_name = _("Template Link")
         verbose_name_plural = _("Template Links")
         ordering = ["template", "order"]
@@ -300,6 +307,14 @@ class Esnad(models.Model):
         related_name="esnads",
         verbose_name=_("Biography"),
     )
+    narrators = models.ManyToManyField(
+        "Biography",
+        through="EsnadLink",
+        through_fields=("esnad", "narrator"),
+        related_name="esnads_as_narrator",   # different from EsnadLink.narrator's related_name
+        blank=True,
+        verbose_name=_("Narrators"),
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -307,9 +322,23 @@ class Esnad(models.Model):
         verbose_name = _("Esnad")
         verbose_name_plural = _("Asanid")
         ordering = ["biography", "id"]
-
+    @property
+    def isnad_rank(self):
+        """Number of intermediary narrators between the esnad holder and the
+        terminal narrator, excluding both endpoints. Returns None for empty chains."""
+        count = getattr(self, "_links_count", None)
+        if count is None:
+            count = self.links.count()
+        return count - 1 if count else None
+    
     def __str__(self):
-        return f"{self.biography} #{self.pk}"
+        lang = get_language()
+         
+        if lang and lang.startswith("ar"):
+            rank = "رتبة " + (str(self.isnad_rank) if self.isnad_rank is not None else "سلسلة فارغة")
+        else:
+            rank = "Rank " + (str(self.isnad_rank) if self.isnad_rank is not None else "empty chain")
+        return f"{self.biography} #{self.pk} - {rank}"
 
     def chain_display(self):
         lang = get_language()
@@ -320,12 +349,13 @@ class Esnad(models.Model):
             return bio.alias_en or bio.full_name_en or bio.alias_ar or bio.full_name_ar
 
         parts = [name(self.biography)]
-        links = list(self.links.select_related("narrator").order_by("order"))
+        links = list(self.links.all())   # ← uses prefetch cache
         for link in links[:-1]:
             parts.append(f"{link.order} {name(link.narrator)}")
         if links:
             parts.append(name(links[-1].narrator))
         return " ← ".join(parts)
+
 
     @property
     def terminal_link(self):
@@ -334,12 +364,7 @@ class Esnad(models.Model):
             self.links.select_related("narrator").order_by("-order").first()
         )
 
-    @property
-    def isnad_rank(self):
-        """Number of intermediary narrators between the esnad holder and the
-        terminal narrator, excluding both endpoints. Returns None for empty chains."""
-        last = self.terminal_link
-        return last.order - 1 if last else None
+    
 
 
 class EsnadLink(models.Model):
@@ -355,31 +380,38 @@ class EsnadLink(models.Model):
         related_name="esnad_appearances",
         verbose_name=_("Narrator"),
     )
-    order = models.PositiveSmallIntegerField(_("Order"))
+    order = models.PositiveSmallIntegerField(_("Order"), null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = [("esnad", "narrator")]
+        constraints = [
+            models.UniqueConstraint(fields=["esnad", "narrator"], name="unique_esnad_narrator"),
+            # Note: NO unique constraint on (esnad, order).
+            # Sortable inlines reorder by swapping order values, which Django's
+            # per-form validate_unique() cannot handle (it sees stale DB state
+            # before sibling forms have saved). Order uniqueness is maintained
+            # by the drag-and-drop JS (sequential renumbering) and by save()
+            # auto-assigning max+1 for new rows.
+        ]
         verbose_name = _("Esnad Link")
         verbose_name_plural = _("Esnad Links")
         ordering = ["esnad", "order"]
 
+    def save(self, *args, **kwargs):
+        if self.order is None:
+            last = EsnadLink.objects.filter(esnad=self.esnad).aggregate(
+                models.Max("order")
+            )["order__max"]
+            self.order = (last or 0) + 1
+        super().save(*args, **kwargs)
+
     def clean(self):
         if not self.esnad_id or not self.narrator_id:
             return
-        holder_id = Esnad.objects.values_list("biography_id", flat=True).get(pk=self.esnad_id)
-        if self.narrator_id == holder_id:
+        if self.narrator_id == self.esnad.biography_id:
             raise ValidationError(
                 {"narrator": _("The holder of this Esnad cannot appear as a narrator in their own chain.")}
-            )
-        if (
-            EsnadLink.objects.filter(esnad_id=self.esnad_id, narrator_id=self.narrator_id)
-            .exclude(pk=self.pk)
-            .exists()
-        ):
-            raise ValidationError(
-                {"narrator": _("This narrator already appears in this chain.")}
             )
 
     def __str__(self):
@@ -405,7 +437,9 @@ class TeacherStudentRelationship(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ("teacher", "student")
+        constraints = [
+            models.UniqueConstraint(fields=["teacher", "student"], name="unique_teacher_student"),
+        ]
         verbose_name = _("Teacher-Student Relationship")
         verbose_name_plural = _("Teacher-Student Relationships")
         ordering = ["teacher", "student"]

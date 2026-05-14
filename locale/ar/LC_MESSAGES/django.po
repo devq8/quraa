@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 09:18+0300\n"
+"POT-Creation-Date: 2026-05-14 22:36+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,78 +16,83 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: core/admin.py:22 core/models.py:227
+#: core/admin.py:23 core/models.py:251
 msgid "Source"
 msgstr "المصدر"
 
-#: core/admin.py:23 core/models.py:228
+#: core/admin.py:24 core/models.py:252
 msgid "Sources"
 msgstr "المصادر"
 
-#: core/admin.py:33 core/models.py:358
+#: core/admin.py:34 core/models.py:426
 msgid "Teacher"
 msgstr "الشيخ"
 
-#: core/admin.py:34
+#: core/admin.py:35
 msgid "Teachers"
 msgstr "الشيوخ"
 
-#: core/admin.py:44 core/models.py:364
+#: core/admin.py:45 core/models.py:432
 msgid "Student"
 msgstr "التلميذ"
 
-#: core/admin.py:45
+#: core/admin.py:46
 msgid "Students"
 msgstr "التلاميذ"
 
-#: core/admin.py:54 core/admin.py:219 core/admin.py:319 core/models.py:261
-#: core/models.py:320
+#: core/admin.py:55 core/admin.py:181 core/admin.py:309 core/models.py:285
+#: core/models.py:381
 msgid "Narrator"
 msgstr "الراوي"
 
-#: core/admin.py:55 core/admin.py:220 core/admin.py:320 core/admin.py:335
+#: core/admin.py:56 core/admin.py:182 core/admin.py:310 core/admin.py:329
+#: core/models.py:316
 msgid "Narrators"
 msgstr "الرواة"
 
-#: core/admin.py:71 core/models.py:288 core/models.py:314
+#: core/admin.py:77 core/models.py:322 core/models.py:375
 msgid "Esnad"
 msgstr "إسناد"
 
-#: core/admin.py:72 core/models.py:289
+#: core/admin.py:78 core/models.py:323
 msgid "Asanid"
 msgstr "الأسانيد"
 
-#: core/admin.py:110
+#: core/admin.py:123 core/models.py:91
 msgid "Birth"
 msgstr "الميلاد"
 
-#: core/admin.py:118
+#: core/admin.py:131 core/models.py:91
 msgid "Death"
 msgstr "الوفاة"
 
-#: core/admin.py:126 core/admin.py:183 core/admin.py:207 core/admin.py:245
-#: core/admin.py:332
+#: core/admin.py:215 core/admin.py:326
+#: templates/admin/core/biography/change_form.html:35
 msgid "Audit"
 msgstr "السجل والمراجعة"
 
-#: core/admin.py:266
+#: core/admin.py:239
+msgid "You do not have permission to modify this Esnad."
+msgstr "ليس لديك صلاحية لتعديل هذا الإسناد."
+
+#: core/admin.py:249
 msgid "Esnad not found."
 msgstr "الإسناد غير موجود."
 
-#: core/admin.py:271
+#: core/admin.py:254
 msgid "No template selected."
 msgstr "لم يُختر قالب."
 
-#: core/admin.py:281
+#: core/admin.py:269
 msgid "Template not found."
 msgstr "القالب غير موجود."
 
-#: core/admin.py:293
+#: core/admin.py:282
 #, python-format
 msgid "Template \"%(name)s\" applied."
 msgstr "تم تطبيق القالب \"%(name)s\"."
 
-#: core/admin.py:308
+#: core/admin.py:297
 msgid "Chain"
 msgstr "السلسلة"
 
@@ -110,6 +115,10 @@ msgstr "الكنية (عربي)"
 #: core/models.py:13
 msgid "Alias (English)"
 msgstr "الكنية (إنجليزي)"
+
+#: core/models.py:16
+msgid "Birthplace"
+msgstr "مكان الولادة"
 
 #: core/models.py:18
 msgid "Birth Year (Hijri)"
@@ -139,6 +148,14 @@ msgstr "يوم الميلاد (ميلادي)"
 msgid "Birth Date Approximate"
 msgstr "تاريخ الميلاد تقريبي"
 
+#: core/models.py:27
+msgid "Hometown"
+msgstr "مكان النشأة"
+
+#: core/models.py:30
+msgid "Death Location"
+msgstr "مكان الوفاة"
+
 #: core/models.py:32
 msgid "Death Year (Hijri)"
 msgstr "سنة الوفاة (هجري)"
@@ -167,144 +184,176 @@ msgstr "يوم الوفاة (ميلادي)"
 msgid "Death Date Approximate"
 msgstr "تاريخ الوفاة تقريبي"
 
-#: core/models.py:68
-msgid "Published"
-msgstr "منشور"
-
-#: core/models.py:73 core/models.py:211 core/models.py:282 users/models.py:43
-msgid "Biography"
-msgstr "سيرة ذاتية"
-
-#: core/models.py:74
-msgid "Biographies"
-msgstr "السير الذاتية"
-
-#: core/models.py:163
-msgid "City (Arabic)"
-msgstr "المدينة (عربي)"
-
-#: core/models.py:164
-msgid "City (English)"
-msgstr "المدينة (إنجليزي)"
-
-#: core/models.py:165
-msgid "Country (Arabic)"
-msgstr "الدولة (عربي)"
-
-#: core/models.py:166
-msgid "Country (English)"
-msgstr "الدولة (إنجليزي)"
-
-#: core/models.py:180
-msgid "Location"
-msgstr "الموقع الجغرافي"
-
-#: core/models.py:181
-msgid "Locations"
-msgstr "المواقع الجغرافية"
-
-#: core/models.py:187
-msgid "Short Name (Arabic)"
-msgstr "الاسم المختصر (عربي)"
-
-#: core/models.py:188
-msgid "Short Name (English)"
-msgstr "الاسم المختصر (إنجليزي)"
-
-#: core/models.py:189
-msgid "Long Name (Arabic)"
-msgstr "الاسم الكامل (عربي)"
-
-#: core/models.py:190
-msgid "Long Name (English)"
-msgstr "الاسم الكامل (إنجليزي)"
-
-#: core/models.py:191 landing/models.py:124
-msgid "Description (Arabic)"
-msgstr "الوصف (عربي)"
-
-#: core/models.py:192 landing/models.py:125
-msgid "Description (English)"
-msgstr "الوصف (إنجليزي)"
-
-#: core/models.py:204
-msgid "Attribute"
-msgstr "الصفة"
-
-#: core/models.py:205
+#: core/models.py:42 core/models.py:229
 msgid "Attributes"
 msgstr "الصفات"
 
-#: core/models.py:213 core/models.py:233
+#: core/models.py:57
+#, fuzzy
+#| msgid "Submitted by"
+msgid "Submitted By"
+msgstr "أُضيف بواسطة"
+
+#: core/models.py:64
+#, fuzzy
+#| msgid "Last modified by"
+msgid "Last Modified By"
+msgstr "آخر تعديل بواسطة"
+
+#: core/models.py:71
+msgid "User Account"
+msgstr "حساب المستخدم"
+
+#: core/models.py:74
+msgid "Published"
+msgstr "منشور"
+
+#: core/models.py:79 core/models.py:235 core/models.py:308 users/models.py:43
+msgid "Biography"
+msgstr "سيرة ذاتية"
+
+#: core/models.py:80
+msgid "Biographies"
+msgstr "السير الذاتية"
+
+#: core/models.py:92
+msgid "Hijri"
+msgstr "الهجري"
+
+#: core/models.py:92
+#, fuzzy
+#| msgid "Birth Day (Gregorian)"
+msgid "Gregorian"
+msgstr "الميلادي"
+
+#: core/models.py:97
+#, python-format
+msgid "%(label)s %(cal)s day requires a month."
+msgstr "يوم %(label)s %(cal)s يستلزم تحديد الشهر."
+
+#: core/models.py:99
+#, python-format
+msgid "%(label)s %(cal)s month requires a year."
+msgstr "شهر %(label)s %(cal)s يستلزم تحديد السنة."
+
+#: core/models.py:185
+msgid "City (Arabic)"
+msgstr "المدينة (عربي)"
+
+#: core/models.py:186
+msgid "City (English)"
+msgstr "المدينة (إنجليزي)"
+
+#: core/models.py:187
+msgid "Country (Arabic)"
+msgstr "الدولة (عربي)"
+
+#: core/models.py:188
+msgid "Country (English)"
+msgstr "الدولة (إنجليزي)"
+
+#: core/models.py:202
+msgid "Location"
+msgstr "الموقع الجغرافي"
+
+#: core/models.py:203
+msgid "Locations"
+msgstr "المواقع الجغرافية"
+
+#: core/models.py:211
+msgid "Short Name (Arabic)"
+msgstr "الاسم المختصر (عربي)"
+
+#: core/models.py:212
+msgid "Short Name (English)"
+msgstr "الاسم المختصر (إنجليزي)"
+
+#: core/models.py:213
+msgid "Long Name (Arabic)"
+msgstr "الاسم الكامل (عربي)"
+
+#: core/models.py:214
+msgid "Long Name (English)"
+msgstr "الاسم الكامل (إنجليزي)"
+
+#: core/models.py:215 landing/models.py:124
+msgid "Description (Arabic)"
+msgstr "الوصف (عربي)"
+
+#: core/models.py:216 landing/models.py:125
+msgid "Description (English)"
+msgstr "الوصف (إنجليزي)"
+
+#: core/models.py:228
+msgid "Attribute"
+msgstr "الصفة"
+
+#: core/models.py:237 core/models.py:257
 msgid "Name (Arabic)"
 msgstr "الاسم (عربي)"
 
-#: core/models.py:214 core/models.py:234
+#: core/models.py:238 core/models.py:258
 msgid "Name (English)"
 msgstr "الاسم (إنجليزي)"
 
-#: core/models.py:215 landing/models.py:126 landing/models.py:169
+#: core/models.py:239 landing/models.py:126 landing/models.py:169
 #: landing/models.py:186
 msgid "Link"
 msgstr "الرابط"
 
-#: core/models.py:239
+#: core/models.py:263
 msgid "Esnad Template"
 msgstr "قالب إسناد"
 
-#: core/models.py:240
+#: core/models.py:264
 msgid "Esnad Templates"
 msgstr "قوالب الأسانيد"
 
-#: core/models.py:255
+#: core/models.py:279
 msgid "Template"
 msgstr "القالب"
 
-#: core/models.py:263 core/models.py:322 landing/models.py:82
+#: core/models.py:287 core/models.py:383 landing/models.py:82
 #: landing/models.py:127 landing/models.py:149 landing/models.py:171
 #: landing/models.py:187 landing/models.py:208 landing/models.py:224
 #: landing/models.py:242
 msgid "Order"
 msgstr "الترتيب"
 
-#: core/models.py:269
+#: core/models.py:295
 msgid "Template Link"
 msgstr "حلقة القالب"
 
-#: core/models.py:270
+#: core/models.py:296
 msgid "Template Links"
 msgstr "حلقات القالب"
 
-#: core/models.py:328
+#: core/models.py:397
 msgid "Esnad Link"
 msgstr "حلقة الإسناد"
 
-#: core/models.py:329
+#: core/models.py:398
 msgid "Esnad Links"
 msgstr "حلقات الإسناد"
 
-#: core/models.py:338
+#: core/models.py:414
 msgid ""
 "The holder of this Esnad cannot appear as a narrator in their own chain."
 msgstr "لا يمكن أن يظهر صاحب هذا الإسناد كراوٍ في سلسلته الخاصة."
 
-#: core/models.py:346
-msgid "This narrator already appears in this chain."
-msgstr "هذا الراوي موجود مسبقاً في هذه السلسلة."
-
-#: core/models.py:366
+#: core/models.py:434
 msgid "Notes (Arabic)"
 msgstr "ملاحظات (عربي)"
 
-#: core/models.py:367
+#: core/models.py:435
 msgid "Notes (English)"
 msgstr "ملاحظات (إنجليزي)"
 
-#: core/models.py:373
+#: core/models.py:443
 msgid "Teacher-Student Relationship"
 msgstr "علاقة شيخ-تلميذ"
 
-#: core/models.py:374
+#: core/models.py:444
 msgid "Teacher-Student Relationships"
 msgstr "علاقات الشيوخ والتلاميذ"
 
@@ -652,27 +701,54 @@ msgstr "روابط التذييل"
 msgid "Select language"
 msgstr "اختر اللغة"
 
+#: templates/admin/core/biography/change_form.html:9
 #: templates/admin/core/esnad/change_form.html:8
 msgid "Load from Template"
 msgstr "تحميل من قالب"
 
+#: templates/admin/core/biography/change_form.html:15
+#, fuzzy, python-format
+#| msgid "Esnad Links"
+msgid "Esnad #%(pk)s"
+msgstr "إسناد #%(pk)s"
+
+#: templates/admin/core/biography/change_form.html:17
 #: templates/admin/core/esnad/change_form.html:13
 msgid "Select a template"
 msgstr "اختر قالباً"
 
+#: templates/admin/core/biography/change_form.html:23
 #: templates/admin/core/esnad/change_form.html:19
 msgid ""
 "This will replace the current chain with the selected template. Continue?"
 msgstr "سيُستبدل التسلسل الحالي بالقالب المختار. هل تريد المتابعة؟"
 
+#: templates/admin/core/biography/change_form.html:24
 #: templates/admin/core/esnad/change_form.html:20
 msgid "Apply"
 msgstr "تطبيق"
 
+#: templates/admin/core/biography/change_form.html:29
 #: templates/admin/core/esnad/change_form.html:23
 msgid ""
 "The holder biography is automatically excluded if present in the template."
 msgstr "يُستثنى صاحب الترجمة تلقائياً إن كان موجوداً في القالب."
+
+#: templates/admin/core/biography/change_form.html:37
+msgid "Submitted by"
+msgstr "أُضيف بواسطة"
+
+#: templates/admin/core/biography/change_form.html:41
+msgid "Last modified by"
+msgstr "آخر تعديل بواسطة"
+
+#: templates/admin/core/biography/change_form.html:45
+msgid "Created"
+msgstr "تاريخ الإنشاء"
+
+#: templates/admin/core/biography/change_form.html:49
+msgid "Updated"
+msgstr "تاريخ التحديث"
 
 #: users/admin.py:18
 msgid "Personal info"
@@ -717,3 +793,6 @@ msgstr "مستخدم"
 #: users/models.py:59
 msgid "users"
 msgstr "المستخدمون"
+
+#~ msgid "This narrator already appears in this chain."
+#~ msgstr "هذا الراوي موجود مسبقاً في هذه السلسلة."
