@@ -81,9 +81,9 @@ class EsnadInline(nested_admin.NestedStackedInline):
 @admin.register(Biography)
 class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     list_display = (
-        "id", "full_name_ar", "full_name_en", "alias_ar",
-        "birth_hijri_year", "birth_greg_year", "birth_date_approximate",
-        "death_hijri_year", "death_greg_year", "death_date_approximate",
+        "id", "full_name_ar", "full_name_en", "alias_ar", "published",
+        "birth_hijri_year", "birth_greg_year", 
+        "death_hijri_year", "death_greg_year", 
         "birthplace", "hometown", "death_location",
     )
     list_filter = ("birthplace", "hometown", "death_location", "attributes", "published")

@@ -72,6 +72,7 @@ class Biography(models.Model):
     )
 
     published = models.BooleanField(_("Published"), default=False)
+    name_search = models.TextField(blank=True, default="", editable=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -176,8 +177,13 @@ class Biography(models.Model):
             approx_hijri_from_greg()
 
     def save(self, *args, **kwargs):
+        from core.search import biography_search_text
+
         self._fill_date("birth")
         self._fill_date("death")
+        self.name_search = biography_search_text(
+            self.full_name_ar, self.full_name_en, self.alias_ar, self.alias_en,
+        )
         super().save(*args, **kwargs)
 
 

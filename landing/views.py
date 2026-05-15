@@ -1,10 +1,13 @@
+import logging
 from itertools import groupby
 
-from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
 from core.models import Biography
+from core.search import normalize_arabic
+
+logger = logging.getLogger(__name__)
 
 from .models import (
     Client,
@@ -223,21 +226,29 @@ def biographies_by_city(request):
 
 
 def search_results(request):
-    """Search published biographies by Arabic/English name and alias."""
+    """Search published biographies by Arabic/English name and alias.
+
+    Matching is tashkeel-insensitive and treats multi-word queries as AND:
+    every word in the (normalized) query must appear somewhere in the
+    biography's normalized name/alias text.
+    """
     query = (request.GET.get("q") or "").strip()
+
+    logger.debug("search_results raw query=%r", query)
     results = []
     if query:
-        results = list(
-            Biography.objects.filter(published=True)
-            .filter(
-                Q(full_name_ar__icontains=query)
-                | Q(full_name_en__icontains=query)
-                | Q(alias_ar__icontains=query)
-                | Q(alias_en__icontains=query)
-            )
-            .select_related("hometown")
-            .order_by("full_name_ar")
-        )
+        words = normalize_arabic(query).split()
+
+        logger.debug("search_results normalized words=%r", words)
+        if words:
+            qs = Biography.objects.filter(published=True)
+            for word in words:
+                qs = qs.filter(name_search__icontains=word)
+
+            logger.debug("search_results SQL=%s", qs.query)
+            results = list(qs.select_related("hometown").order_by("full_name_ar"))
+
+    logger.info("search_results query=%r matched %d biographies", query, len(results))
     site_settings = SiteSettings.objects.first()
     footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
     context = {
