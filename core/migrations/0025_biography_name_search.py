@@ -21,7 +21,7 @@ def backfill_name_search(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0023_remove_esnadlink_unique_esnad_order_and_more'),
+        ('core', '0024_alter_biography_attributes_and_more'),
     ]
 
     operations = [
