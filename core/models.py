@@ -356,8 +356,8 @@ class Esnad(models.Model):
 
         parts = [name(self.biography)]
         links = list(self.links.all())   # ← uses prefetch cache
-        for link in links[:-1]:
-            parts.append(f"{link.order} {name(link.narrator)}")
+        for i, link in enumerate(links[:-1], start=1):
+            parts.append(f"{i} {name(link.narrator)}")
         if links:
             parts.append(name(links[-1].narrator))
         return " ← ".join(parts)
