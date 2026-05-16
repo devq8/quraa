@@ -49,6 +49,9 @@ class Biography(models.Model):
         related_name="students",
     )
 
+    comments_ar = models.TextField(_("Comments (Arabic)"), blank=True)
+    comments_en = models.TextField(_("Comments (English)"), blank=True)
+
     submitted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

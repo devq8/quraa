@@ -1,0 +1,502 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" type="image/png" href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'images/favicon.png' %}{% endif %}">
+    <title>Quraa | {% if site_settings %}{{ site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}</title>
+
+    <script>
+    (function () {
+        var lang = localStorage.getItem('quraa-lang') || 'ar';
+        var d = document.documentElement;
+        d.setAttribute('lang', lang);
+        d.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        window.quraaLang = lang;
+    })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome icons (from existing plugins bundle) -->
+    <link href="{% static 'css/plugins.css' %}" rel="stylesheet">
+
+    <style>
+        :root {
+            --q-bg: #0e1a1a;
+            --q-bg-2: #142525;
+            --q-accent: #c89758;
+            --q-accent-2: #a68b5c;
+            --q-cream: #f0e9dc;
+            --q-fg: #f0e9dc;
+            --q-fg-muted: rgba(240, 233, 220, 0.7);
+            --q-fg-dim: rgba(240, 233, 220, 0.5);
+            --q-section-muted: #f4efe5;
+            --q-section-muted-fg: rgb(29, 41, 41);
+            --q-section-muted-fg-soft: rgba(29, 41, 41, 0.7);
+            --q-border: rgba(200, 151, 88, 0.25);
+        }
+
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; background: var(--q-bg); color: var(--q-fg); }
+        html[lang="en"] body { font-family: "Noto Sans", system-ui, -apple-system, sans-serif; }
+        html[lang="ar"] body { font-family: "Noto Sans Arabic", system-ui, -apple-system, sans-serif; }
+        body { font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+        a { color: var(--q-accent); text-decoration: none; transition: color .2s; }
+        a:hover { color: var(--q-cream); }
+        img { max-width: 100%; height: auto; display: block; }
+        h1, h2, h3, h4 { font-weight: 600; line-height: 1.2; margin: 0 0 .6rem; letter-spacing: -.01em; }
+        h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 700; }
+        h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); }
+        h3 { font-size: 1.25rem; }
+        p  { margin: 0 0 1rem; }
+
+        .q-container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        #header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 22px 0;
+            background: transparent;
+            transition: background .3s ease, box-shadow .3s ease, padding .3s ease;
+        }
+        #header.is-scrolled {
+            background: var(--q-bg);
+            box-shadow: 0 2px 18px rgba(0, 0, 0, .35);
+            padding: 12px 0;
+        }
+        #header .q-container { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+        #header .logo { display: flex; align-items: center; gap: 12px; color: var(--q-cream); font-weight: 600; font-size: 1.05rem; }
+        #header .logo .star { width: 32px; height: 32px; flex-shrink: 0; }
+        #header nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 28px; align-items: center; }
+        #header nav a { color: var(--q-fg-muted); font-size: .95rem; font-weight: 500; }
+        #header nav a:hover, #header nav a.is-active { color: var(--q-accent); }
+        #header .extras { display: flex; gap: 14px; align-items: center; }
+        #header .lang-toggle { background: transparent; border: 1px solid var(--q-border); color: var(--q-fg-muted); padding: 6px 14px; border-radius: 999px; font-size: .85rem; cursor: pointer; font-family: inherit; transition: border-color .2s, color .2s; }
+        #header .lang-toggle:hover { color: var(--q-accent); border-color: var(--q-accent); }
+
+        .q-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 999px; font-weight: 500; font-size: .95rem; border: 1px solid transparent; cursor: pointer; font-family: inherit; transition: background .2s, color .2s, border-color .2s; }
+        .q-btn--primary { background: var(--q-accent); color: var(--q-bg); }
+        .q-btn--primary:hover { background: var(--q-cream); color: var(--q-bg); }
+        .q-btn--ghost { background: transparent; color: var(--q-cream); border-color: var(--q-border); }
+        .q-btn--ghost:hover { border-color: var(--q-accent); color: var(--q-accent); }
+
+        /* Hero */
+        .q-hero { position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; }
+        .q-hero__media { position: absolute; inset: 0; z-index: 0; }
+        .q-hero__media video, .q-hero__media img { width: 100%; height: 100%; object-fit: cover; }
+        .q-hero__media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14, 26, 26, .55) 0%, rgba(14, 26, 26, .85) 100%); }
+        .q-hero__inner { position: relative; z-index: 1; padding: 140px 0 60px; max-width: 760px; }
+        .q-hero__eyebrow { display: inline-block; color: var(--q-accent); letter-spacing: .35em; font-size: .8rem; text-transform: uppercase; margin-bottom: 18px; }
+        .q-hero h1 { color: var(--q-cream); margin-bottom: 18px; }
+        .q-hero p { color: var(--q-fg-muted); font-size: 1.15rem; max-width: 580px; margin-bottom: 32px; }
+        .q-hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
+        .q-hero__scroll { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1; color: var(--q-fg-dim); font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; }
+        .q-hero__star { position: absolute; right: -100px; top: 50%; transform: translateY(-50%); width: 500px; height: 500px; opacity: .07; z-index: 0; }
+        html[dir="rtl"] .q-hero__star { right: auto; left: -100px; }
+
+        /* Section primitives */
+        .q-section { padding: 110px 0; position: relative; }
+        .q-section--muted { background: var(--q-section-muted); color: var(--q-section-muted-fg); }
+        .q-section--muted h1, .q-section--muted h2, .q-section--muted h3 { color: var(--q-section-muted-fg); }
+        .q-section--muted p { color: var(--q-section-muted-fg-soft); }
+        .q-section--muted a { color: var(--q-accent-2); }
+        .q-section--muted a:hover { color: var(--q-bg); }
+        .q-section__head { max-width: 760px; margin: 0 auto 60px; text-align: center; }
+        .q-section__eyebrow { display: inline-block; color: var(--q-accent); letter-spacing: .35em; font-size: .8rem; text-transform: uppercase; margin-bottom: 14px; }
+        .q-section__lead { font-size: 1.05rem; }
+
+        /* About / welcome */
+        .q-about { display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; align-items: center; }
+        .q-about__image { border-radius: 4px; overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, .15); }
+        .q-about__quote { border-inline-start: 3px solid var(--q-accent); padding-inline-start: 20px; font-style: italic; color: var(--q-section-muted-fg); margin: 24px 0; }
+
+        /* Services grid */
+        .q-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+        .q-card { background: rgba(255, 255, 255, .55); border: 1px solid rgba(200, 151, 88, .15); border-radius: 8px; padding: 32px 28px; transition: transform .2s, border-color .2s, box-shadow .2s; }
+        .q-section--muted .q-card { background: #fff; }
+        .q-card:hover { transform: translateY(-4px); border-color: var(--q-accent); box-shadow: 0 12px 30px rgba(0, 0, 0, .08); }
+        .q-card__icon { width: 52px; height: 52px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(200, 151, 88, .15); color: var(--q-accent-2); font-size: 1.3rem; margin-bottom: 18px; }
+        .q-card h3 { margin: 0 0 8px; }
+        .q-card p { margin: 0; font-size: .95rem; }
+
+        /* Stats */
+        .q-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px 28px; text-align: center; }
+        .q-stat__icon { font-size: 2rem; color: var(--q-accent); margin-bottom: 14px; }
+        .q-stat__value { font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; color: var(--q-cream); line-height: 1; margin-bottom: 8px; }
+        .q-stat__label { color: var(--q-fg-muted); font-size: .95rem; letter-spacing: .04em; }
+        .q-section--muted .q-stat__value { color: var(--q-section-muted-fg); }
+        .q-section--muted .q-stat__label { color: var(--q-section-muted-fg-soft); }
+
+        /* Blog */
+        .q-posts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+        .q-post { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, .06); display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+        .q-post:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0, 0, 0, .12); }
+        .q-post__image { aspect-ratio: 16 / 10; background: #ece6d8; position: relative; overflow: hidden; }
+        .q-post__image img { width: 100%; height: 100%; object-fit: cover; }
+        .q-post__category { position: absolute; top: 16px; inset-inline-start: 16px; background: var(--q-accent); color: #fff; font-size: .72rem; letter-spacing: .15em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
+        .q-post__body { padding: 24px 26px 28px; flex: 1; display: flex; flex-direction: column; }
+        .q-post__meta { color: var(--q-section-muted-fg-soft); font-size: .8rem; margin-bottom: 10px; }
+        .q-post__title { font-size: 1.15rem; line-height: 1.4; margin-bottom: 10px; color: var(--q-section-muted-fg); }
+        .q-post__title a { color: inherit; }
+        .q-post__title a:hover { color: var(--q-accent-2); }
+        .q-post__excerpt { font-size: .92rem; color: var(--q-section-muted-fg-soft); display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 16px; }
+        .q-post__more { font-size: .88rem; font-weight: 500; color: var(--q-accent-2); margin-top: auto; }
+
+        /* Team */
+        .q-team { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+        .q-member { background: var(--q-bg-2); border: 1px solid var(--q-border); border-radius: 8px; overflow: hidden; transition: transform .2s, border-color .2s; }
+        .q-member:hover { transform: translateY(-4px); border-color: var(--q-accent); }
+        .q-member__image { aspect-ratio: 4 / 5; background: #1a2828; overflow: hidden; }
+        .q-member__image img { width: 100%; height: 100%; object-fit: cover; }
+        .q-member__body { padding: 22px 22px 26px; }
+        .q-member__name { font-size: 1.05rem; color: var(--q-cream); margin-bottom: 4px; }
+        .q-member__role { font-size: .82rem; color: var(--q-accent); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+        .q-member__bio { font-size: .9rem; color: var(--q-fg-muted); margin: 0 0 14px; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .q-member__social { display: flex; gap: 10px; }
+        .q-member__social a { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(200, 151, 88, .12); color: var(--q-accent); font-size: .85rem; }
+        .q-member__social a:hover { background: var(--q-accent); color: var(--q-bg); }
+
+        /* Clients */
+        .q-clients { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 50px; opacity: .85; }
+        .q-clients a { display: inline-flex; align-items: center; justify-content: center; }
+        .q-clients img { max-height: 50px; width: auto; filter: grayscale(1) brightness(.6); transition: filter .2s; }
+        .q-clients a:hover img { filter: grayscale(0) brightness(1); }
+
+        /* CTA */
+        .q-cta { padding: 90px 0; text-align: center; background: var(--q-bg-2); border-top: 1px solid var(--q-border); border-bottom: 1px solid var(--q-border); }
+        .q-cta h2 { color: var(--q-cream); margin-bottom: 16px; }
+        .q-cta p { color: var(--q-fg-muted); max-width: 560px; margin: 0 auto 28px; }
+
+        /* Footer */
+        #footer { padding: 70px 0 30px; color: var(--q-fg-muted); }
+        .q-footer__grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 50px; margin-bottom: 50px; }
+        .q-footer__brand .star { width: 40px; height: 40px; margin-bottom: 18px; }
+        .q-footer__brand h4 { color: var(--q-cream); font-size: 1.05rem; margin-bottom: 14px; }
+        .q-footer__brand p { font-size: .92rem; margin-bottom: 22px; max-width: 320px; }
+        .q-footer__col h5 { color: var(--q-cream); font-size: .9rem; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 18px; }
+        .q-footer__col ul { list-style: none; margin: 0; padding: 0; }
+        .q-footer__col li { margin-bottom: 10px; }
+        .q-footer__col a { color: var(--q-fg-muted); font-size: .92rem; }
+        .q-footer__col a:hover { color: var(--q-accent); }
+        .q-footer__bottom { border-top: 1px solid var(--q-border); padding-top: 24px; text-align: center; font-size: .85rem; color: var(--q-fg-dim); }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            #header nav { display: none; }
+            .q-grid, .q-posts, .q-team { grid-template-columns: 1fr 1fr; }
+            .q-stats { grid-template-columns: 1fr 1fr; }
+            .q-about { grid-template-columns: 1fr; gap: 32px; }
+            .q-footer__grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .q-section { padding: 80px 0; }
+        }
+        @media (max-width: 600px) {
+            .q-grid, .q-posts, .q-team { grid-template-columns: 1fr; }
+            .q-footer__grid { grid-template-columns: 1fr; }
+            .q-hero__inner { padding-top: 120px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    {# Reusable 8-pointed star SVG (decorative) #}
+    {% spaceless %}
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="q-star" viewBox="-180 -180 360 360">
+            <g fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M0,-160 L45,-45 L160,0 L45,45 L0,160 L-45,45 L-160,0 L-45,-45 Z"/>
+                <path d="M0,-110 L31,-31 L110,0 L31,31 L0,110 L-31,31 L-110,0 L-31,-31 Z" opacity="0.6"/>
+                <circle r="55"/>
+                <path d="M-30,0 L30,0 M0,-30 L0,30" opacity="0.5"/>
+            </g>
+        </symbol>
+    </svg>
+    {% endspaceless %}
+
+    <header id="header">
+        <div class="q-container">
+            <a class="logo" href="/">
+                <svg class="star" aria-hidden="true"><use href="#q-star"/></svg>
+                <span data-ar="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}قُرَّاء{% endif %}" data-en="Quraa">{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}قُرَّاء{% endif %}</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                    <li><a href="#welcome" data-ar="عن المركز" data-en="About">عن المركز</a></li>
+                    <li><a href="#services" data-ar="خدماتنا" data-en="Services">خدماتنا</a></li>
+                    <li><a href="#blog-section" data-ar="المقالات" data-en="Articles">المقالات</a></li>
+                    <li><a href="#team" data-ar="الفريق" data-en="Team">الفريق</a></li>
+                    <li><a href="{% url 'landing:contact_us' %}" data-ar="تواصل معنا" data-en="Contact">تواصل معنا</a></li>
+                </ul>
+            </nav>
+            <div class="extras">
+                <button class="lang-toggle" id="lang-toggle" type="button"
+                        data-ar="English" data-en="عربي">English</button>
+            </div>
+        </div>
+    </header>
+
+    {# HERO #}
+    {% with first_slide=hero_slides|first %}
+    <section class="q-hero">
+        <div class="q-hero__media">
+            {% if first_slide.video_url %}
+                {% if 'http' in first_slide.video_url %}
+                    <video autoplay muted loop playsinline src="{{ first_slide.video_url }}"></video>
+                {% else %}
+                    <video autoplay muted loop playsinline src="{% static first_slide.video_url %}"></video>
+                {% endif %}
+            {% elif first_slide.image %}
+                <img src="{{ first_slide.image.url }}" alt="">
+            {% else %}
+                <video autoplay muted loop playsinline src="{% static 'video/quran_video.mp4' %}"></video>
+            {% endif %}
+        </div>
+        <svg class="q-hero__star" aria-hidden="true" style="color: var(--q-accent);"><use href="#q-star"/></svg>
+        <div class="q-container">
+            <div class="q-hero__inner">
+                <span class="q-hero__eyebrow" data-ar="مرحباً بكم في قُرَّاء" data-en="Welcome to Quraa">مرحباً بكم في قُرَّاء</span>
+                <h1 data-ar="{% if first_slide %}{{ first_slide.title_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-en="{% if first_slide %}{{ first_slide.title_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}">{% if first_slide %}{{ first_slide.title_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}</h1>
+                <p data-ar="{% if first_slide %}{{ first_slide.subtitle_ar }}{% else %}التميز عالمياً في جمع وتوثيق تاريخ القراء{% endif %}" data-en="{% if first_slide %}{{ first_slide.subtitle_en }}{% else %}Excellence globally in collecting and documenting the history of Quran reciters{% endif %}">{% if first_slide %}{{ first_slide.subtitle_ar }}{% else %}التميز عالمياً في جمع وتوثيق تاريخ القراء{% endif %}</p>
+                <div class="q-hero__actions">
+                    <a href="{% if first_slide %}{{ first_slide.button_link }}{% else %}#welcome{% endif %}" class="q-btn q-btn--primary"
+                       data-ar="{% if first_slide %}{{ first_slide.button_text_ar }}{% else %}اكتشف المزيد{% endif %}"
+                       data-en="{% if first_slide %}{{ first_slide.button_text_en }}{% else %}Explore more{% endif %}">{% if first_slide %}{{ first_slide.button_text_ar }}{% else %}اكتشف المزيد{% endif %}</a>
+                    <a href="{% url 'landing:biographies_alphabetical' %}" class="q-btn q-btn--ghost"
+                       data-ar="تصفح التراجم" data-en="Browse Biographies">تصفح التراجم</a>
+                </div>
+            </div>
+        </div>
+        <div class="q-hero__scroll" data-ar="مرر للأسفل" data-en="Scroll to discover">مرر للأسفل</div>
+    </section>
+    {% endwith %}
+
+    {# WELCOME / ABOUT #}
+    <section id="welcome" class="q-section q-section--muted">
+        <div class="q-container">
+            <div class="q-about">
+                <div>
+                    <span class="q-section__eyebrow" data-ar="عن المركز" data-en="About the Center">عن المركز</span>
+                    <h2 data-ar="{% if welcome_section %}{{ welcome_section.heading_ar }}{% elif sections.welcome %}{{ sections.welcome.heading_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}" data-en="{% if welcome_section %}{{ welcome_section.heading_en }}{% elif sections.welcome %}{{ sections.welcome.heading_en }}{% else %}We are dedicated to the heritage of the people of the Qur'an{% endif %}">{% if welcome_section %}{{ welcome_section.heading_ar }}{% elif sections.welcome %}{{ sections.welcome.heading_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}</h2>
+                    <p data-ar="{% if welcome_section %}{{ welcome_section.lead_ar }}{% elif sections.welcome %}{{ sections.welcome.lead_ar }}{% else %}التميز في جمع وتوثيق تاريخ القراء{% endif %}" data-en="{% if welcome_section %}{{ welcome_section.lead_en }}{% elif sections.welcome %}{{ sections.welcome.lead_en }}{% else %}Excellence in the collection and documentation of the history of Qur'an reciters{% endif %}">{% if welcome_section %}{{ welcome_section.lead_ar }}{% elif sections.welcome %}{{ sections.welcome.lead_ar }}{% else %}التميز في جمع وتوثيق تاريخ القراء{% endif %}</p>
+                    <a href="{% url 'landing:biographies_alphabetical' %}" class="q-btn q-btn--primary"
+                       data-ar="استكشف الأرشيف" data-en="Explore the Archive">استكشف الأرشيف</a>
+                </div>
+                <div class="q-about__image">
+                    <img src="{% if welcome_section.image %}{{ welcome_section.image.url }}{% else %}{% static 'images/other/old_quran_2.jpg' %}{% endif %}"
+                         alt="{% if welcome_section %}{{ welcome_section.heading_ar }}{% else %}Old Quran Image{% endif %}">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# SERVICES #}
+    <section id="services" class="q-section">
+        <div class="q-container">
+            <div class="q-section__head">
+                <span class="q-section__eyebrow" data-ar="ما نقدمه" data-en="What we do">ما نقدمه</span>
+                <h2 data-ar="{% if sections.services %}{{ sections.services.heading_ar }}{% else %}خدماتنا{% endif %}" data-en="{% if sections.services %}{{ sections.services.heading_en }}{% else %}Our Services{% endif %}">{% if sections.services %}{{ sections.services.heading_ar }}{% else %}خدماتنا{% endif %}</h2>
+                <p class="q-section__lead" data-ar="{% if sections.services %}{{ sections.services.lead_ar }}{% else %}خدماتنا المتنوعة للباحثين وأهل القرآن{% endif %}" data-en="{% if sections.services %}{{ sections.services.lead_en }}{% else %}Our diverse services for researchers and the people of the Qur'an{% endif %}">{% if sections.services %}{{ sections.services.lead_ar }}{% else %}خدماتنا المتنوعة للباحثين وأهل القرآن{% endif %}</p>
+            </div>
+            <div class="q-grid">
+                {% for service in services %}
+                <div class="q-card">
+                    <div class="q-card__icon"><i class="{{ service.icon }}"></i></div>
+                    <h3 data-ar="{{ service.title_ar }}" data-en="{{ service.title_en|default:service.title_ar }}">{{ service.title_ar }}</h3>
+                    <p data-ar="{{ service.description_ar }}" data-en="{{ service.description_en|default:service.description_ar }}">{{ service.description_ar }}</p>
+                    {% if service.link %}<a href="{{ service.link }}" class="q-post__more" data-ar="اقرأ المزيد ←" data-en="Read more →">اقرأ المزيد ←</a>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# STATS #}
+    <section class="q-section" style="padding: 70px 0; background: var(--q-bg-2); border-top: 1px solid var(--q-border); border-bottom: 1px solid var(--q-border);">
+        <div class="q-container">
+            <div class="q-stats">
+                {% for stat in stat_counters %}
+                <div>
+                    <div class="q-stat__icon"><i class="{{ stat.icon }}"></i></div>
+                    <div class="q-stat__value">{{ stat.value_to|stringformat:"d" }}</div>
+                    <div class="q-stat__label" data-ar="{{ stat.label_ar }}" data-en="{{ stat.label_en|default:stat.label_ar }}">{{ stat.label_ar }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# BLOG #}
+    {% if featured_posts %}
+    <section id="blog-section" class="q-section q-section--muted">
+        <div class="q-container">
+            <div class="q-section__head">
+                <span class="q-section__eyebrow" data-ar="من الأرشيف" data-en="From the Archive">من الأرشيف</span>
+                <h2 data-ar="{% if sections.blog %}{{ sections.blog.heading_ar }}{% else %}المقالات{% endif %}" data-en="{% if sections.blog %}{{ sections.blog.heading_en }}{% else %}Articles{% endif %}">{% if sections.blog %}{{ sections.blog.heading_ar }}{% else %}المقالات{% endif %}</h2>
+                <p class="q-section__lead" data-ar="{% if sections.blog %}{{ sections.blog.lead_ar }}{% else %}أحدث المقالات والموارد حول القرآن والتلاوة.{% endif %}" data-en="{% if sections.blog %}{{ sections.blog.lead_en }}{% else %}Latest articles and resources on the Quran and recitation.{% endif %}">{% if sections.blog %}{{ sections.blog.lead_ar }}{% else %}أحدث المقالات والموارد حول القرآن والتلاوة.{% endif %}</p>
+            </div>
+            <div class="q-posts">
+                {% for post in featured_posts %}
+                <article class="q-post">
+                    <a class="q-post__image" href="{% if post.url %}{{ post.url }}{% else %}{% url 'landing:post_detail' post.pk %}{% endif %}">
+                        {% if post.image %}<img src="{{ post.image.url }}" alt="{{ post.title_ar }}">{% endif %}
+                        {% if post.category_ar or post.category_en %}
+                        <span class="q-post__category" data-ar="{{ post.category_ar }}" data-en="{{ post.category_en|default:post.category_ar }}">{{ post.category_ar|default:post.category_en }}</span>
+                        {% endif %}
+                    </a>
+                    <div class="q-post__body">
+                        {% if post.published_at %}
+                        <div class="q-post__meta post-date-formatted" data-date="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"M d, Y" }}</div>
+                        {% endif %}
+                        <h3 class="q-post__title"><a href="{% if post.url %}{{ post.url }}{% else %}{% url 'landing:post_detail' post.pk %}{% endif %}" data-ar="{{ post.title_ar }}" data-en="{{ post.title_en|default:post.title_ar }}">{{ post.title_ar }}</a></h3>
+                        <p class="q-post__excerpt" data-ar="{{ post.excerpt_ar }}" data-en="{{ post.excerpt_en|default:post.excerpt_ar }}">{{ post.excerpt_ar }}</p>
+                        <a href="{% if post.url %}{{ post.url }}{% else %}{% url 'landing:post_detail' post.pk %}{% endif %}" class="q-post__more" data-ar="اقرأ المزيد ←" data-en="Read more →">اقرأ المزيد ←</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {# TEAM #}
+    {% if team_members %}
+    <section id="team" class="q-section">
+        <div class="q-container">
+            <div class="q-section__head">
+                <span class="q-section__eyebrow" data-ar="فريقنا" data-en="Our Team">فريقنا</span>
+                <h2 data-ar="{% if sections.team %}{{ sections.team.heading_ar }}{% else %}تعرف على فريقنا{% endif %}" data-en="{% if sections.team %}{{ sections.team.heading_en }}{% else %}Meet Our Team{% endif %}">{% if sections.team %}{{ sections.team.heading_ar }}{% else %}تعرف على فريقنا{% endif %}</h2>
+                <p class="q-section__lead" data-ar="{% if sections.team %}{{ sections.team.lead_ar }}{% else %}فريقنا المتخصص في تطوير منصة قُراء{% endif %}" data-en="{% if sections.team %}{{ sections.team.lead_en }}{% else %}Our team specialized in developing the Quraa platform{% endif %}">{% if sections.team %}{{ sections.team.lead_ar }}{% else %}فريقنا المتخصص في تطوير منصة قُراء{% endif %}</p>
+            </div>
+            <div class="q-team">
+                {% for member in team_members %}
+                <div class="q-member">
+                    <div class="q-member__image">
+                        <img src="{% if member.image %}{{ member.image.url }}{% else %}{% static 'images/team/6.jpg' %}{% endif %}" alt="{{ member.name }}">
+                    </div>
+                    <div class="q-member__body">
+                        <h3 class="q-member__name">{{ member.name }}</h3>
+                        <div class="q-member__role">{{ member.role }}</div>
+                        <p class="q-member__bio">{{ member.bio }}</p>
+                        <div class="q-member__social">
+                            {% if member.facebook_url %}<a href="{{ member.facebook_url }}" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>{% endif %}
+                            {% if member.twitter_url %}<a href="{{ member.twitter_url }}" aria-label="Twitter"><i class="fab fa-twitter"></i></a>{% endif %}
+                            {% if member.instagram_url %}<a href="{{ member.instagram_url }}" aria-label="Instagram"><i class="fab fa-instagram"></i></a>{% endif %}
+                            {% if member.email %}<a href="mailto:{{ member.email }}" aria-label="Email"><i class="icon-mail"></i></a>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {# CLIENTS #}
+    {% if clients %}
+    <section id="clients" class="q-section q-section--muted" style="padding: 60px 0;">
+        <div class="q-container">
+            <div class="q-clients">
+                {% for client in clients %}
+                <a href="{% if client.link %}{{ client.link }}{% else %}#{% endif %}" aria-label="{{ client.name }}">
+                    {% if client.logo %}<img src="{{ client.logo.url }}" alt="{{ client.name }}">{% else %}<span>{{ client.name }}</span>{% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {# CTA #}
+    {% if site_settings %}
+    <section class="q-cta">
+        <div class="q-container">
+            <h2 data-ar="{{ site_settings.footer_title_ar|default:site_settings.site_name_ar }}" data-en="{{ site_settings.footer_title_en|default:site_settings.site_name_en }}">{{ site_settings.footer_title_ar|default:site_settings.site_name_ar }}</h2>
+            <p data-ar="{{ site_settings.footer_description_ar }}" data-en="{{ site_settings.footer_description_en }}">{{ site_settings.footer_description_ar }}</p>
+            <a href="{% if site_settings.footer_button_link %}{{ site_settings.footer_button_link }}{% else %}#{% endif %}" class="q-btn q-btn--primary"
+               data-ar="{{ site_settings.footer_button_text_ar }}" data-en="{{ site_settings.footer_button_text_en }}">{{ site_settings.footer_button_text_ar }}</a>
+        </div>
+    </section>
+    {% endif %}
+
+    {# FOOTER #}
+    <footer id="footer">
+        <div class="q-container">
+            <div class="q-footer__grid">
+                <div class="q-footer__brand">
+                    <svg class="star" aria-hidden="true" style="color: var(--q-accent);"><use href="#q-star"/></svg>
+                    <h4 data-ar="{% if site_settings %}{{ site_settings.footer_title_ar|default:site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_title_en|default:site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}">{% if site_settings %}{{ site_settings.footer_title_ar|default:site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}</h4>
+                    <p data-ar="{% if site_settings %}{{ site_settings.footer_description_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_description_en }}{% else %}We are dedicated to the heritage of the people of the Qur'an{% endif %}">{% if site_settings %}{{ site_settings.footer_description_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}</p>
+                </div>
+                {% for column in footer_columns %}
+                <div class="q-footer__col">
+                    <h5 data-ar="{% firstof column.title_ar column.title %}" data-en="{% firstof column.title_en column.title %}">{% firstof column.title_ar column.title %}</h5>
+                    <ul>
+                        {% for link in column.links.all %}
+                        <li><a href="{% if link.url %}{{ link.url }}{% else %}#{% endif %}" data-ar="{% firstof link.label_ar link.label %}" data-en="{% firstof link.label_en link.label %}">{% firstof link.label_ar link.label %}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="q-footer__bottom">
+                © <span id="copyright-year"></span>
+                <span data-ar="{% if site_settings %}{{ site_settings.copyright_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.{% endif %}" data-en="{% if site_settings %}{{ site_settings.copyright_en }}{% else %}The International Center for the History and Documentation of Quran Reciters. All rights reserved.{% endif %}">{% if site_settings %}{{ site_settings.copyright_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.{% endif %}</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function () {
+        var lang = window.quraaLang || 'ar';
+        var attr = lang === 'ar' ? 'data-ar' : 'data-en';
+
+        // Bilingual swap
+        document.querySelectorAll('[' + attr + ']').forEach(function (el) {
+            var v = el.getAttribute(attr);
+            if (v !== null && v !== '') el.textContent = v;
+        });
+
+        // Localized post dates
+        document.querySelectorAll('.post-date-formatted').forEach(function (el) {
+            var ds = el.getAttribute('data-date');
+            if (!ds) return;
+            var d = new Date(ds);
+            if (isNaN(d.getTime())) return;
+            var opts = lang === 'ar'
+                ? { year: 'numeric', month: 'long', day: 'numeric' }
+                : { year: 'numeric', month: 'short', day: 'numeric' };
+            el.textContent = d.toLocaleDateString(lang === 'ar' ? 'ar' : 'en-US', opts);
+        });
+
+        // Copyright year
+        var y = document.getElementById('copyright-year');
+        if (y) y.textContent = new Date().getFullYear();
+
+        // Language toggle button
+        var btn = document.getElementById('lang-toggle');
+        if (btn) {
+            btn.addEventListener('click', function () {
+                var next = lang === 'ar' ? 'en' : 'ar';
+                localStorage.setItem('quraa-lang', next);
+                window.location.reload();
+            });
+        }
+
+        // Scroll-aware header
+        var header = document.getElementById('header');
+        function onScroll() {
+            if (window.scrollY > 50) header.classList.add('is-scrolled');
+            else header.classList.remove('is-scrolled');
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+    </script>
+</body>
+</html>
