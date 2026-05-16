@@ -85,6 +85,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         "birth_hijri_year", "birth_greg_year", 
         "death_hijri_year", "death_greg_year", 
         "birthplace", "hometown", "death_location",
+        "comments_ar", "comments_en",
     )
     list_filter = ("birthplace", "hometown", "death_location", "attributes", "published")
     search_fields = ("full_name_ar", "full_name_en", "alias_ar", "alias_en")
@@ -117,6 +118,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 ("full_name_ar", "full_name_en"),
                 ("alias_ar", "alias_en"),
                 "attributes", "published",
+                "comments_ar", "comments_en",
                 "user",
             ),
         }),
