@@ -119,30 +119,29 @@ def _format_date(year, month, day, months_ar, months_en, era_ar, era_en, approxi
     en_parts.append(f"{year} {era_en}")
     ar = " ".join(ar_parts)
     en = " ".join(en_parts)
-    is_full = bool(year and month and day)
-    if approximate and not is_full:
+    if approximate:
         ar = ar + " تقريباً"
         en = "c. " + en
-    return {"ar": ar, "en": en}
+    return {"ar": ar, "en": en, "approximate": bool(approximate)}
 
 
 def _bio_dates(bio):
     return {
         "birth_hijri": _format_date(
             bio.birth_hijri_year, bio.birth_hijri_month, bio.birth_hijri_day,
-            HIJRI_MONTHS_AR, HIJRI_MONTHS_EN, "هـ", "AH", bio.birth_date_approximate,
+            HIJRI_MONTHS_AR, HIJRI_MONTHS_EN, "هـ", "AH", bio.birth_hijri_approximate,
         ),
         "birth_greg": _format_date(
             bio.birth_greg_year, bio.birth_greg_month, bio.birth_greg_day,
-            GREG_MONTHS_AR, GREG_MONTHS_EN, "م", "CE", bio.birth_date_approximate,
+            GREG_MONTHS_AR, GREG_MONTHS_EN, "م", "CE", bio.birth_greg_approximate,
         ),
         "death_hijri": _format_date(
             bio.death_hijri_year, bio.death_hijri_month, bio.death_hijri_day,
-            HIJRI_MONTHS_AR, HIJRI_MONTHS_EN, "هـ", "AH", bio.death_date_approximate,
+            HIJRI_MONTHS_AR, HIJRI_MONTHS_EN, "هـ", "AH", bio.death_hijri_approximate,
         ),
         "death_greg": _format_date(
             bio.death_greg_year, bio.death_greg_month, bio.death_greg_day,
-            GREG_MONTHS_AR, GREG_MONTHS_EN, "م", "CE", bio.death_date_approximate,
+            GREG_MONTHS_AR, GREG_MONTHS_EN, "م", "CE", bio.death_greg_approximate,
         ),
     }
 

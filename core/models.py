@@ -1,5 +1,3 @@
-import math
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -21,7 +19,8 @@ class Biography(models.Model):
     birth_greg_year = models.PositiveIntegerField(_("Birth Year (Gregorian)"), null=True, blank=True)
     birth_greg_month = models.PositiveSmallIntegerField(_("Birth Month (Gregorian)"), null=True, blank=True)
     birth_greg_day = models.PositiveSmallIntegerField(_("Birth Day (Gregorian)"), null=True, blank=True)
-    birth_date_approximate = models.BooleanField(_("Birth Date Approximate"), default=False)
+    birth_hijri_approximate = models.BooleanField(_("Birth Hijri Approximate"), default=False)
+    birth_greg_approximate = models.BooleanField(_("Birth Gregorian Approximate"), default=False)
 
     hometown = models.ForeignKey(
         "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="hometown", verbose_name=_("Hometown"),
@@ -35,7 +34,8 @@ class Biography(models.Model):
     death_greg_year = models.PositiveIntegerField(_("Death Year (Gregorian)"), null=True, blank=True)
     death_greg_month = models.PositiveSmallIntegerField(_("Death Month (Gregorian)"), null=True, blank=True)
     death_greg_day = models.PositiveSmallIntegerField(_("Death Day (Gregorian)"), null=True, blank=True)
-    death_date_approximate = models.BooleanField(_("Death Date Approximate"), default=False)
+    death_hijri_approximate = models.BooleanField(_("Death Hijri Approximate"), default=False)
+    death_greg_approximate = models.BooleanField(_("Death Gregorian Approximate"), default=False)
 
     attributes = models.ManyToManyField(
         "Attribute", blank=True, related_name="biographies",
@@ -90,6 +90,32 @@ class Biography(models.Model):
             return self.alias_ar or self.full_name_ar or self.alias_en or self.full_name_en
         return self.alias_en or self.full_name_en or self.alias_ar or self.full_name_ar
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._snapshot_dates()
+        return instance
+
+    def _snapshot_dates(self):
+        """Capture date field state at load time so save() can tell which side
+        the user actually edited and avoid clobbering the approximate flags."""
+        self._orig_dates = {}
+        for prefix in ("birth", "death"):
+            self._orig_dates[prefix] = {
+                "hijri": (
+                    getattr(self, f"{prefix}_hijri_year"),
+                    getattr(self, f"{prefix}_hijri_month"),
+                    getattr(self, f"{prefix}_hijri_day"),
+                ),
+                "greg": (
+                    getattr(self, f"{prefix}_greg_year"),
+                    getattr(self, f"{prefix}_greg_month"),
+                    getattr(self, f"{prefix}_greg_day"),
+                ),
+                "hijri_approx": getattr(self, f"{prefix}_hijri_approximate"),
+                "greg_approx": getattr(self, f"{prefix}_greg_approximate"),
+            }
+
     def clean(self):
         errors = {}
         for prefix, label in (("birth", _("Birth")), ("death", _("Death"))):
@@ -106,8 +132,21 @@ class Biography(models.Model):
             raise ValidationError(errors)
 
     def _fill_date(self, prefix):
-        """Convert whichever calendar was provided into the other one."""
+        """Convert whichever calendar was provided into the other one.
+
+        Approximate flag policy (per calendar side):
+        - On first input, a side is approximate iff the user did not supply a
+          full year+month+day on that side; the derived side is approximate.
+        - On subsequent saves, the flag for a side flips only when the user
+          actually edits that side's fields — otherwise it stays as stored.
+          This prevents a previously-derived (auto-filled) side from being
+          re-classified as "exact" when the row is saved with no date changes.
+        """
         from hijridate import Gregorian as HijriGregorian, Hijri
+        from core.hijri_utils import (
+            hijri_date_to_gregorian,
+            gregorian_date_to_hijri,
+        )
 
         hY = getattr(self, f"{prefix}_hijri_year")
         hM = getattr(self, f"{prefix}_hijri_month")
@@ -116,68 +155,77 @@ class Biography(models.Model):
         gM = getattr(self, f"{prefix}_greg_month")
         gD = getattr(self, f"{prefix}_greg_day")
 
-        # Both calendars already have a year — nothing to derive.
-        if hY and gY:
-            return
+        hijri_full = bool(hY and hM and hD)
+        greg_full = bool(gY and gM and gD)
 
-        # hijridate only supports Hijri ~1356–1500 / Gregorian ~1937–2077.
-        # Outside that window the library raises OverflowError; fall back to the
-        # year-only linear approximation (and mark the date approximate).
-        def approx_greg_from_hijri():
-            setattr(self, f"{prefix}_greg_year", hY + 622 - math.floor(hY / 33))
-            setattr(self, f"{prefix}_greg_month", None)
-            setattr(self, f"{prefix}_greg_day", None)
-            setattr(self, f"{prefix}_date_approximate", True)
+        orig = getattr(self, "_orig_dates", {}).get(prefix)
+        if orig is not None:
+            hijri_changed = (hY, hM, hD) != orig["hijri"]
+            greg_changed = (gY, gM, gD) != orig["greg"]
+            prior_hijri_approx = orig["hijri_approx"]
+            prior_greg_approx = orig["greg_approx"]
+        else:
+            # No snapshot: treat as a fresh row where current values are the
+            # user's authoritative input.
+            hijri_changed = True
+            greg_changed = True
+            prior_hijri_approx = True
+            prior_greg_approx = True
 
-        def approx_hijri_from_greg():
-            setattr(self, f"{prefix}_hijri_year", gY - 622 + math.floor((gY - 622) / 32))
-            setattr(self, f"{prefix}_hijri_month", None)
-            setattr(self, f"{prefix}_hijri_day", None)
-            setattr(self, f"{prefix}_date_approximate", True)
+        # If the user touched a side, its flag follows the new completeness;
+        # if untouched, keep whatever was previously stored.
+        hijri_approx = (not hijri_full) if hijri_changed else prior_hijri_approx
+        greg_approx = (not greg_full) if greg_changed else prior_greg_approx
 
-        if hY and hM and hD and not gY:
+        setattr(self, f"{prefix}_hijri_approximate", hijri_approx)
+        setattr(self, f"{prefix}_greg_approximate", greg_approx)
+
+        def fill_greg_from_hijri():
+            month = hM or 6  # midyear when month unknown
+            day = hD or 15   # mid-month when day unknown
             try:
-                g = Hijri(hY, hM, hD).to_gregorian()
-                setattr(self, f"{prefix}_greg_year", g.year)
-                setattr(self, f"{prefix}_greg_month", g.month)
-                setattr(self, f"{prefix}_greg_day", g.day)
-                setattr(self, f"{prefix}_date_approximate", False)
+                g = Hijri(hY, month, day).to_gregorian()
             except (OverflowError, ValueError):
-                approx_greg_from_hijri()
+                g = hijri_date_to_gregorian(hY, month, day)
+            setattr(self, f"{prefix}_greg_year", g.year)
+            setattr(self, f"{prefix}_greg_month", g.month)
+            setattr(self, f"{prefix}_greg_day", g.day)
 
-        elif gY and gM and gD and not hY:
+        def fill_hijri_from_greg():
+            month = gM or 6
+            day = gD or 15
             try:
-                h = HijriGregorian(gY, gM, gD).to_hijri()
-                setattr(self, f"{prefix}_hijri_year", h.year)
-                setattr(self, f"{prefix}_hijri_month", h.month)
-                setattr(self, f"{prefix}_hijri_day", h.day)
-                setattr(self, f"{prefix}_date_approximate", False)
+                h = HijriGregorian(gY, month, day).to_hijri()
+                h_year, h_month, h_day = h.year, h.month, h.day
             except (OverflowError, ValueError):
-                approx_hijri_from_greg()
+                try:
+                    h = gregorian_date_to_hijri(gY, month, day)
+                except ValueError:
+                    return
+                h_year, h_month, h_day = h.year, h.month, h.day
+            setattr(self, f"{prefix}_hijri_year", h_year)
+            setattr(self, f"{prefix}_hijri_month", h_month)
+            setattr(self, f"{prefix}_hijri_day", h_day)
 
-        elif hY and hM and not hD and not gY:
-            try:
-                g = Hijri(hY, hM, 1).to_gregorian()
-                setattr(self, f"{prefix}_greg_year", g.year)
-                setattr(self, f"{prefix}_greg_month", g.month)
-                setattr(self, f"{prefix}_date_approximate", True)
-            except (OverflowError, ValueError):
-                approx_greg_from_hijri()
+        hijri_exact = not hijri_approx
+        greg_exact = not greg_approx
 
-        elif gY and gM and not gD and not hY:
-            try:
-                h = HijriGregorian(gY, gM, 1).to_hijri()
-                setattr(self, f"{prefix}_hijri_year", h.year)
-                setattr(self, f"{prefix}_hijri_month", h.month)
-                setattr(self, f"{prefix}_date_approximate", True)
-            except (OverflowError, ValueError):
-                approx_hijri_from_greg()
-
-        elif hY and not gY:
-            approx_greg_from_hijri()
-
-        elif gY and not hY:
-            approx_hijri_from_greg()
+        # Derive the partner side. Re-derive when the source side was edited
+        # and the partner wasn't (refreshes stale auto-filled data); otherwise
+        # only fill an empty partner. If the user supplied data on the partner
+        # — even a partial year — respect their input.
+        if hijri_exact and not greg_exact and hY:
+            if not gY or (hijri_changed and not greg_changed):
+                fill_greg_from_hijri()
+        elif greg_exact and not hijri_exact and gY:
+            if not hY or (greg_changed and not hijri_changed):
+                fill_hijri_from_greg()
+        elif not hijri_exact and not greg_exact:
+            # Both approximate. Fill an empty side from the side that has a year.
+            if hY and not gY:
+                fill_greg_from_hijri()
+            elif gY and not hY:
+                fill_hijri_from_greg()
 
     def save(self, *args, **kwargs):
         from core.search import biography_search_text
@@ -188,6 +236,9 @@ class Biography(models.Model):
             self.full_name_ar, self.full_name_en, self.alias_ar, self.alias_en,
         )
         super().save(*args, **kwargs)
+        # Refresh the snapshot so a follow-up save() on the same instance
+        # treats derived fields as part of the stored state, not user input.
+        self._snapshot_dates()
 
 
 class Location(models.Model):

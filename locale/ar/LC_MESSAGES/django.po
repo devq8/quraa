@@ -144,9 +144,13 @@ msgstr "شهر الميلاد (ميلادي)"
 msgid "Birth Day (Gregorian)"
 msgstr "يوم الميلاد (ميلادي)"
 
-#: core/models.py:24
-msgid "Birth Date Approximate"
-msgstr "تاريخ الميلاد تقريبي"
+#: core/models.py:22
+msgid "Birth Hijri Approximate"
+msgstr "تاريخ الميلاد الهجري تقريبي"
+
+#: core/models.py:23
+msgid "Birth Gregorian Approximate"
+msgstr "تاريخ الميلاد الميلادي تقريبي"
 
 #: core/models.py:27
 msgid "Hometown"
@@ -180,9 +184,13 @@ msgstr "شهر الوفاة (ميلادي)"
 msgid "Death Day (Gregorian)"
 msgstr "يوم الوفاة (ميلادي)"
 
+#: core/models.py:37
+msgid "Death Hijri Approximate"
+msgstr "تاريخ الوفاة الهجري تقريبي"
+
 #: core/models.py:38
-msgid "Death Date Approximate"
-msgstr "تاريخ الوفاة تقريبي"
+msgid "Death Gregorian Approximate"
+msgstr "تاريخ الوفاة الميلادي تقريبي"
 
 #: core/models.py:42 core/models.py:238
 msgid "Attributes"

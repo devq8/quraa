@@ -367,8 +367,9 @@
                 <th data-ar="التاريخ الهجري" data-en="Hijri Date">
                   التاريخ الهجري
                 </th>
-                <td data-ar="{{ dates.birth_hijri.ar }}" data-en="{{ dates.birth_hijri.en }}">
-                  {{ dates.birth_hijri.ar }}
+                <td>
+                  <span data-ar="{{ dates.birth_hijri.ar }}" data-en="{{ dates.birth_hijri.en }}">{{ dates.birth_hijri.ar }}</span>
+                  {% if dates.birth_hijri.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
                 </td>
               </tr>
               {% endif %} {% if dates.birth_greg %}
@@ -376,8 +377,9 @@
                 <th data-ar="التاريخ الميلادي" data-en="Gregorian Date">
                   التاريخ الميلادي
                 </th>
-                <td data-ar="{{ dates.birth_greg.ar }}" data-en="{{ dates.birth_greg.en }}">
-                  {{ dates.birth_greg.ar }}
+                <td>
+                  <span data-ar="{{ dates.birth_greg.ar }}" data-en="{{ dates.birth_greg.en }}">{{ dates.birth_greg.ar }}</span>
+                  {% if dates.birth_greg.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
                 </td>
               </tr>
               {% endif %} {% if biography.birthplace %}
@@ -413,8 +415,9 @@
                 <th data-ar="التاريخ الهجري" data-en="Hijri Date">
                   التاريخ الهجري
                 </th>
-                <td data-ar="{{ dates.death_hijri.ar }}" data-en="{{ dates.death_hijri.en }}">
-                  {{ dates.death_hijri.ar }}
+                <td>
+                  <span data-ar="{{ dates.death_hijri.ar }}" data-en="{{ dates.death_hijri.en }}">{{ dates.death_hijri.ar }}</span>
+                  {% if dates.death_hijri.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
                 </td>
               </tr>
               {% endif %} {% if dates.death_greg %}
@@ -422,8 +425,9 @@
                 <th data-ar="التاريخ الميلادي" data-en="Gregorian Date">
                   التاريخ الميلادي
                 </th>
-                <td data-ar="{{ dates.death_greg.ar }}" data-en="{{ dates.death_greg.en }}">
-                  {{ dates.death_greg.ar }}
+                <td>
+                  <span data-ar="{{ dates.death_greg.ar }}" data-en="{{ dates.death_greg.en }}">{{ dates.death_greg.ar }}</span>
+                  {% if dates.death_greg.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
                 </td>
               </tr>
               {% endif %} {% if biography.death_location %}
