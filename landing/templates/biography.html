@@ -303,8 +303,14 @@
           </div>
           <div class="col-lg-9">
             <table class="bio-table">
+              {% if biography.alias_ar %}
               <tr>
-                <th data-ar="الاسم" data-en="Name">الاسم</th>
+                <th data-ar="الكنية / اللقب" data-en="Alias">الكنية / اللقب</th>
+                <td data-ar="{{ biography.alias_ar }}" data-en="{{ biography.alias_en|default:biography.alias_ar }}">{{ biography.alias_ar }}</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <th data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</th>
                 <td>{{ biography.full_name_ar|default:"—" }}</td>
               </tr>
               <!-- <tr>
