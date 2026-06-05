@@ -116,6 +116,8 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             kwargs["queryset"] = Location.objects.order_by(*ordering)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    filter_horizontal = ("attributes",)
+
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "attributes":
             ordering = _lang_ordering(
@@ -123,7 +125,17 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 ("short_name_en", "short_name_ar"),
             )
             kwargs["queryset"] = Attribute.objects.order_by(*ordering)
-        return super().formfield_for_manytomany(db_field, request, **kwargs)
+        formfield = super().formfield_for_manytomany(db_field, request, **kwargs)
+        if db_field.name == "attributes":
+            is_ar = (get_language() or "").startswith("ar")
+            def _label(obj):
+                long_name = (obj.long_name_ar if is_ar else obj.long_name_en) or obj.long_name_ar or obj.long_name_en or ""
+                short_name = (obj.short_name_ar if is_ar else obj.short_name_en) or obj.short_name_ar or obj.short_name_en or ""
+                if long_name and short_name:
+                    return f"{long_name} ({short_name})"
+                return long_name or short_name
+            formfield.label_from_instance = _label
+        return formfield
 
     def save_model(self, request, obj, form, change):
         if not change:
