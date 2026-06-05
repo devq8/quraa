@@ -290,6 +290,28 @@ class Attribute(models.Model):
         ordering = ["id", "short_name_ar"]
 
 
+# ملاحظات معرَّفة مسبقًا لعلاقات المشيخة كـ"إجازة عامة"، "سماع"، "قراءة"... إلخ
+class Note(models.Model):
+    short_name_ar = models.CharField(_("Short Name (Arabic)"), max_length=255)
+    short_name_en = models.CharField(_("Short Name (English)"), max_length=255, blank=True)
+    long_name_ar = models.CharField(_("Long Name (Arabic)"), max_length=255, blank=True)
+    long_name_en = models.CharField(_("Long Name (English)"), max_length=255, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        lang = get_language()
+        if lang and lang.startswith("ar"):
+            return self.short_name_ar or self.short_name_en
+        return self.short_name_en or self.short_name_ar
+
+    class Meta:
+        verbose_name = _("Note")
+        verbose_name_plural = _("Notes")
+        ordering = ["id", "short_name_ar"]
+
+
 class Source(models.Model):
     biography = models.ForeignKey(
         "Biography", on_delete=models.CASCADE, related_name="sources", verbose_name=_("Biography")
@@ -491,8 +513,10 @@ class TeacherStudentRelationship(models.Model):
         related_name="teacher_relationships",
         verbose_name=_("Student"),
     )
-    notes_ar = models.CharField(_("Notes (Arabic)"), max_length=500, blank=True)
-    notes_en = models.CharField(_("Notes (English)"), max_length=500, blank=True)
+    notes = models.ManyToManyField(
+        "Note", blank=True, related_name="relationships",
+        verbose_name=_("Notes"),
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

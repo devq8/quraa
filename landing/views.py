@@ -155,7 +155,9 @@ def biography_detail(request, pk):
         "sources",
         "esnads__links__narrator",
         "teacher_relationships__teacher",
+        "teacher_relationships__notes",
         "student_relationships__student",
+        "student_relationships__notes",
     )
     biography = get_object_or_404(qs, pk=pk)
     if not biography.published and not request.user.is_staff:

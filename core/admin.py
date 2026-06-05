@@ -12,7 +12,7 @@ from .models import (
     Attribute, Biography,
     Esnad, EsnadLink,
     EsnadTemplate, EsnadTemplateLink,
-    Location, Source, TeacherStudentRelationship,
+    Location, Note, Source, TeacherStudentRelationship,
 )
 
 
@@ -35,8 +35,8 @@ class TeacherInline(nested_admin.NestedTabularInline):
     model = TeacherStudentRelationship
     fk_name = "student"
     extra = 0
-    fields = ("teacher", "notes_ar", "notes_en")
-    autocomplete_fields = ("teacher",)
+    fields = ("teacher", "notes")
+    autocomplete_fields = ("teacher", "notes")
     verbose_name = _("Teacher")
     verbose_name_plural = _("Teachers")
 
@@ -46,8 +46,8 @@ class StudentInline(nested_admin.NestedTabularInline):
     model = TeacherStudentRelationship
     fk_name = "teacher"
     extra = 0
-    fields = ("student", "notes_ar", "notes_en")
-    autocomplete_fields = ("student",)
+    fields = ("student", "notes")
+    autocomplete_fields = ("student", "notes")
     verbose_name = _("Student")
     verbose_name_plural = _("Students")
 
@@ -207,6 +207,24 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(Attribute)
 class AttributeAdmin(admin.ModelAdmin):
+    list_display = ("id", "short_name_ar", "short_name_en", "long_name_ar")
+    search_fields = ("short_name_ar", "short_name_en", "long_name_ar", "long_name_en")
+    fieldsets = (
+        (None, {
+            "fields": (
+                ("short_name_ar", "short_name_en"),
+                ("long_name_ar", "long_name_en"),
+                ("description_ar", "description_en"),
+            ),
+        }),
+    )
+
+    def get_ordering(self, request):
+        return _lang_ordering(("short_name_ar",), ("short_name_en", "short_name_ar"))
+
+
+@admin.register(Note)
+class NoteAdmin(admin.ModelAdmin):
     list_display = ("id", "short_name_ar", "short_name_en", "long_name_ar")
     search_fields = ("short_name_ar", "short_name_en", "long_name_ar", "long_name_en")
     fieldsets = (
