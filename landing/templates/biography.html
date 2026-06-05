@@ -450,8 +450,8 @@
             <ul class="bio-relation-list">
               {% for rel in teachers %}
               <li>
-                <a href="{% url 'landing:biography_detail' rel.teacher.pk %}" data-ar="{{ rel.teacher.full_name_ar|default:rel.teacher.full_name_en }}" data-en="{{ rel.teacher.full_name_en|default:rel.teacher.full_name_ar }}">{{
-                    rel.teacher.full_name_ar|default:rel.teacher.full_name_en
+                <a href="{% url 'landing:biography_detail' rel.teacher.pk %}" data-ar="{{ rel.teacher.alias_ar|default:rel.teacher.full_name_ar|default:rel.teacher.alias_en|default:rel.teacher.full_name_en }}" data-en="{{ rel.teacher.alias_en|default:rel.teacher.full_name_en|default:rel.teacher.alias_ar|default:rel.teacher.full_name_ar }}">{{
+                    rel.teacher.alias_ar|default:rel.teacher.full_name_ar|default:rel.teacher.alias_en|default:rel.teacher.full_name_en
                     }}</a>
                 {% if rel.notes_ar or rel.notes_en %}
                 <span class="relation-notes" data-ar="{{ rel.notes_ar|default:rel.notes_en }}" data-en="{{ rel.notes_en|default:rel.notes_ar }}">{{ rel.notes_ar|default:rel.notes_en }}</span>
@@ -482,8 +482,8 @@
             <ul class="bio-relation-list">
               {% for rel in students %}
               <li>
-                <a href="{% url 'landing:biography_detail' rel.student.pk %}" data-ar="{{ rel.student.full_name_ar|default:rel.student.full_name_en }}" data-en="{{ rel.student.full_name_en|default:rel.student.full_name_ar }}">{{
-                    rel.student.full_name_ar|default:rel.student.full_name_en
+                <a href="{% url 'landing:biography_detail' rel.student.pk %}" data-ar="{{ rel.student.alias_ar|default:rel.student.full_name_ar|default:rel.student.alias_en|default:rel.student.full_name_en }}" data-en="{{ rel.student.alias_en|default:rel.student.full_name_en|default:rel.student.alias_ar|default:rel.student.full_name_ar }}">{{
+                    rel.student.alias_ar|default:rel.student.full_name_ar|default:rel.student.alias_en|default:rel.student.full_name_en
                     }}</a>
                 {% if rel.notes_ar or rel.notes_en %}
                 <span class="relation-notes" data-ar="{{ rel.notes_ar|default:rel.notes_en }}" data-en="{{ rel.notes_en|default:rel.notes_ar }}">{{ rel.notes_ar|default:rel.notes_en }}</span>

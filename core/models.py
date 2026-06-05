@@ -87,8 +87,8 @@ class Biography(models.Model):
     def __str__(self):
         lang = get_language()
         if lang and lang.startswith("ar"):
-            return self.full_name_ar or self.full_name_en
-        return self.full_name_en or self.full_name_ar
+            return self.alias_ar or self.full_name_ar or self.alias_en or self.full_name_en
+        return self.alias_en or self.full_name_en or self.alias_ar or self.full_name_ar
 
     def clean(self):
         errors = {}
