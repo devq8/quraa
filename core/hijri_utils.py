@@ -62,6 +62,41 @@ def hijri_date_to_gregorian(
 
 
 @dataclass(frozen=True)
+class HijriDate:
+    year: int
+    month: int
+    day: int
+
+
+def gregorian_date_to_hijri(g_year: int, g_month: int, g_day: int) -> HijriDate:
+    """
+    Convert a Gregorian date (year, month, day) to an approximate Hijri date.
+
+    Inverse of hijri_date_to_gregorian using the same mean lunar month/year.
+    Result is approximate; expect drift of a few days versus exact tabular
+    calendars, especially far from the present.
+    """
+    g = date(g_year, g_month, g_day)
+    days_since_epoch = (g - _HIJRI_EPOCH).days
+    if days_since_epoch < 0:
+        # Pre-Hijra Gregorian dates are not meaningful in this calendar.
+        raise ValueError("Gregorian date precedes the Hijri epoch (622-07-19 CE).")
+    year_float = days_since_epoch / _MEAN_LUNAR_YEAR_DAYS
+    h_year = int(year_float) + 1
+    remaining_days = days_since_epoch - (h_year - 1) * _MEAN_LUNAR_YEAR_DAYS
+    h_month = int(remaining_days // _MEAN_LUNAR_MONTH_DAYS) + 1
+    if h_month > 12:
+        h_month = 12
+    remaining_days -= (h_month - 1) * _MEAN_LUNAR_MONTH_DAYS
+    h_day = int(round(remaining_days)) + 1
+    if h_day < 1:
+        h_day = 1
+    if h_day > 30:
+        h_day = 30
+    return HijriDate(year=h_year, month=h_month, day=h_day)
+
+
+@dataclass(frozen=True)
 class HijriMonthToGregorianRange:
     """Gregorian date range for a Hijri month (first and last day of that month)."""
 

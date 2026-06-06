@@ -7,13 +7,19 @@ from django.db import models
 from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 from .models import (
     Attribute, Biography,
     Esnad, EsnadLink,
     EsnadTemplate, EsnadTemplateLink,
-    Location, Source, TeacherStudentRelationship,
+    Location, Note, Source, TeacherStudentRelationship,
 )
+
+
+def _lang_ordering(ar_fields, en_fields):
+    """Return Arabic field tuple when the active UI language is Arabic, else English."""
+    lang = get_language()
+    return ar_fields if (lang and lang.startswith("ar")) else en_fields
 
 
 class SourceInline(nested_admin.NestedTabularInline):
@@ -29,8 +35,8 @@ class TeacherInline(nested_admin.NestedTabularInline):
     model = TeacherStudentRelationship
     fk_name = "student"
     extra = 0
-    fields = ("teacher", "notes_ar", "notes_en")
-    autocomplete_fields = ("teacher",)
+    fields = ("teacher", "notes")
+    autocomplete_fields = ("teacher", "notes")
     verbose_name = _("Teacher")
     verbose_name_plural = _("Teachers")
 
@@ -40,8 +46,8 @@ class StudentInline(nested_admin.NestedTabularInline):
     model = TeacherStudentRelationship
     fk_name = "teacher"
     extra = 0
-    fields = ("student", "notes_ar", "notes_en")
-    autocomplete_fields = ("student",)
+    fields = ("student", "notes")
+    autocomplete_fields = ("student", "notes")
     verbose_name = _("Student")
     verbose_name_plural = _("Students")
 
@@ -89,13 +95,47 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     )
     list_filter = ("birthplace", "hometown", "death_location", "attributes", "published")
     search_fields = ("full_name_ar", "full_name_en", "alias_ar", "alias_en")
-    ordering = ("id", "full_name_ar")
     readonly_fields = (
-        "birth_date_approximate",
-        "death_date_approximate",
+        "birth_hijri_approximate",
+        "birth_greg_approximate",
+        "death_hijri_approximate",
+        "death_greg_approximate",
     )
     inlines = [TeacherInline, StudentInline, EsnadInline, SourceInline]
     change_form_template = "admin/core/biography/change_form.html"
+
+    def get_ordering(self, request):
+        return _lang_ordering(("full_name_ar",), ("full_name_en", "full_name_ar"))
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name in ("birthplace", "hometown", "death_location"):
+            ordering = _lang_ordering(
+                ("country_ar", "city_ar"),
+                ("country_en", "city_en", "country_ar", "city_ar"),
+            )
+            kwargs["queryset"] = Location.objects.order_by(*ordering)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    filter_horizontal = ("attributes",)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "attributes":
+            ordering = _lang_ordering(
+                ("short_name_ar",),
+                ("short_name_en", "short_name_ar"),
+            )
+            kwargs["queryset"] = Attribute.objects.order_by(*ordering)
+        formfield = super().formfield_for_manytomany(db_field, request, **kwargs)
+        if db_field.name == "attributes":
+            is_ar = (get_language() or "").startswith("ar")
+            def _label(obj):
+                long_name = (obj.long_name_ar if is_ar else obj.long_name_en) or obj.long_name_ar or obj.long_name_en or ""
+                short_name = (obj.short_name_ar if is_ar else obj.short_name_en) or obj.short_name_ar or obj.short_name_en or ""
+                if long_name and short_name:
+                    return f"{long_name} ({short_name})"
+                return long_name or short_name
+            formfield.label_from_instance = _label
+        return formfield
 
     def save_model(self, request, obj, form, change):
         if not change:
@@ -109,7 +149,10 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             extra_context["biography_esnads"] = (
                 Esnad.objects.filter(biography_id=object_id).order_by("id")
             )
-            extra_context["esnad_templates"] = EsnadTemplate.objects.only("id", "name_ar", "name_en")
+            template_ordering = _lang_ordering(("name_ar",), ("name_en", "name_ar"))
+            extra_context["esnad_templates"] = (
+                EsnadTemplate.objects.only("id", "name_ar", "name_en").order_by(*template_ordering)
+            )
         return super().changeform_view(request, object_id, form_url, extra_context)
 
     fieldsets = (
@@ -127,7 +170,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 "birthplace", "hometown",
                 ("birth_hijri_year", "birth_hijri_month", "birth_hijri_day"),
                 ("birth_greg_year",  "birth_greg_month",  "birth_greg_day"),
-                "birth_date_approximate",
+                ("birth_hijri_approximate", "birth_greg_approximate"),
             ),
         }),
         (_("Death"), {
@@ -135,7 +178,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 "death_location",
                 ("death_hijri_year", "death_hijri_month", "death_hijri_day"),
                 ("death_greg_year",  "death_greg_month",  "death_greg_day"),
-                "death_date_approximate",
+                ("death_hijri_approximate", "death_greg_approximate"),
             ),
         }),
     )
@@ -146,7 +189,6 @@ class LocationAdmin(admin.ModelAdmin):
     list_display = ("id", "city_ar", "city_en", "country_ar", "country_en")
     list_filter = ("country_ar",)
     search_fields = ("city_ar", "city_en", "country_ar", "country_en")
-    ordering = ("id", "country_ar", "city_ar")
     fieldsets = (
         (None, {
             "fields": (
@@ -156,12 +198,17 @@ class LocationAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_ordering(self, request):
+        return _lang_ordering(
+            ("country_ar", "city_ar"),
+            ("country_en", "city_en", "country_ar", "city_ar"),
+        )
+
 
 @admin.register(Attribute)
 class AttributeAdmin(admin.ModelAdmin):
     list_display = ("id", "short_name_ar", "short_name_en", "long_name_ar")
     search_fields = ("short_name_ar", "short_name_en", "long_name_ar", "long_name_en")
-    ordering = ("id", "short_name_ar")
     fieldsets = (
         (None, {
             "fields": (
@@ -171,6 +218,27 @@ class AttributeAdmin(admin.ModelAdmin):
             ),
         }),
     )
+
+    def get_ordering(self, request):
+        return _lang_ordering(("short_name_ar",), ("short_name_en", "short_name_ar"))
+
+
+@admin.register(Note)
+class NoteAdmin(admin.ModelAdmin):
+    list_display = ("id", "short_name_ar", "short_name_en", "long_name_ar")
+    search_fields = ("short_name_ar", "short_name_en", "long_name_ar", "long_name_en")
+    fieldsets = (
+        (None, {
+            "fields": (
+                ("short_name_ar", "short_name_en"),
+                ("long_name_ar", "long_name_en"),
+                ("description_ar", "description_en"),
+            ),
+        }),
+    )
+
+    def get_ordering(self, request):
+        return _lang_ordering(("short_name_ar",), ("short_name_en", "short_name_ar"))
 
 
 class EsnadLinkInline(SortableInlineAdminMixin, admin.TabularInline):
@@ -230,7 +298,10 @@ class EsnadAdmin(SortableAdminBase, admin.ModelAdmin):
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         extra_context = extra_context or {}
         if object_id:
-            extra_context["esnad_templates"] = EsnadTemplate.objects.only("id", "name_ar", "name_en")
+            template_ordering = _lang_ordering(("name_ar",), ("name_en", "name_ar"))
+            extra_context["esnad_templates"] = (
+                EsnadTemplate.objects.only("id", "name_ar", "name_en").order_by(*template_ordering)
+            )
         return super().changeform_view(request, object_id, form_url, extra_context)
 
     def apply_template_view(self, request, object_id):
@@ -320,13 +391,15 @@ class EsnadTemplateLinkInline(SortableInlineAdminMixin, admin.TabularInline):
 class EsnadTemplateAdmin(SortableAdminBase, admin.ModelAdmin):
     list_display = ("id", "name_ar", "name_en", "link_count", "created")
     search_fields = ("name_ar", "name_en")
-    ordering = ("name_ar",)
     readonly_fields = ("created", "updated")
     inlines = [EsnadTemplateLinkInline]
     fieldsets = (
         (None, {"fields": (("name_ar", "name_en"),)}),
         (_("Audit"), {"classes": ("collapse",), "fields": ("created", "updated")}),
     )
+
+    def get_ordering(self, request):
+        return _lang_ordering(("name_ar",), ("name_en", "name_ar"))
 
     @admin.display(description=_("Narrators"))
     def link_count(self, obj):
