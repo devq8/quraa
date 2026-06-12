@@ -36,6 +36,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}" />
+  <!-- Utility layer rebuilt from templates (see tailwind.config.js / `npm run tw:build`) -->
+  <link rel="stylesheet" href="{% static 'assets/css/tailwind-utilities.css' %}" />
   <style>
     /* Single source of truth — change this one line to swap the heading/paragraph font everywhere. */
     :root {
@@ -54,7 +56,7 @@
 
 </head>
 
-<body class="font-rubik text-base text-slate-900 dark:text-white dark:bg-slate-900">
+<body class="font-rubik text-base text-slate-900 dark:text-white dark:bg-slate-900 flex flex-col min-h-screen">
   <!-- Navbar Start -->
   <nav class="navbar" id="navbar">
     <div class="container flex flex-wrap items-center justify-end">
@@ -102,7 +104,7 @@
         </ul>
         <!-- Navbar Collapse Manu Button -->
         <button data-collapse="menu-collapse" type="button" class="collapse-btn inline-flex items-center ms-3 text-dark dark:text-white lg_992:hidden" aria-controls="menu-collapse" aria-expanded="false">
-          <span class="sr-only">Navigation Menu</span>
+          <span class="sr-only">{% trans "Navigation Menu" %}</span>
           <i class="mdi mdi-menu mdi-24px"></i>
         </button>
       </div>
@@ -112,6 +114,9 @@
         <ul class="navbar-nav nav-light" id="navbar-navlist">
           <li class="nav-item">
             <a class="nav-link active" href="{% url 'landing:landing' %}#home">{% trans "Home" %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'landing:biographies' %}">{% trans "Biographies" %}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'landing:landing' %}#about">{% trans "About us" %}</a>
@@ -156,7 +161,9 @@
   </nav>
   <!-- Navbar End -->
 
-  {% block Hero %} {% endblock Hero%}
+  <main class="flex-grow">
+    {% block Hero %} {% endblock Hero%}
+  </main>
 
   <!-- Start Footer -->
   <footer class="py-8 bg-slate-800 dark:bg-gray-900">
@@ -297,15 +304,15 @@
           .then((data) => {
             if (data.success) {
               document.getElementById("simple-msg").innerHTML =
-                '<div class="success_message">Email Sent Successfully.</div>';
+                '<div class="success_message">{% trans "Email Sent Successfully." %}</div>';
             } else {
               document.getElementById("simple-msg").innerHTML =
-                '<div class="error_message">Error sending email. Please try again later.</div>';
+                '<div class="error_message">{% trans "Error sending email. Please try again later." %}</div>';
             }
           })
           .catch((error) => {
             document.getElementById("simple-msg").innerHTML =
-              '<div class="error_message">Error sending email. Please try again later.</div>';
+              '<div class="error_message">{% trans "Error sending email. Please try again later." %}</div>';
           });
       }
     });

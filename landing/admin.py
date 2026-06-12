@@ -44,6 +44,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         (_("Blog section header"), {"fields": ("blog_heading_ar", "blog_heading_en", "blog_subheading_ar", "blog_subheading_en", "blog_description_ar", "blog_description_en")}),
         (_("Contact section"), {"fields": ("contact_heading_ar", "contact_heading_en", "contact_subheading_ar", "contact_subheading_en", "contact_description_ar", "contact_description_en", "contact_email", "contact_phone", "contact_address_ar", "contact_address_en")}),
         (_("Social media links"), {"fields": ("facebook_url", "twitter_url", "instagram_url")}),
+        (_("Search"), {"fields": ("search_results_per_page",)}),
         (_("Copyright"), {"fields": ("copyright_ar", "copyright_en")}),
     )
 

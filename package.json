@@ -1,0 +1,13 @@
+{
+  "name": "quraa-tailwind",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tailwind v3.4.1 utility build for the Upwind theme. See tailwind.config.js.",
+  "scripts": {
+    "tw:build": "tailwindcss -c tailwind.config.js -i tailwind/input.css -o core/static/assets/css/tailwind-utilities.css --minify",
+    "tw:watch": "tailwindcss -c tailwind.config.js -i tailwind/input.css -o core/static/assets/css/tailwind-utilities.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.1"
+  }
+}

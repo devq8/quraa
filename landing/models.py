@@ -1,6 +1,7 @@
 import json
 import time
 
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -67,10 +68,18 @@ class SiteSettings(models.Model):
     twitter_url = models.URLField(_("Twitter URL"), blank=True)
     instagram_url = models.URLField(_("Instagram URL"), blank=True)
 
+    # Search
+    search_results_per_page = models.PositiveIntegerField(
+        _("Search results per page"),
+        default=5,
+        validators=[MinValueValidator(1)],
+        help_text=_("Number of biographies shown per page on the search results page."),
+    )
+
     # Copyright
     copyright_ar = models.CharField(_("Copyright (Arabic)"), max_length=255, default="المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.")
     copyright_en = models.CharField(_("Copyright (English)"), max_length=255, default="The International Center for the History and Documentation of Quran Reciters. All rights reserved.")
-    
+
     class Meta:
         verbose_name = _("Site settings")
         verbose_name_plural = _("Site settings")
@@ -140,6 +149,10 @@ class Post(models.Model):
     category_en = models.CharField(_("Category (English)"), max_length=100, blank=True)
     title_ar = models.CharField(_("Title (Arabic)"), max_length=255)
     title_en = models.CharField(_("Title (English)"), max_length=255, blank=True)
+    author_ar = models.CharField(_("Author (Arabic)"), max_length=255, blank=True)
+    author_en = models.CharField(_("Author (English)"), max_length=255, blank=True)
+    author_role_ar = models.CharField(_("Author role (Arabic)"), max_length=255, blank=True)
+    author_role_en = models.CharField(_("Author role (English)"), max_length=255, blank=True)
     excerpt_ar = models.TextField(_("Excerpt (Arabic)"), blank=True)
     excerpt_en = models.TextField(_("Excerpt (English)"), blank=True)
     body_ar = models.TextField(_("Body (Arabic)"), blank=True)

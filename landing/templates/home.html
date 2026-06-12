@@ -155,11 +155,13 @@
               {% endif %}
             </p>
 
+            {% if service.link %}
             <div class="mt-5">
-              <a href="{{ service.link|default:'' }}" class="btn btn-link hover:text-orange-600 dark:hover:text-orange-600 after:bg-orange-600 dark:text-white transition duration-500">
+              <a href="{{ service.link }}" class="btn btn-link hover:text-orange-600 dark:hover:text-orange-600 after:bg-orange-600 dark:text-white transition duration-500">
                 {% if LANGUAGE_CODE == 'ar' %}اقرأ المزيد{% else %}Read More{% endif %}
                 {% if LANGUAGE_CODE == 'ar' %}<i class="uil uil-arrow-left"></i></a>{% else %}<i class="uil uil-arrow-right"></i></a>{% endif %}
             </div>
+            {% endif %}
           </div>
         </div>
         {% endfor %}

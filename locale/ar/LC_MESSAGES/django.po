@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-11 21:25+0300\n"
+"POT-Creation-Date: 2026-06-12 10:50+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -293,6 +293,9 @@ msgstr "قسم اتصل بنا"
 msgid "Social media links"
 msgstr "روابط وسائل التواصل الاجتماعي"
 
+msgid "Search"
+msgstr "بحث"
+
 msgid "Copyright"
 msgstr "حقوق النشر"
 
@@ -434,6 +437,12 @@ msgstr "رابط تويتر"
 msgid "Instagram URL"
 msgstr "رابط إنستغرام"
 
+msgid "Search results per page"
+msgstr "عدد نتائج البحث في الصفحة"
+
+msgid "Number of biographies shown per page on the search results page."
+msgstr "عدد السِيَر المعروضة في كل صفحة على صفحة نتائج البحث."
+
 msgid "Copyright (Arabic)"
 msgstr "حقوق النشر (عربي)"
 
@@ -491,6 +500,18 @@ msgstr "الفئة (عربي)"
 msgid "Category (English)"
 msgstr "الفئة (إنجليزي)"
 
+msgid "Author (Arabic)"
+msgstr "المؤلف (عربي)"
+
+msgid "Author (English)"
+msgstr "المؤلف (إنجليزي)"
+
+msgid "Author role (Arabic)"
+msgstr "صفة المؤلف (عربي)"
+
+msgid "Author role (English)"
+msgstr "صفة المؤلف (إنجليزي)"
+
 msgid "Excerpt (Arabic)"
 msgstr "المقتطف (عربي)"
 
@@ -519,6 +540,9 @@ msgid ""
 "The International Center for the History and Documentation of Quran Reciters"
 msgstr "المركز الدولي لتاريخ وتوثيق قرّاء القرآن الكريم"
 
+msgid "Navigation Menu"
+msgstr "قائمة التنقل"
+
 msgid "Home"
 msgstr "الرئيسية"
 
@@ -537,11 +561,103 @@ msgstr "الخروج"
 msgid "Login"
 msgstr "الدخول"
 
+msgid "Email Sent Successfully."
+msgstr "تم إرسال البريد الإلكتروني بنجاح."
+
+msgid "Error sending email. Please try again later."
+msgstr "حدث خطأ أثناء إرسال البريد الإلكتروني. يرجى المحاولة لاحقاً."
+
+msgid "Browse all biographies in the site"
+msgstr "تصفح جميع التراجم في الموقع"
+
+#, python-format
+msgid "%(counter)s biography"
+msgid_plural "%(counter)s biographies"
+msgstr[0] "لا توجد تراجم"
+msgstr[1] "ترجمة واحدة"
+msgstr[2] "ترجمتان"
+msgstr[3] "%(counter)s تراجم"
+msgstr[4] "%(counter)s ترجمة"
+msgstr[5] "%(counter)s ترجمة"
+
+msgid "Filters"
+msgstr "عوامل التصفية"
+
+msgid "All hometowns"
+msgstr "جميع المواطن"
+
+msgid "All birthplaces"
+msgstr "جميع أماكن الولادة"
+
+msgid "Death location"
+msgstr "مكان الوفاة"
+
+msgid "All death locations"
+msgstr "جميع أماكن الوفاة"
+
+msgid "All attributes"
+msgstr "جميع الصفات والتصنيفات"
+
+msgid "Sort by"
+msgstr "ترتيب حسب"
+
+msgid "Name (A–Z)"
+msgstr "الاسم (أ–ي)"
+
+msgid "Name (Z–A)"
+msgstr "الاسم (ي–أ)"
+
+msgid "Death year (earliest)"
+msgstr "سنة الوفاة (الأقدم)"
+
+msgid "Death year (latest)"
+msgstr "سنة الوفاة (الأحدث)"
+
+msgid "Isnad rank (best)"
+msgstr "مرتبة الإسناد (الأفضل)"
+
+msgid "Clear filters"
+msgstr "مسح عوامل التصفية"
+
+#, python-format
+msgid "Rank %(rank)s"
+msgstr "المرتبة %(rank)s"
+
+msgid "Page navigation"
+msgstr "التنقل بين الصفحات"
+
+msgid "Previous"
+msgstr "السابق"
+
+msgid "Next"
+msgstr "التالي"
+
+msgid "No matching biographies were found."
+msgstr "لم يتم العثور على سِيَر مطابقة."
+
 msgid "Born"
 msgstr "وُلد"
 
 msgid "Died"
 msgstr "توفي"
+
+msgid "Share this biography"
+msgstr "شارك هذه الترجمة"
+
+msgid "Share on WhatsApp"
+msgstr "شارك عبر واتساب"
+
+msgid "Share on Telegram"
+msgstr "شارك عبر تيليجرام"
+
+msgid "Share on X"
+msgstr "شارك عبر إكس"
+
+msgid "Share on Facebook"
+msgstr "شارك عبر فيسبوك"
+
+msgid "Copy link"
+msgstr "نسخ الرابط"
 
 msgid "Unpublished biography (visible to staff only)"
 msgstr "سيرة غير منشورة (مرئية للموظفين فقط)"
@@ -568,6 +684,27 @@ msgstr "سند رقم %(num)s"
 msgid "Comments"
 msgstr "فوائد وملاحظات"
 
+msgid "Copy this link"
+msgstr "انسخ هذا الرابط"
+
+msgid "Author"
+msgstr "المؤلف"
+
+msgid "Details"
+msgstr "التفاصيل"
+
+msgid "Category"
+msgstr "التصنيف"
+
+msgid "Share this post"
+msgstr "شارك هذه المقالة"
+
+msgid "Related Blogs"
+msgstr "مقالات ذات صلة"
+
+msgid "Read More"
+msgstr "إقرأ المزيد"
+
 msgid "Who We Are ?"
 msgstr "من نحن ؟"
 
@@ -578,10 +715,9 @@ msgid ""
 "Join our landmark initiative to research, document, and preserve the "
 "biographies and chains of transmission of the world's greatest Quran "
 "reciters."
-msgstr "انضم إلى مبادرتنا الرائدة لبحث وتوثيق وحفظ سِيَر وأسانيد أعظم قرّاء القرآن الكريم في العالم."
-
-msgid "Read More"
-msgstr "إقرأ المزيد"
+msgstr ""
+"انضم إلى مبادرتنا الرائدة لبحث وتوثيق وحفظ سِيَر وأسانيد أعظم قرّاء القرآن "
+"الكريم في العالم."
 
 msgid "Contribute to preserving the history of the reciters"
 msgstr "ساهم في حفظ تاريخ القراء"
@@ -650,6 +786,35 @@ msgstr "الهاتف"
 
 msgid "Email"
 msgstr "البريد الإلكتروني"
+
+msgid "Search Results"
+msgstr "نتائج البحث"
+
+#, python-format
+msgid "Searching for: %(query)s"
+msgstr "البحث عن: %(query)s"
+
+msgid "Enter a keyword to search biographies"
+msgstr "أدخل كلمة مفتاحية للبحث في السِيَر"
+
+msgid "Filters & sorting"
+msgstr "التصفية والترتيب"
+
+msgid "Relevance"
+msgstr "الأكثر صلة"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "لا توجد نتائج"
+msgstr[1] "نتيجة واحدة"
+msgstr[2] "نتيجتان"
+msgstr[3] "%(counter)s نتائج"
+msgstr[4] "%(counter)s نتيجة"
+msgstr[5] "%(counter)s نتيجة"
+
+msgid "Type a keyword in the field above to begin."
+msgstr "اكتب كلمة مفتاحية في الحقل أعلاه للبدء."
 
 msgid "Select language"
 msgstr "اختر اللغة"
@@ -720,6 +885,9 @@ msgstr "مستخدم"
 
 msgid "users"
 msgstr "المستخدمون"
+
+#~ msgid "Written by"
+#~ msgstr "بقلم"
 
 #~ msgid "Button text (Arabic)"
 #~ msgstr "نص الزر (عربي)"
@@ -821,9 +989,6 @@ msgstr "المستخدمون"
 #~ msgid "Role / title"
 #~ msgstr "الدور / المسمى"
 
-#~ msgid "Short bio"
-#~ msgstr "نبذة قصيرة"
-
 #~ msgid "Photo"
 #~ msgstr "الصورة"
 
@@ -856,9 +1021,6 @@ msgstr "المستخدمون"
 
 #~ msgid "URL"
 #~ msgstr "الرابط"
-
-#~ msgid "Footer link"
-#~ msgstr "رابط التذييل"
 
 #~ msgid "Footer links"
 #~ msgstr "روابط التذييل"

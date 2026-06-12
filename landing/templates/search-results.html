@@ -14,10 +14,10 @@
 {% block Hero %}
 
 <!-- Hero Start -->
-<section class="py-28 w-full table relative bg-center bg-cover" style="background-image: url('{% static 'assets/images/bg/quraan_1080.jpg' %}');">
+<section class="py-16 w-full table relative bg-center bg-cover" style="background-image: url('{% static 'assets/images/bg/quraan_1080.jpg' %}');">
   <div class="absolute inset-0 bg-black opacity-80"></div>
   <div class="container relative">
-    <div class="grid grid-cols-1 pb-8 text-center mt-10">
+    <div class="grid grid-cols-1 pb-4 text-center mt-6">
       <h3 class="mb-3 text-4xl leading-normal font-medium text-white">{% trans "Search Results" %}</h3>
       <p class="text-white opacity-50 text-lg">
         {% if query %}{% blocktrans %}Searching for: {{ query }}{% endblocktrans %}{% else %}{% trans "Enter a keyword to search biographies" %}{% endif %}
@@ -33,52 +33,177 @@
 <section class="relative md:pt-12 pt-8 md:pb-24 pb-16">
   <div class="container">
 
-    <!-- Search box -->
-    <div class="grid grid-cols-1 mb-8">
-      <form action="{% url 'landing:search_results' %}" method="get" class="flex gap-3 max-w-xl mx-auto w-full">
-        <input type="search" name="q" value="{{ query }}" autofocus required
-          class="form-input flex-1 px-4 rounded-md h-12 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-gray-700"
-          placeholder="{% if LANGUAGE_CODE == 'ar' %}ابحث بالاسم أو اللقب...{% else %}Search by name or alias...{% endif %}">
-        <button type="submit"
-          class="btn bg-orange-600 hover:bg-orange-700 border-orange-600 hover:border-orange-700 text-white rounded-md h-12 px-6 shrink-0">
-          {% trans "Search" %}
-        </button>
+    <!-- Search box + filters -->
+    <div class="mb-8 max-w-3xl mx-auto w-full">
+      <form action="{% url 'landing:search_results' %}" method="get">
+        <div class="flex gap-2 max-w-xl mx-auto w-full">
+          <input type="search" name="q" value="{{ query }}" autofocus
+            class="form-input flex-1 px-4 rounded-md h-12 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-gray-700"
+            placeholder="{% if LANGUAGE_CODE == 'ar' %}ابحث بالاسم أو اللقب...{% else %}Search by name or alias...{% endif %}">
+          <!-- Filter toggle -->
+          <button type="button" id="filterToggle" aria-controls="filterPanel" aria-expanded="{% if has_filters %}true{% else %}false{% endif %}"
+            title="{% trans 'Filters & sorting' %}"
+            class="relative flex items-center justify-center aspect-square h-12 shrink-0 rounded-md bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-gray-700 text-base leading-none text-slate-600 dark:text-slate-300 hover:text-orange-600 hover:border-orange-600 transition">
+            <i class="fa fa-filter"></i>
+            {% if has_filters %}<span class="absolute -top-1 ltr:-right-1 rtl:-left-1 w-2.5 h-2.5 rounded-full bg-orange-600"></span>{% endif %}
+          </button>
+          <button type="submit"
+            class="btn bg-orange-600 hover:bg-orange-700 border-orange-600 hover:border-orange-700 text-white rounded-md h-12 px-6 shrink-0">
+            {% trans "Search" %}
+          </button>
+        </div>
+
+        {% with select_class="form-select w-full h-9 px-2 rounded-md bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-gray-700 text-xs" %}
+        <div id="filterPanel" class="{% if not has_filters %}hidden {% endif %}grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mt-3 max-w-xl mx-auto">
+          <!-- Hometown -->
+          <select name="hometown" onchange="this.form.submit()" aria-label="{% trans 'Hometown' %}" class="{{ select_class }}">
+            <option value="">{% trans "All hometowns" %}</option>
+            {% for loc in hometown_options %}
+            <option value="{{ loc.pk }}" {% if active_hometown == loc.pk|stringformat:"s" %}selected{% endif %}>{{ loc }}</option>
+            {% endfor %}
+          </select>
+          <!-- Birthplace -->
+          <select name="birthplace" onchange="this.form.submit()" aria-label="{% trans 'Birthplace' %}" class="{{ select_class }}">
+            <option value="">{% trans "All birthplaces" %}</option>
+            {% for loc in birthplace_options %}
+            <option value="{{ loc.pk }}" {% if active_birthplace == loc.pk|stringformat:"s" %}selected{% endif %}>{{ loc }}</option>
+            {% endfor %}
+          </select>
+          <!-- Death location -->
+          <select name="death_location" onchange="this.form.submit()" aria-label="{% trans 'Death location' %}" class="{{ select_class }}">
+            <option value="">{% trans "All death locations" %}</option>
+            {% for loc in death_location_options %}
+            <option value="{{ loc.pk }}" {% if active_death_location == loc.pk|stringformat:"s" %}selected{% endif %}>{{ loc }}</option>
+            {% endfor %}
+          </select>
+          <!-- Attribute -->
+          <select name="attribute" onchange="this.form.submit()" aria-label="{% trans 'Attribute' %}" class="{{ select_class }}">
+            <option value="">{% trans "All attributes" %}</option>
+            {% for attr in attribute_options %}
+            <option value="{{ attr.pk }}" {% if active_attribute == attr.pk|stringformat:"s" %}selected{% endif %}>{{ attr }}</option>
+            {% endfor %}
+          </select>
+          <!-- Sort -->
+          <div class="relative">
+            <i class="fa fa-sort absolute top-1/2 -translate-y-1/2 ltr:left-2.5 rtl:right-2.5 text-orange-600 text-xs pointer-events-none"></i>
+            <select name="sort" onchange="this.form.submit()" aria-label="{% trans 'Sort by' %}" class="{{ select_class }} ltr:pl-7 rtl:pr-7">
+              <option value="relevance" {% if sort == "relevance" %}selected{% endif %}>{% trans "Relevance" %}</option>
+              <option value="name_asc" {% if sort == "name_asc" %}selected{% endif %}>{% trans "Name (A–Z)" %}</option>
+              <option value="name_desc" {% if sort == "name_desc" %}selected{% endif %}>{% trans "Name (Z–A)" %}</option>
+              <option value="death_asc" {% if sort == "death_asc" %}selected{% endif %}>{% trans "Death year (earliest)" %}</option>
+              <option value="death_desc" {% if sort == "death_desc" %}selected{% endif %}>{% trans "Death year (latest)" %}</option>
+              <option value="rank" {% if sort == "rank" %}selected{% endif %}>{% trans "Isnad rank (best)" %}</option>
+            </select>
+          </div>
+        </div>
+        {% endwith %}
+
+        {% if has_filters %}
+        <div class="text-center mt-3">
+          <a href="?{% if query %}q={{ query|urlencode }}{% endif %}" class="text-sm text-orange-600 hover:text-orange-700">
+            <i class="fa fa-times-circle me-1"></i>{% trans "Clear filters" %}
+          </a>
+        </div>
+        {% endif %}
       </form>
+      <script>
+        (function () {
+          var toggle = document.getElementById('filterToggle');
+          var panel = document.getElementById('filterPanel');
+          if (toggle && panel) {
+            toggle.addEventListener('click', function () {
+              var open = panel.classList.toggle('hidden') === false;
+              toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+          }
+        })();
+      </script>
     </div>
 
-    {% if query %}
+    {% if query or has_filters %}
       <p class="text-slate-400 mb-6 text-center">
-        {% blocktrans count counter=results|length %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %}
+        {% blocktrans count counter=total_results %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %}
       </p>
 
       {% if results %}
+      <style>
+        /* Match the search-result hover color to the search button (bg-orange-600 → #99855B). */
+        .search-result:hover .search-result-title,
+        .search-result:hover .search-result-arrow { color: rgb(153 133 91); }
+      </style>
       <ul role="list" class="divide-y divide-gray-100 dark:divide-gray-700 max-w-3xl mx-auto">
         {% for bio in results %}
-        <li class="flex justify-between gap-x-6 py-5">
-          <a href="{% url 'landing:biography_detail' bio.pk %}" class="group flex min-w-0 flex-auto items-center justify-between gap-x-4">
+        <li class="flex items-center justify-between gap-x-6 py-5">
+          <a href="{% url 'landing:biography_detail' bio.pk %}" class="search-result group flex min-w-0 flex-auto items-center justify-between gap-x-4">
             <div class="min-w-0 flex-auto">
-              <p class="text-sm/6 font-semibold text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-600 transition duration-500">
+              <p class="search-result-title text-sm/6 font-semibold text-gray-900 dark:text-white transition duration-500">
                 {% if LANGUAGE_CODE == 'ar' %}{{ bio.alias_ar|default:bio.full_name_ar|default:bio.alias_en|default:bio.full_name_en }}{% else %}{{ bio.alias_en|default:bio.full_name_en|default:bio.alias_ar|default:bio.full_name_ar }}{% endif %}
               </p>
-              {% if bio.alias_ar or bio.alias_en %}
               <p class="mt-1 truncate text-xs/5 text-gray-500 dark:text-slate-400">
-                {% if LANGUAGE_CODE == 'ar' %}{{ bio.full_name_ar|default:bio.full_name_en }}{% else %}{{ bio.full_name_en|default:bio.full_name_ar }}{% endif %}
+                {% if bio.alias_ar or bio.alias_en %}{% if LANGUAGE_CODE == 'ar' %}{{ bio.full_name_ar|default:bio.full_name_en }}{% else %}{{ bio.full_name_en|default:bio.full_name_ar }}{% endif %}{% else %}&nbsp;{% endif %}
               </p>
-              {% endif %}
             </div>
-            <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+            <div class="flex shrink-0 flex-col items-end gap-y-1 px-3">
               {% if bio.hometown %}
               <p class="text-sm/6 text-gray-900 dark:text-slate-300">
                 <i class="fa fa-map-marker-alt text-orange-600 me-1"></i>
-                {% if LANGUAGE_CODE == 'ar' %}{{ bio.hometown.city_ar|default:bio.hometown.city_en }}{% else %}{{ bio.hometown.city_en|default:bio.hometown.city_ar }}{% endif %}
+                {% if LANGUAGE_CODE == 'ar' %}{{ bio.hometown.city_ar|default:bio.hometown.city_en }}{% if bio.hometown.country_ar or bio.hometown.country_en %}، {{ bio.hometown.country_ar|default:bio.hometown.country_en }}{% endif %}{% else %}{{ bio.hometown.city_en|default:bio.hometown.city_ar }}{% if bio.hometown.country_en or bio.hometown.country_ar %}, {{ bio.hometown.country_en|default:bio.hometown.country_ar }}{% endif %}{% endif %}
+              </p>
+              {% endif %}
+              {% if bio.best_isnad_rank is not None %}
+              <p class="text-xs/5 text-gray-500 dark:text-slate-400">
+                <i class="fa fa-sitemap text-orange-600 me-1"></i>
+                {% if LANGUAGE_CODE == 'ar' %}رتبة {{ bio.best_isnad_rank }}{% else %}{% blocktrans with rank=bio.best_isnad_rank %}Rank {{ rank }}{% endblocktrans %}{% endif %}
               </p>
               {% endif %}
             </div>
-            <i class="fa fa-chevron-right rtl:rotate-180 shrink-0 text-slate-400 group-hover:text-orange-600 transition duration-500"></i>
+            <i class="search-result-arrow fa fa-chevron-right rtl:rotate-180 shrink-0 text-slate-400 transition duration-500"></i>
           </a>
         </li>
         {% endfor %}
       </ul>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="flex justify-center mt-10" aria-label="{% trans 'Page navigation' %}">
+        <ul class="flex -space-x-px text-sm">
+          <li>
+            {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}" class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading font-medium rounded-s-base text-sm w-10 h-10 focus:outline-none">
+              <span class="sr-only">{% trans "Previous" %}</span>
+              <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/></svg>
+            </a>
+            {% else %}
+            <span class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium font-medium rounded-s-base text-sm w-10 h-10 opacity-50 cursor-not-allowed">
+              <span class="sr-only">{% trans "Previous" %}</span>
+              <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/></svg>
+            </span>
+            {% endif %}
+          </li>
+          {% for num in page_obj.paginator.page_range %}
+          <li>
+            {% if num == page_obj.number %}
+            <a href="?{{ querystring }}&page={{ num }}" aria-current="page" class="flex items-center justify-center text-fg-brand bg-neutral-tertiary-medium box-border border border-default-medium hover:text-fg-brand font-medium text-sm w-10 h-10 focus:outline-none">{{ num }}</a>
+            {% else %}
+            <a href="?{{ querystring }}&page={{ num }}" class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading font-medium text-sm w-10 h-10 focus:outline-none">{{ num }}</a>
+            {% endif %}
+          </li>
+          {% endfor %}
+          <li>
+            {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}" class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading font-medium rounded-e-base text-sm w-10 h-10 focus:outline-none">
+              <span class="sr-only">{% trans "Next" %}</span>
+              <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/></svg>
+            </a>
+            {% else %}
+            <span class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium font-medium rounded-e-base text-sm w-10 h-10 opacity-50 cursor-not-allowed">
+              <span class="sr-only">{% trans "Next" %}</span>
+              <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/></svg>
+            </span>
+            {% endif %}
+          </li>
+        </ul>
+      </nav>
+      {% endif %}
       {% else %}
       <p class="text-slate-400 text-center">{% trans "No matching biographies were found." %}</p>
       {% endif %}

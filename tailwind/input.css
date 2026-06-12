@@ -1,0 +1,10 @@
+/*
+ * Utility layer only.
+ *
+ * The theme's precompiled core/static/assets/css/tailwind.css already provides
+ * @tailwind base and the custom @tailwind components. This file regenerates just
+ * the utilities so newly used classes (divide-y, min-w-0, text-sm/6, rtl:rotate-180,
+ * etc.) are compiled in. Output: core/static/assets/css/tailwind-utilities.css,
+ * loaded immediately after tailwind.css in base.html.
+ */
+@tailwind utilities;

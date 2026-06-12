@@ -74,6 +74,45 @@
         </li>
         {% endif %}
       </ul>
+
+      <!-- Share -->
+      {% with share_url=request.build_absolute_uri share_title=biography.alias_ar|default:biography.alias_en|default:biography.full_name_ar|default:biography.full_name_en %}
+      <div class="mt-6">
+        <p class="text-white opacity-50 text-sm mb-3">{% trans "Share this biography" %}</p>
+        <ul class="list-none flex items-center justify-center gap-2">
+          <li class="inline">
+            <a href="https://wa.me/?text={{ share_title|urlencode }}%20{{ share_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on WhatsApp' %}" title="{% trans 'Share on WhatsApp' %}"
+              class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-green-600 hover:border-green-600 transition duration-500">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
+          </li>
+          <li class="inline">
+            <a href="https://t.me/share/url?url={{ share_url|urlencode }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Telegram' %}" title="{% trans 'Share on Telegram' %}"
+              class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-sky-500 hover:border-sky-500 transition duration-500">
+              <i class="fa-brands fa-telegram"></i>
+            </a>
+          </li>
+          <li class="inline">
+            <a href="https://twitter.com/intent/tweet?url={{ share_url|urlencode }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on X' %}" title="{% trans 'Share on X' %}"
+              class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-black hover:border-black transition duration-500">
+              <i class="fa-brands fa-x-twitter"></i>
+            </a>
+          </li>
+          <li class="inline">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Facebook' %}" title="{% trans 'Share on Facebook' %}"
+              class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-blue-600 hover:border-blue-600 transition duration-500">
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+          </li>
+          <li class="inline">
+            <button type="button" onclick="copyBiographyLink(this)" data-url="{{ share_url }}" aria-label="{% trans 'Copy link' %}" title="{% trans 'Copy link' %}"
+              class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-orange-600 hover:border-orange-600 transition duration-500">
+              <i class="fa fa-link"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+      {% endwith %}
     </div>
     <!--end grid-->
   </div>
@@ -286,5 +325,23 @@
   <!--end container-->
 </section>
 <!--end section-->
+
+<script>
+  function copyBiographyLink(btn) {
+    var url = btn.getAttribute('data-url');
+    var done = function () {
+      var icon = btn.querySelector('i');
+      if (!icon) return;
+      var original = icon.className;
+      icon.className = 'fa fa-check';
+      setTimeout(function () { icon.className = original; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(function () { window.prompt('{% trans "Copy this link" %}', url); });
+    } else {
+      window.prompt('{% trans "Copy this link" %}', url);
+    }
+  }
+</script>
 
 {% endblock Hero %}

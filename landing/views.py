@@ -1,12 +1,13 @@
 import logging
 from difflib import SequenceMatcher
-from itertools import groupby
 from django.core.mail import send_mail
 
+from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import get_language
 
-from core.models import Biography
+from core.models import Attribute, Biography, Location
 from core.search import normalize_arabic
 
 logger = logging.getLogger(__name__)
@@ -48,12 +49,14 @@ def post_detail(request, pk):
     """Single post page (Post by pk)."""
     post = get_object_or_404(Post, pk=pk)
     site_settings = SiteSettings.objects.first()
+    related_posts = list(Post.objects.exclude(pk=post.pk)[:3])
     context = {
         "post": post,
+        "related_posts": related_posts,
         "site_settings": site_settings,
         "user": request.user,
     }
-    return render(request, "post.html", context)
+    return render(request, "blog-detail.html", context)
 
 
 HIJRI_MONTHS_AR = [
@@ -155,40 +158,81 @@ def biography_detail(request, pk):
     return render(request, "biography.html", context)
 
 
-def biographies_alphabetical(request):
-    """All published biographies sorted alphabetically by name."""
-    biographies = list(
-        Biography.objects.filter(published=True)
-        .select_related("hometown")
-        .order_by("full_name_ar", "full_name_en")
+def biographies(request):
+    """Browse every published biography with the same faceted filters,
+    sorting and pagination as the search page (but no text query)."""
+    hometown_id = (request.GET.get("hometown") or "").strip()
+    birthplace_id = (request.GET.get("birthplace") or "").strip()
+    death_location_id = (request.GET.get("death_location") or "").strip()
+    attribute_id = (request.GET.get("attribute") or "").strip()
+    sort = request.GET.get("sort") or "name_asc"
+    if sort not in SORT_OPTIONS or sort == "relevance":
+        sort = "name_asc"
+    has_filters = any([hometown_id, birthplace_id, death_location_id, attribute_id])
+
+    qs = Biography.objects.filter(published=True)
+    if hometown_id:
+        qs = qs.filter(hometown_id=hometown_id)
+    if birthplace_id:
+        qs = qs.filter(birthplace_id=birthplace_id)
+    if death_location_id:
+        qs = qs.filter(death_location_id=death_location_id)
+    if attribute_id:
+        qs = qs.filter(attributes__id=attribute_id)
+
+    results = list(
+        qs.select_related("hometown")
+        .prefetch_related("esnads__links")
+        .distinct()
+        .order_by("full_name_ar")
     )
+
+    # Strongest (shortest) chain per biography, mirroring the search view.
+    for bio in results:
+        ranks = []
+        for esnad in bio.esnads.all():
+            count = len(esnad.links.all())
+            if count:
+                ranks.append(count - 1)
+        bio.best_isnad_rank = min(ranks) if ranks else None
+
+    _sort_results(results, sort)
+
     site_settings = SiteSettings.objects.first()
+    per_page = getattr(site_settings, "search_results_per_page", 5) or 5
+    paginator = Paginator(results, per_page)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    # Filter dropdown options, limited to values referenced by published bios.
+    published = Biography.objects.filter(published=True)
+    hometown_options = Location.objects.filter(hometown__in=published).distinct()
+    birthplace_options = Location.objects.filter(birthplace__in=published).distinct()
+    death_location_options = Location.objects.filter(death_location__in=published).distinct()
+    attribute_options = Attribute.objects.filter(biographies__in=published).distinct()
+
+    params = request.GET.copy()
+    params.pop("page", None)
+    querystring = params.urlencode()
+
     context = {
-        "biographies": biographies,
+        "results": page_obj,
+        "page_obj": page_obj,
+        "total_results": paginator.count,
         "site_settings": site_settings,
         "user": request.user,
+        "has_filters": has_filters,
+        "sort": sort,
+        "querystring": querystring,
+        "hometown_options": hometown_options,
+        "birthplace_options": birthplace_options,
+        "death_location_options": death_location_options,
+        "attribute_options": attribute_options,
+        "active_hometown": hometown_id,
+        "active_birthplace": birthplace_id,
+        "active_death_location": death_location_id,
+        "active_attribute": attribute_id,
     }
-    return render(request, "biographies-alphabetical.html", context)
-
-
-def biographies_by_city(request):
-    """Published biographies grouped by hometown city."""
-    qs = (
-        Biography.objects.filter(published=True)
-        .select_related("hometown")
-        .order_by("hometown__city_ar", "hometown__city_en", "full_name_ar")
-    )
-    groups = [
-        {"location": loc, "biographies": list(bios)}
-        for loc, bios in groupby(qs, key=lambda b: b.hometown)
-    ]
-    site_settings = SiteSettings.objects.first()
-    context = {
-        "groups": groups,
-        "site_settings": site_settings,
-        "user": request.user,
-    }
-    return render(request, "biographies-by-city.html", context)
+    return render(request, "biographies.html", context)
 
 
 # Minimum token-similarity (0-1) for a biography to surface as a "similar"
@@ -197,6 +241,39 @@ def biographies_by_city(request):
 SIMILARITY_THRESHOLD = 0.8
 # Cap on how many similar matches we show, best-scoring first.
 SIMILARITY_MAX_RESULTS = 12
+
+# Allowed values for the ?sort= query param on the search page.
+SORT_OPTIONS = {"relevance", "name_asc", "name_desc", "death_asc", "death_desc", "rank"}
+
+
+def _name_sort_key(bio):
+    """Display-name sort key, picking the active language's name first."""
+    lang = get_language() or ""
+    if lang.startswith("ar"):
+        name = bio.full_name_ar or bio.full_name_en
+    else:
+        name = bio.full_name_en or bio.full_name_ar
+    return (name or "").strip()
+
+
+def _sort_results(results, sort):
+    """Re-order the in-memory results list per the chosen ``sort`` mode.
+
+    ``relevance`` (the default) leaves the existing order untouched: exact
+    matches first (alphabetical), then fuzzy matches by descending similarity.
+    Entries missing the sort key (no death year / no isnad rank) sort last.
+    """
+    if sort == "name_asc":
+        results.sort(key=_name_sort_key)
+    elif sort == "name_desc":
+        results.sort(key=_name_sort_key, reverse=True)
+    elif sort == "death_asc":
+        results.sort(key=lambda b: (b.death_hijri_year is None, b.death_hijri_year or 0))
+    elif sort == "death_desc":
+        results.sort(key=lambda b: (b.death_hijri_year is None, -(b.death_hijri_year or 0)))
+    elif sort == "rank":
+        results.sort(key=lambda b: (b.best_isnad_rank is None, b.best_isnad_rank or 0))
+    return results
 
 
 def _token_similarity(query_words, target_text):
@@ -228,28 +305,59 @@ def search_results(request):
     """
     query = (request.GET.get("q") or "").strip()
 
+    # Faceted filters (Location / Attribute primary keys, as raw strings) and
+    # the chosen ordering. Filters may drive the results on their own, even
+    # without a text query.
+    hometown_id = (request.GET.get("hometown") or "").strip()
+    birthplace_id = (request.GET.get("birthplace") or "").strip()
+    death_location_id = (request.GET.get("death_location") or "").strip()
+    attribute_id = (request.GET.get("attribute") or "").strip()
+    sort = request.GET.get("sort") or "relevance"
+    if sort not in SORT_OPTIONS:
+        sort = "relevance"
+    has_filters = any([hometown_id, birthplace_id, death_location_id, attribute_id])
+
+    def apply_filters(qs):
+        if hometown_id:
+            qs = qs.filter(hometown_id=hometown_id)
+        if birthplace_id:
+            qs = qs.filter(birthplace_id=birthplace_id)
+        if death_location_id:
+            qs = qs.filter(death_location_id=death_location_id)
+        if attribute_id:
+            qs = qs.filter(attributes__id=attribute_id)
+        return qs
+
     logger.debug("search_results raw query=%r", query)
     results = []
-    if query:
-        words = normalize_arabic(query).split()
+    if query or has_filters:
+        words = normalize_arabic(query).split() if query else []
 
         logger.debug("search_results normalized words=%r", words)
+        qs = Biography.objects.filter(published=True)
+        for word in words:
+            qs = qs.filter(name_search__icontains=word)
+        qs = apply_filters(qs).distinct()
+
+        logger.debug("search_results SQL=%s", qs.query)
+        results = list(
+            qs.select_related("hometown")
+            .prefetch_related("esnads__links")
+            .order_by("full_name_ar")
+        )
+
+        # Fold in fuzzy "similar" matches: biographies that aren't exact
+        # substring hits but are close enough in spelling. Only meaningful when
+        # there's a text query; the active filters apply to candidates too.
         if words:
-            qs = Biography.objects.filter(published=True)
-            for word in words:
-                qs = qs.filter(name_search__icontains=word)
-
-            logger.debug("search_results SQL=%s", qs.query)
-            results = list(qs.select_related("hometown").order_by("full_name_ar"))
-
-            # Fold in fuzzy "similar" matches: biographies that aren't exact
-            # substring hits but are close enough in spelling. They're appended
-            # after the exact matches, best similarity first.
             exact_ids = {bio.pk for bio in results}
             candidates = (
-                Biography.objects.filter(published=True)
-                .exclude(pk__in=exact_ids)
+                apply_filters(
+                    Biography.objects.filter(published=True).exclude(pk__in=exact_ids)
+                )
                 .select_related("hometown")
+                .prefetch_related("esnads__links")
+                .distinct()
             )
             scored = []
             for bio in candidates:
@@ -259,13 +367,59 @@ def search_results(request):
             scored.sort(key=lambda item: item[0], reverse=True)
             results.extend(bio for _, bio in scored[:SIMILARITY_MAX_RESULTS])
 
+    # Surface the strongest (shortest) chain each biography holds: the lowest
+    # isnad_rank across its esnads. Uses the prefetched links cache (len, not
+    # .count()) so no extra queries are issued per esnad.
+    for bio in results:
+        ranks = []
+        for esnad in bio.esnads.all():
+            count = len(esnad.links.all())
+            if count:
+                ranks.append(count - 1)
+        bio.best_isnad_rank = min(ranks) if ranks else None
+
+    _sort_results(results, sort)
+
     logger.info("search_results query=%r matched %d biographies", query, len(results))
+
     site_settings = SiteSettings.objects.first()
+    per_page = getattr(site_settings, "search_results_per_page", 5) or 5
+
+    paginator = Paginator(results, per_page)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    # Filter dropdown options, limited to locations/attributes that are actually
+    # referenced by published biographies so the menus stay useful.
+    published = Biography.objects.filter(published=True)
+    hometown_options = Location.objects.filter(hometown__in=published).distinct()
+    birthplace_options = Location.objects.filter(birthplace__in=published).distinct()
+    death_location_options = Location.objects.filter(death_location__in=published).distinct()
+    attribute_options = Attribute.objects.filter(biographies__in=published).distinct()
+
+    # Querystring for pagination links: everything except the page number, so
+    # the active query/filters/sort survive page changes.
+    params = request.GET.copy()
+    params.pop("page", None)
+    querystring = params.urlencode()
+
     context = {
         "query": query,
-        "results": results,
+        "results": page_obj,
+        "page_obj": page_obj,
+        "total_results": paginator.count,
         "site_settings": site_settings,
         "user": request.user,
+        "has_filters": has_filters,
+        "sort": sort,
+        "querystring": querystring,
+        "hometown_options": hometown_options,
+        "birthplace_options": birthplace_options,
+        "death_location_options": death_location_options,
+        "attribute_options": attribute_options,
+        "active_hometown": hometown_id,
+        "active_birthplace": birthplace_id,
+        "active_death_location": death_location_id,
+        "active_attribute": attribute_id,
     }
     return render(request, "search-results.html", context)
 
