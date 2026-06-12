@@ -3,7 +3,7 @@ from difflib import SequenceMatcher
 from django.core.mail import send_mail
 
 from django.core.paginator import Paginator
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import get_language
 
@@ -134,8 +134,6 @@ def biography_detail(request, pk):
         "student_relationships__notes",
     )
     biography = get_object_or_404(qs, pk=pk)
-    if not biography.published and not request.user.is_staff:
-        raise Http404()
 
     teachers = list(biography.teacher_relationships.all())
     students = list(biography.student_relationships.all())

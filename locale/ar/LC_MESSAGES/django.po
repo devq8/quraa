@@ -659,8 +659,14 @@ msgstr "شارك عبر فيسبوك"
 msgid "Copy link"
 msgstr "نسخ الرابط"
 
-msgid "Unpublished biography (visible to staff only)"
-msgstr "سيرة غير منشورة (مرئية للموظفين فقط)"
+msgid "This biography is not completed yet."
+msgstr "هذه السيرة لم تكتمل بعد."
+
+msgid "We are still working on this biography. Please check back later."
+msgstr "ما زلنا نعمل على هذه السيرة. يرجى العودة لاحقًا."
+
+msgid "Unpublished — visible to staff only."
+msgstr "غير منشورة — مرئية للموظفين فقط."
 
 msgid "Identity"
 msgstr "الهوية"
