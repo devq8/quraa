@@ -36,6 +36,9 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
     fieldsets = (
         (None, {"fields": ("site_name_ar", "site_name_en", "logo", "logo_dark", "favicon")}),
         (_("About us section"), {"fields": ("about_heading_ar", "about_heading_en", "about_subheading_ar", "about_subheading_en", "about_description_ar", "about_description_en", "about_image", "about_url")}),
@@ -55,6 +58,9 @@ class HeroSlideAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not HeroSlide.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Service)

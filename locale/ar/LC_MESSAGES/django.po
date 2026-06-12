@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-12 13:44+0300\n"
+"POT-Creation-Date: 2026-06-12 14:37+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,12 +52,12 @@ msgstr "التلميذ"
 msgid "Students"
 msgstr "التلاميذ"
 
-#: core/admin.py:74 core/admin.py:376 core/admin.py:507 core/models.py:367
+#: core/admin.py:74 core/admin.py:375 core/admin.py:506 core/models.py:367
 #: core/models.py:463
 msgid "Narrator"
 msgstr "الراوي"
 
-#: core/admin.py:75 core/admin.py:377 core/admin.py:508 core/admin.py:529
+#: core/admin.py:75 core/admin.py:376 core/admin.py:507 core/admin.py:528
 #: core/models.py:398
 msgid "Narrators"
 msgstr "الرواة"
@@ -103,33 +103,33 @@ msgstr "الميلاد"
 msgid "Death"
 msgstr "الوفاة"
 
-#: core/admin.py:410 core/admin.py:523
+#: core/admin.py:409 core/admin.py:522
 #: templates/admin/core/biography/change_form.html:9
 msgid "Audit"
 msgstr "السجل والمراجعة"
 
-#: core/admin.py:437
+#: core/admin.py:436
 msgid "You do not have permission to modify this Esnad."
 msgstr "ليس لديك صلاحية لتعديل هذا الإسناد."
 
-#: core/admin.py:447
+#: core/admin.py:446
 msgid "Esnad not found."
 msgstr "الإسناد غير موجود."
 
-#: core/admin.py:452
+#: core/admin.py:451
 msgid "No template selected."
 msgstr "لم يُختر قالب."
 
-#: core/admin.py:467
+#: core/admin.py:466
 msgid "Template not found."
 msgstr "القالب غير موجود."
 
-#: core/admin.py:480
+#: core/admin.py:479
 #, python-format
 msgid "Template \"%(name)s\" applied."
 msgstr "تم تطبيق القالب \"%(name)s\"."
 
-#: core/admin.py:495
+#: core/admin.py:494
 msgid "Chain"
 msgstr "سند"
 
@@ -474,35 +474,47 @@ msgstr "علاقة شيخ-تلميذ"
 msgid "Teacher-Student Relationships"
 msgstr "علاقات الشيوخ والتلاميذ"
 
-#: landing/admin.py:41
+#: core/views.py:26
+msgid "Invalid email or password."
+msgstr "البريد الإلكتروني أو كلمة المرور غير صحيحة."
+
+#: core/views.py:41
+msgid "Please fill in all fields."
+msgstr "يرجى تعبئة جميع الحقول."
+
+#: core/views.py:43
+msgid "An account with this email already exists."
+msgstr "يوجد حساب مسجَّل بهذا البريد الإلكتروني بالفعل."
+
+#: landing/admin.py:44
 msgid "About us section"
 msgstr "قسم من نحن"
 
-#: landing/admin.py:42
+#: landing/admin.py:45
 msgid "Services section header"
 msgstr "عنوان قسم الخدمات"
 
-#: landing/admin.py:43
+#: landing/admin.py:46
 msgid "Donate section"
 msgstr "قسم التبرع"
 
-#: landing/admin.py:44
+#: landing/admin.py:47
 msgid "Blog section header"
 msgstr "عنوان قسم المدونة"
 
-#: landing/admin.py:45
+#: landing/admin.py:48
 msgid "Contact section"
 msgstr "قسم اتصل بنا"
 
-#: landing/admin.py:46
+#: landing/admin.py:49
 msgid "Social media links"
 msgstr "روابط وسائل التواصل الاجتماعي"
 
-#: landing/admin.py:47 landing/templates/search-results.html:52
+#: landing/admin.py:50 landing/templates/search-results.html:52
 msgid "Search"
 msgstr "بحث"
 
-#: landing/admin.py:48
+#: landing/admin.py:51
 msgid "Copyright"
 msgstr "حقوق النشر"
 
@@ -853,9 +865,9 @@ msgstr "اتصل بنا"
 msgid "Logout"
 msgstr "الخروج"
 
-#: landing/templates/base.html:155
+#: landing/templates/base.html:155 landing/templates/login.html:22
 msgid "Login"
-msgstr "الدخول"
+msgstr "تسجيل الدخول"
 
 #: landing/templates/base.html:310
 msgid "Email Sent Successfully."
@@ -1022,7 +1034,8 @@ msgstr "هذه السيرة غير منشورة ولن تظهر للزوار."
 msgid "Identity"
 msgstr "الهوية"
 
-#: landing/templates/biography.html:151
+#: landing/templates/biography.html:151 landing/templates/signup.html:34
+#: landing/templates/signup.html:37
 msgid "Full Name"
 msgstr "الاسم الكامل"
 
@@ -1182,6 +1195,27 @@ msgstr "الهاتف"
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
+#: landing/templates/login.html:35 landing/templates/signup.html:41
+msgid "Email Address"
+msgstr "البريد الإلكتروني"
+
+#: landing/templates/login.html:42 landing/templates/login.html:44
+#: landing/templates/signup.html:48 landing/templates/signup.html:50
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: landing/templates/login.html:50 landing/templates/signup.html:62
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
+#: landing/templates/login.html:55
+msgid "Don't have an account ?"
+msgstr "ليس لديك حساب؟"
+
+#: landing/templates/login.html:56
+msgid "Sign Up"
+msgstr "إنشاء حساب"
+
 #: landing/templates/search-results.html:21
 msgid "Search Results"
 msgstr "نتائج البحث"
@@ -1217,6 +1251,18 @@ msgstr[5] "%(counter)s نتيجة"
 #: landing/templates/search-results.html:211
 msgid "Type a keyword in the field above to begin."
 msgstr "اكتب كلمة مفتاحية في الحقل أعلاه للبدء."
+
+#: landing/templates/signup.html:22
+msgid "Signup"
+msgstr "إنشاء حساب"
+
+#: landing/templates/signup.html:56
+msgid "Register"
+msgstr "إنشاء حساب"
+
+#: landing/templates/signup.html:61
+msgid "Already have an account ?"
+msgstr "لديك حساب بالفعل؟"
 
 #: templates/admin/base_site.html:11
 msgid "Select language"
@@ -1322,8 +1368,8 @@ msgid ""
 "Birth/Death dates: birth_hijri_year/month/day, birth_greg_year/month/day and "
 "the death_* equivalents"
 msgstr ""
-"تواريخ الميلاد/الوفاة: birth_hijri_year/month/day و birth_greg_year/month/day "
-"وما يقابلها من death_*"
+"تواريخ الميلاد/الوفاة: birth_hijri_year/month/day و birth_greg_year/month/"
+"day وما يقابلها من death_*"
 
 #: templates/admin/core/biography/csv_import.html:41
 msgid ""
@@ -1547,3 +1593,6 @@ msgstr "مستخدم"
 #: users/models.py:59
 msgid "users"
 msgstr "المستخدمون"
+
+#~ msgid "Your Name"
+#~ msgstr "اسمك"

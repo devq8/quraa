@@ -41,6 +41,7 @@ urlpatterns = [
     path("tinymce/", include("tinymce.urls")),
     path("admin/", admin.site.urls),
     path("accounts/login/", core_views.login_view, name="login"),
+    path("accounts/signup/", core_views.signup_view, name="signup"),
     path("accounts/logout/", logout_redirect_landing, name="logout"),
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("landing.urls")),
