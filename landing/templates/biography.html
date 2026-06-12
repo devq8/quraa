@@ -121,16 +121,21 @@
 <!--end section-->
 <!-- Hero End -->
 
-<section class="relative md:py-24 py-16">
+<section class="relative md:py-10 py-16">
   <div class="container">
 
-    {% if not biography.published %}
+    {% if not biography.published and not user.is_staff %}
     <div class="max-w-xl mx-auto my-16 px-12 py-20 text-center rounded-lg bg-yellow-500/10 border border-yellow-500/40">
       <h4 class="text-2xl font-medium text-yellow-700 dark:text-yellow-500 mt-8 mb-8 px-4 leading-relaxed">{% trans "This biography is not completed yet." %}</h4>
       <p class="text-slate-500 dark:text-slate-300 leading-loose px-4 mt-8 mb-8">{% trans "We are still working on this biography. Please check back later." %}</p>
-      {% if user.is_staff %}<p class="text-sm text-slate-400 mt-6 mb-0">{% trans "Unpublished — visible to staff only." %}</p>{% endif %}
     </div>
     {% else %}
+
+    {% if not biography.published %}
+    <div class="max-w-3xl mx-auto mb-8 px-6 py-4 text-center rounded-lg bg-yellow-500/10 border border-yellow-500/40">
+      <p class="text-sm font-medium text-yellow-700 dark:text-yellow-500 mb-0 px-4 py-2 mx-auto">{% trans "This biography is unpublished and is not visible to visitors." %}</p>
+    </div>
+    {% endif %}
 
     <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
 

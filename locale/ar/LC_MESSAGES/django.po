@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-12 10:50+0300\n"
+"POT-Creation-Date: 2026-06-12 14:37+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,560 +16,872 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
+#: core/admin.py:24
+msgid "CSV or Excel file"
+msgstr "ملف CSV أو Excel"
+
+#: core/admin.py:26
+msgid ""
+"A UTF-8 CSV or an .xlsx file. Download the Excel template for dropdown lists "
+"of existing locations and attributes."
+msgstr ""
+"ملف CSV بترميز UTF-8 أو ملف ‎.xlsx. حمّل قالب Excel للحصول على قوائم منسدلة "
+"بالمواقع والخصائص الموجودة."
+
+#: core/admin.py:42 core/models.py:333
 msgid "Source"
 msgstr "المصدر"
 
+#: core/admin.py:43 core/models.py:334 landing/templates/biography.html:305
 msgid "Sources"
 msgstr "المصادر"
 
+#: core/admin.py:53 core/models.py:508
 msgid "Teacher"
 msgstr "الشيخ"
 
+#: core/admin.py:54 landing/templates/biography.html:267
 msgid "Teachers"
 msgstr "الشيوخ"
 
+#: core/admin.py:64 core/models.py:514
 msgid "Student"
 msgstr "التلميذ"
 
+#: core/admin.py:65 landing/templates/biography.html:286
 msgid "Students"
 msgstr "التلاميذ"
 
+#: core/admin.py:74 core/admin.py:375 core/admin.py:506 core/models.py:367
+#: core/models.py:463
 msgid "Narrator"
 msgstr "الراوي"
 
+#: core/admin.py:75 core/admin.py:376 core/admin.py:507 core/admin.py:528
+#: core/models.py:398
 msgid "Narrators"
 msgstr "الرواة"
 
+#: core/admin.py:96 core/models.py:404 core/models.py:457
 msgid "Esnad"
 msgstr "إسناد"
 
+#: core/admin.py:97 core/models.py:405 landing/templates/biography.html:232
 msgid "Asanid"
 msgstr "الأسانيد"
 
+#: core/admin.py:151
+msgid "You do not have permission to import biographies."
+msgstr "ليس لديك صلاحية لاستيراد التراجم."
+
+#: core/admin.py:157
+msgid "Import biographies from CSV"
+msgstr "استيراد التراجم من ملف CSV"
+
+#: core/admin.py:165
+msgid "Your import session expired. Please upload the file again."
+msgstr "انتهت صلاحية جلسة الاستيراد. يرجى رفع الملف مرة أخرى."
+
+#: core/admin.py:186
+#, python-format
+msgid ""
+"Import complete: %(created)d created, %(updated)d updated, %(skipped)d "
+"skipped, %(errors)d with errors."
+msgstr ""
+"اكتمل الاستيراد: %(created)d مُضافة، %(updated)d محدَّثة، %(skipped)d متخطّاة، "
+"%(errors)d بها أخطاء."
+
+#: core/admin.py:204
+msgid "No data rows were found in the file."
+msgstr "لم يُعثر على أي صفوف بيانات في الملف."
+
+#: core/admin.py:293 core/models.py:121 landing/templates/biography.html:178
 msgid "Birth"
 msgstr "الميلاد"
 
+#: core/admin.py:301 core/models.py:121 landing/templates/biography.html:205
 msgid "Death"
 msgstr "الوفاة"
 
+#: core/admin.py:409 core/admin.py:522
+#: templates/admin/core/biography/change_form.html:9
 msgid "Audit"
 msgstr "السجل والمراجعة"
 
+#: core/admin.py:436
 msgid "You do not have permission to modify this Esnad."
 msgstr "ليس لديك صلاحية لتعديل هذا الإسناد."
 
+#: core/admin.py:446
 msgid "Esnad not found."
 msgstr "الإسناد غير موجود."
 
+#: core/admin.py:451
 msgid "No template selected."
 msgstr "لم يُختر قالب."
 
+#: core/admin.py:466
 msgid "Template not found."
 msgstr "القالب غير موجود."
 
+#: core/admin.py:479
 #, python-format
 msgid "Template \"%(name)s\" applied."
 msgstr "تم تطبيق القالب \"%(name)s\"."
 
+#: core/admin.py:494
 msgid "Chain"
 msgstr "سند"
 
+#: core/apps.py:7
 msgid "Core"
 msgstr "الأساسي"
 
+#: core/csv_import.py:38 core/models.py:8
+#: templates/admin/core/biography/csv_import_review.html:104
+#: templates/admin/core/biography/csv_import_review.html:123
+#: templates/admin/core/biography/csv_import_review.html:138
+#: templates/admin/core/biography/csv_import_review.html:154
 msgid "Full Name (Arabic)"
 msgstr "الاسم الكامل (عربي)"
 
+#: core/csv_import.py:39 core/models.py:9
 msgid "Full Name (English)"
 msgstr "الاسم الكامل (إنجليزي)"
 
+#: core/csv_import.py:40 core/models.py:10
 msgid "Alias (Arabic)"
 msgstr "الكنية (عربي)"
 
+#: core/csv_import.py:41 core/models.py:11
 msgid "Alias (English)"
 msgstr "الكنية (إنجليزي)"
 
-msgid "Birthplace"
-msgstr "مكان الولادة"
-
+#: core/csv_import.py:42 core/models.py:16
 msgid "Birth Year (Hijri)"
 msgstr "سنة الميلاد (هجري)"
 
+#: core/csv_import.py:43 core/models.py:17
 msgid "Birth Month (Hijri)"
 msgstr "شهر الميلاد (هجري)"
 
+#: core/csv_import.py:44 core/models.py:18
 msgid "Birth Day (Hijri)"
 msgstr "يوم الميلاد (هجري)"
 
+#: core/csv_import.py:45 core/models.py:19
 msgid "Birth Year (Gregorian)"
 msgstr "سنة الميلاد (ميلادي)"
 
+#: core/csv_import.py:46 core/models.py:20
 msgid "Birth Month (Gregorian)"
 msgstr "شهر الميلاد (ميلادي)"
 
+#: core/csv_import.py:47 core/models.py:21
 msgid "Birth Day (Gregorian)"
 msgstr "يوم الميلاد (ميلادي)"
 
-msgid "Birth Hijri Approximate"
-msgstr "تاريخ الميلاد الهجري تقريبي"
-
-msgid "Birth Gregorian Approximate"
-msgstr "تاريخ الميلاد الميلادي تقريبي"
-
-msgid "Hometown"
-msgstr "الموطن"
-
-msgid "Death Location"
-msgstr "مكان الوفاة"
-
+#: core/csv_import.py:48 core/models.py:31
 msgid "Death Year (Hijri)"
 msgstr "سنة الوفاة (هجري)"
 
+#: core/csv_import.py:49 core/models.py:32
 msgid "Death Month (Hijri)"
 msgstr "شهر الوفاة (هجري)"
 
+#: core/csv_import.py:50 core/models.py:33
 msgid "Death Day (Hijri)"
 msgstr "يوم الوفاة (هجري)"
 
+#: core/csv_import.py:51 core/models.py:34
 msgid "Death Year (Gregorian)"
 msgstr "سنة الوفاة (ميلادي)"
 
+#: core/csv_import.py:52 core/models.py:35
 msgid "Death Month (Gregorian)"
 msgstr "شهر الوفاة (ميلادي)"
 
+#: core/csv_import.py:53 core/models.py:36
 msgid "Death Day (Gregorian)"
 msgstr "يوم الوفاة (ميلادي)"
 
-msgid "Death Hijri Approximate"
-msgstr "تاريخ الوفاة الهجري تقريبي"
-
-msgid "Death Gregorian Approximate"
-msgstr "تاريخ الوفاة الميلادي تقريبي"
-
-msgid "Attributes"
-msgstr "صفات وتصنيفات"
-
+#: core/csv_import.py:54 core/models.py:52
 msgid "Comments (Arabic)"
 msgstr "فوائد وملاحظات (عربي)"
 
+#: core/csv_import.py:55 core/models.py:53
 msgid "Comments (English)"
 msgstr "فوائد وملاحظات (إنجليزي)"
 
-msgid "Submitted By"
-msgstr "أُضيف بواسطة"
-
-msgid "Last Modified By"
-msgstr "آخر تعديل بواسطة"
-
-msgid "User Account"
-msgstr "حساب المستخدم"
-
+#: core/csv_import.py:56 core/models.py:77
 msgid "Published"
 msgstr "منشور"
 
+#: core/csv_import.py:61 core/models.py:14
+#: landing/templates/biographies.html:59 landing/templates/biography.html:195
+#: landing/templates/search-results.html:66
+msgid "Birthplace"
+msgstr "مكان الولادة"
+
+#: core/csv_import.py:62 core/models.py:26
+#: landing/templates/biographies.html:52 landing/templates/biography.html:157
+#: landing/templates/search-results.html:59
+msgid "Hometown"
+msgstr "الموطن"
+
+#: core/csv_import.py:63 core/models.py:29 landing/templates/biography.html:222
+msgid "Death Location"
+msgstr "مكان الوفاة"
+
+#: core/csv_import.py:251
+msgid "The file could not be read as an Excel workbook."
+msgstr "تعذّرت قراءة الملف كمصنّف Excel."
+
+#: core/csv_import.py:258 core/csv_import.py:307
+msgid "The file is empty."
+msgstr "الملف فارغ."
+
+#: core/csv_import.py:263
+#, python-format
+msgid "The sheet must contain a '%(col)s' column."
+msgstr "يجب أن تحتوي الورقة على عمود '%(col)s'."
+
+#: core/csv_import.py:303
+msgid "The file could not be read as UTF-8 text."
+msgstr "تعذّرت قراءة الملف كنص بترميز UTF-8."
+
+#: core/csv_import.py:312
+#, python-format
+msgid "The CSV must contain a '%(col)s' column."
+msgstr "يجب أن يحتوي ملف CSV على عمود '%(col)s'."
+
+#: core/csv_import.py:343
+#, python-format
+msgid "'%(v)s' is not a whole number."
+msgstr "'%(v)s' ليس عدداً صحيحاً."
+
+#: core/csv_import.py:350
+#, python-format
+msgid "'%(v)s' is not a yes/no value."
+msgstr "'%(v)s' ليس قيمة نعم/لا."
+
+#: core/csv_import.py:365
+#, python-format
+msgid "%(fk)s needs both an Arabic city and Arabic country."
+msgstr "%(fk)s يتطلب اسم المدينة والدولة بالعربية معاً."
+
+#: core/csv_import.py:578
+#, python-format
+msgid "Missing '%(col)s'."
+msgstr "العمود '%(col)s' مفقود."
+
+#: core/csv_import.py:604
+#, python-format
+msgid "Attribute '%(name)s' not found — it will be skipped."
+msgstr "الخاصية '%(name)s' غير موجودة — سيتم تخطّيها."
+
+#: core/csv_import.py:618
+#, python-format
+msgid "%(n)d existing biographies share this name — row skipped."
+msgstr "%(n)d تراجم موجودة تحمل هذا الاسم — تم تخطّي الصف."
+
+#: core/csv_import.py:671 core/models.py:42 core/models.py:289
+#: landing/templates/biography.html:162
+msgid "Attributes"
+msgstr "صفات وتصنيفات"
+
+#: core/csv_import.py:689
+msgid "Yes"
+msgstr "نعم"
+
+#: core/csv_import.py:689
+msgid "No"
+msgstr "لا"
+
+#: core/models.py:22
+msgid "Birth Hijri Approximate"
+msgstr "تاريخ الميلاد الهجري تقريبي"
+
+#: core/models.py:23
+msgid "Birth Gregorian Approximate"
+msgstr "تاريخ الميلاد الميلادي تقريبي"
+
+#: core/models.py:37
+msgid "Death Hijri Approximate"
+msgstr "تاريخ الوفاة الهجري تقريبي"
+
+#: core/models.py:38
+msgid "Death Gregorian Approximate"
+msgstr "تاريخ الوفاة الميلادي تقريبي"
+
+#: core/models.py:60
+msgid "Submitted By"
+msgstr "أُضيف بواسطة"
+
+#: core/models.py:67
+msgid "Last Modified By"
+msgstr "آخر تعديل بواسطة"
+
+#: core/models.py:74
+msgid "User Account"
+msgstr "حساب المستخدم"
+
+#: core/models.py:83 core/models.py:317 core/models.py:390 users/models.py:43
 msgid "Biography"
 msgstr "سيرة ذاتية"
 
+#: core/models.py:84 landing/templates/base.html:118
+#: landing/templates/biographies.html:21
 msgid "Biographies"
 msgstr "السير الذاتية"
 
+#: core/models.py:122
 msgid "Hijri"
 msgstr "الهجري"
 
+#: core/models.py:122
 msgid "Gregorian"
 msgstr "الميلادي"
 
+#: core/models.py:127
 #, python-format
 msgid "%(label)s %(cal)s day requires a month."
 msgstr "يوم %(label)s %(cal)s يستلزم تحديد الشهر."
 
+#: core/models.py:129
 #, python-format
 msgid "%(label)s %(cal)s month requires a year."
 msgstr "شهر %(label)s %(cal)s يستلزم تحديد السنة."
 
+#: core/models.py:245
 msgid "City (Arabic)"
 msgstr "المدينة (عربي)"
 
+#: core/models.py:246
 msgid "City (English)"
 msgstr "المدينة (إنجليزي)"
 
+#: core/models.py:247
 msgid "Country (Arabic)"
 msgstr "الدولة (عربي)"
 
+#: core/models.py:248
 msgid "Country (English)"
 msgstr "الدولة (إنجليزي)"
 
+#: core/models.py:262 landing/templates/home.html:417
 msgid "Location"
 msgstr "الموقع الجغرافي"
 
+#: core/models.py:263
 msgid "Locations"
 msgstr "المواقع الجغرافية"
 
+#: core/models.py:271 core/models.py:295
 msgid "Short Name (Arabic)"
 msgstr "الاسم المختصر (عربي)"
 
+#: core/models.py:272 core/models.py:296
 msgid "Short Name (English)"
 msgstr "الاسم المختصر (إنجليزي)"
 
+#: core/models.py:273 core/models.py:297
 msgid "Long Name (Arabic)"
 msgstr "الاسم الكامل (عربي)"
 
+#: core/models.py:274 core/models.py:298
 msgid "Long Name (English)"
 msgstr "الاسم الكامل (إنجليزي)"
 
+#: core/models.py:275 landing/models.py:132
 msgid "Description (Arabic)"
 msgstr "الوصف (عربي)"
 
+#: core/models.py:276 landing/models.py:133
 msgid "Description (English)"
 msgstr "الوصف (إنجليزي)"
 
+#: core/models.py:288 landing/templates/biographies.html:73
+#: landing/templates/search-results.html:80
 msgid "Attribute"
 msgstr "الصفة"
 
+#: core/models.py:310
 msgid "Note"
 msgstr "ملاحظة"
 
+#: core/models.py:311 core/models.py:518
+#: templates/admin/core/biography/csv_import_review.html:104
+#: templates/admin/core/biography/csv_import_review.html:138
 msgid "Notes"
 msgstr "الملاحظات"
 
+#: core/models.py:319 core/models.py:339
 msgid "Name (Arabic)"
 msgstr "الاسم (عربي)"
 
+#: core/models.py:320 core/models.py:340
 msgid "Name (English)"
 msgstr "الاسم (إنجليزي)"
 
+#: core/models.py:321 landing/models.py:134
 msgid "Link"
 msgstr "الرابط"
 
+#: core/models.py:345
 msgid "Esnad Template"
 msgstr "قالب إسناد"
 
+#: core/models.py:346
 msgid "Esnad Templates"
 msgstr "قوالب الأسانيد"
 
+#: core/models.py:361
 msgid "Template"
 msgstr "القالب"
 
+#: core/models.py:369 core/models.py:465 landing/models.py:135
+#: landing/models.py:162
 msgid "Order"
 msgstr "الترتيب"
 
+#: core/models.py:377
 msgid "Template Link"
 msgstr "حلقة القالب"
 
+#: core/models.py:378
 msgid "Template Links"
 msgstr "حلقات القالب"
 
+#: core/models.py:479
 msgid "Esnad Link"
 msgstr "حلقة الإسناد"
 
+#: core/models.py:480
 msgid "Esnad Links"
 msgstr "حلقات الإسناد"
 
+#: core/models.py:496
 msgid ""
 "The holder of this Esnad cannot appear as a narrator in their own chain."
 msgstr "لا يمكن أن يظهر صاحب هذا الإسناد كراوٍ في سلسلته الخاصة."
 
+#: core/models.py:527
 msgid "Teacher-Student Relationship"
 msgstr "علاقة شيخ-تلميذ"
 
+#: core/models.py:528
 msgid "Teacher-Student Relationships"
 msgstr "علاقات الشيوخ والتلاميذ"
 
+#: core/views.py:26
+msgid "Invalid email or password."
+msgstr "البريد الإلكتروني أو كلمة المرور غير صحيحة."
+
+#: core/views.py:41
+msgid "Please fill in all fields."
+msgstr "يرجى تعبئة جميع الحقول."
+
+#: core/views.py:43
+msgid "An account with this email already exists."
+msgstr "يوجد حساب مسجَّل بهذا البريد الإلكتروني بالفعل."
+
+#: landing/admin.py:44
 msgid "About us section"
 msgstr "قسم من نحن"
 
+#: landing/admin.py:45
 msgid "Services section header"
 msgstr "عنوان قسم الخدمات"
 
+#: landing/admin.py:46
 msgid "Donate section"
 msgstr "قسم التبرع"
 
+#: landing/admin.py:47
 msgid "Blog section header"
 msgstr "عنوان قسم المدونة"
 
+#: landing/admin.py:48
 msgid "Contact section"
 msgstr "قسم اتصل بنا"
 
+#: landing/admin.py:49
 msgid "Social media links"
 msgstr "روابط وسائل التواصل الاجتماعي"
 
+#: landing/admin.py:50 landing/templates/search-results.html:52
 msgid "Search"
 msgstr "بحث"
 
+#: landing/admin.py:51
 msgid "Copyright"
 msgstr "حقوق النشر"
 
+#: landing/apps.py:7
 msgid "Landing"
 msgstr "الواجهة"
 
+#: landing/models.py:13
 msgid "Site name (Arabic)"
 msgstr "اسم الموقع (عربي)"
 
+#: landing/models.py:14
 msgid "Site name (English)"
 msgstr "اسم الموقع (إنجليزي)"
 
+#: landing/models.py:15
 msgid "Logo"
 msgstr "الشعار"
 
+#: landing/models.py:16
 msgid "Logo (dark)"
 msgstr "الشعار (داكن)"
 
+#: landing/models.py:17
 msgid "Favicon"
 msgstr "أيقونة المفضلة"
 
+#: landing/models.py:20
 msgid "About us heading (Arabic)"
 msgstr "عنوان من نحن (عربي)"
 
+#: landing/models.py:21
 msgid "About us heading (English)"
 msgstr "عنوان من نحن (إنجليزي)"
 
+#: landing/models.py:22
 msgid "About us subheading (Arabic)"
 msgstr "العنوان الفرعي لمن نحن (عربي)"
 
+#: landing/models.py:23
 msgid "About us subheading (English)"
 msgstr "العنوان الفرعي لمن نحن (إنجليزي)"
 
+#: landing/models.py:24
 msgid "About us description (Arabic)"
 msgstr "وصف من نحن (عربي)"
 
+#: landing/models.py:25
 msgid "About us description (English)"
 msgstr "وصف من نحن (إنجليزي)"
 
+#: landing/models.py:26
 msgid "About us image"
 msgstr "صورة من نحن"
 
+#: landing/models.py:27
 msgid "About us URL"
 msgstr "رابط من نحن"
 
+#: landing/models.py:30
 msgid "Services heading (Arabic)"
 msgstr "عنوان الخدمات (عربي)"
 
+#: landing/models.py:31
 msgid "Services heading (English)"
 msgstr "عنوان الخدمات (إنجليزي)"
 
+#: landing/models.py:32
 msgid "Services subheading (Arabic)"
 msgstr "العنوان الفرعي للخدمات (عربي)"
 
+#: landing/models.py:33
 msgid "Services subheading (English)"
 msgstr "العنوان الفرعي للخدمات (إنجليزي)"
 
+#: landing/models.py:34
 msgid "Services description (Arabic)"
 msgstr "وصف الخدمات (عربي)"
 
+#: landing/models.py:35
 msgid "Services description (English)"
 msgstr "وصف الخدمات (إنجليزي)"
 
+#: landing/models.py:38
 msgid "Donate heading (Arabic)"
 msgstr "عنوان التبرع (عربي)"
 
+#: landing/models.py:39
 msgid "Donate heading (English)"
 msgstr "عنوان التبرع (إنجليزي)"
 
+#: landing/models.py:40
 msgid "Donate subheading (Arabic)"
 msgstr "العنوان الفرعي للتبرع (عربي)"
 
+#: landing/models.py:41
 msgid "Donate subheading (English)"
 msgstr "العنوان الفرعي للتبرع (إنجليزي)"
 
+#: landing/models.py:42
 msgid "Donate button (Arabic)"
 msgstr "زر التبرع (عربي)"
 
+#: landing/models.py:43
 msgid "Donate button (English)"
 msgstr "زر التبرع (إنجليزي)"
 
+#: landing/models.py:44
 msgid "Donate button URL"
 msgstr "رابط زر التبرع"
 
+#: landing/models.py:47
 msgid "Blog heading (Arabic)"
 msgstr "عنوان المدونة (عربي)"
 
+#: landing/models.py:48
 msgid "Blog heading (English)"
 msgstr "عنوان المدونة (إنجليزي)"
 
+#: landing/models.py:49
 msgid "Blog subheading (Arabic)"
 msgstr "العنوان الفرعي للمدونة (عربي)"
 
+#: landing/models.py:50
 msgid "Blog subheading (English)"
 msgstr "العنوان الفرعي للمدونة (إنجليزي)"
 
+#: landing/models.py:51
 msgid "Blog description (Arabic)"
 msgstr "وصف المدونة (عربي)"
 
+#: landing/models.py:52
 msgid "Blog description (English)"
 msgstr "وصف المدونة (إنجليزي)"
 
+#: landing/models.py:55
 msgid "Contact heading (Arabic)"
 msgstr "عنوان اتصل بنا (عربي)"
 
+#: landing/models.py:56
 msgid "Contact heading (English)"
 msgstr "عنوان اتصل بنا (إنجليزي)"
 
+#: landing/models.py:57
 msgid "Contact subheading (Arabic)"
 msgstr "العنوان الفرعي لاتصل بنا (عربي)"
 
+#: landing/models.py:58
 msgid "Contact subheading (English)"
 msgstr "العنوان الفرعي لاتصل بنا (إنجليزي)"
 
+#: landing/models.py:59
 msgid "Contact description (Arabic)"
 msgstr "وصف اتصل بنا (عربي)"
 
+#: landing/models.py:60
 msgid "Contact description (English)"
 msgstr "وصف اتصل بنا (إنجليزي)"
 
+#: landing/models.py:61
 msgid "Contact email"
 msgstr "البريد الإلكتروني للتواصل"
 
+#: landing/models.py:62
 msgid "Contact phone"
 msgstr "هاتف التواصل"
 
+#: landing/models.py:63
 msgid "Contact address (Arabic)"
 msgstr "عنوان التواصل (عربي)"
 
+#: landing/models.py:64
 msgid "Contact address (English)"
 msgstr "عنوان التواصل (إنجليزي)"
 
+#: landing/models.py:67
 msgid "Facebook URL"
 msgstr "رابط فيسبوك"
 
+#: landing/models.py:68
 msgid "Twitter URL"
 msgstr "رابط تويتر"
 
+#: landing/models.py:69
 msgid "Instagram URL"
 msgstr "رابط إنستغرام"
 
+#: landing/models.py:73
 msgid "Search results per page"
 msgstr "عدد نتائج البحث في الصفحة"
 
+#: landing/models.py:76
 msgid "Number of biographies shown per page on the search results page."
 msgstr "عدد السِيَر المعروضة في كل صفحة على صفحة نتائج البحث."
 
+#: landing/models.py:80
 msgid "Copyright (Arabic)"
 msgstr "حقوق النشر (عربي)"
 
+#: landing/models.py:81
 msgid "Copyright (English)"
 msgstr "حقوق النشر (إنجليزي)"
 
+#: landing/models.py:84 landing/models.py:85
 msgid "Site settings"
 msgstr "إعدادات الموقع"
 
+#: landing/models.py:97 landing/models.py:130 landing/models.py:150
 msgid "Title (Arabic)"
 msgstr "العنوان (عربي)"
 
+#: landing/models.py:98 landing/models.py:131 landing/models.py:151
 msgid "Title (English)"
 msgstr "العنوان (إنجليزي)"
 
+#: landing/models.py:99
 msgid "Subtitle (Arabic)"
 msgstr "العنوان الفرعي (عربي)"
 
+#: landing/models.py:100
 msgid "Subtitle (English)"
 msgstr "العنوان الفرعي (إنجليزي)"
 
+#: landing/models.py:101
 msgid "Show search bar"
 msgstr "إظهار شريط البحث"
 
+#: landing/models.py:104
 msgid "Video URL or path"
 msgstr "رابط أو مسار الفيديو"
 
+#: landing/models.py:107
 msgid "e.g. path under static like 'video/quran_video.mp4' or full URL"
 msgstr "مثال: مسار تحت static مثل 'video/quran_video.mp4' أو رابط كامل"
 
+#: landing/models.py:109
 msgid "Image (if no video)"
 msgstr "الصورة (إن لم يكن فيديو)"
 
+#: landing/models.py:112 landing/models.py:113
 msgid "Hero section"
 msgstr "القسم الرئيسي"
 
+#: landing/models.py:126
 msgid "Icon class (FontAwesome)"
 msgstr "فئة الأيقونة (FontAwesome)"
 
+#: landing/models.py:128
 msgid "e.g. fa fa-book, fa fa-clipboard-check"
 msgstr "مثال: fa fa-book, fa fa-clipboard-check"
 
+#: landing/models.py:139
 msgid "Service"
 msgstr "الخدمة"
 
+#: landing/models.py:140 landing/templates/base.html:124
 msgid "Services"
 msgstr "الخدمات"
 
+#: landing/models.py:147
 msgid "Image"
 msgstr "الصورة"
 
+#: landing/models.py:148
 msgid "Category (Arabic)"
 msgstr "الفئة (عربي)"
 
+#: landing/models.py:149
 msgid "Category (English)"
 msgstr "الفئة (إنجليزي)"
 
+#: landing/models.py:152
 msgid "Author (Arabic)"
 msgstr "المؤلف (عربي)"
 
+#: landing/models.py:153
 msgid "Author (English)"
 msgstr "المؤلف (إنجليزي)"
 
+#: landing/models.py:154
 msgid "Author role (Arabic)"
 msgstr "صفة المؤلف (عربي)"
 
+#: landing/models.py:155
 msgid "Author role (English)"
 msgstr "صفة المؤلف (إنجليزي)"
 
+#: landing/models.py:156
 msgid "Excerpt (Arabic)"
 msgstr "المقتطف (عربي)"
 
+#: landing/models.py:157
 msgid "Excerpt (English)"
 msgstr "المقتطف (إنجليزي)"
 
+#: landing/models.py:158
 msgid "Body (Arabic)"
 msgstr "المحتوى (عربي)"
 
+#: landing/models.py:159
 msgid "Body (English)"
 msgstr "المحتوى (إنجليزي)"
 
+#: landing/models.py:160
 msgid "Show as featured post"
 msgstr "عرض كمقال مميز"
 
+#: landing/models.py:161 landing/templates/blog-detail.html:80
 msgid "Date"
 msgstr "التاريخ"
 
+#: landing/models.py:166
 msgid "Post"
 msgstr "مقال"
 
+#: landing/models.py:167
 msgid "Posts"
 msgstr "المقالات"
 
+#: landing/templates/base.html:17
 msgid ""
 "The International Center for the History and Documentation of Quran Reciters"
 msgstr "المركز الدولي لتاريخ وتوثيق قرّاء القرآن الكريم"
 
+#: landing/templates/base.html:106
 msgid "Navigation Menu"
 msgstr "قائمة التنقل"
 
+#: landing/templates/base.html:115
+#: templates/admin/core/biography/csv_import.html:6
+#: templates/admin/core/biography/csv_import_review.html:6
 msgid "Home"
 msgstr "الرئيسية"
 
+#: landing/templates/base.html:121
 msgid "About us"
 msgstr "من نحن"
 
+#: landing/templates/base.html:127 landing/templates/home.html:216
 msgid "Blog"
 msgstr "المدونة"
 
+#: landing/templates/base.html:130 landing/templates/home.html:275
 msgid "Contact us"
 msgstr "اتصل بنا"
 
+#: landing/templates/base.html:153
 msgid "Logout"
 msgstr "الخروج"
 
+#: landing/templates/base.html:155 landing/templates/login.html:22
 msgid "Login"
-msgstr "الدخول"
+msgstr "تسجيل الدخول"
 
+#: landing/templates/base.html:310
 msgid "Email Sent Successfully."
 msgstr "تم إرسال البريد الإلكتروني بنجاح."
 
+#: landing/templates/base.html:313 landing/templates/base.html:318
 msgid "Error sending email. Please try again later."
 msgstr "حدث خطأ أثناء إرسال البريد الإلكتروني. يرجى المحاولة لاحقاً."
 
+#: landing/templates/biographies.html:22
 msgid "Browse all biographies in the site"
 msgstr "تصفح جميع التراجم في الموقع"
 
+#: landing/templates/biographies.html:38
 #, python-format
 msgid "%(counter)s biography"
 msgid_plural "%(counter)s biographies"
@@ -580,143 +892,214 @@ msgstr[3] "%(counter)s تراجم"
 msgstr[4] "%(counter)s ترجمة"
 msgstr[5] "%(counter)s ترجمة"
 
+#: landing/templates/biographies.html:43
 msgid "Filters"
 msgstr "عوامل التصفية"
 
+#: landing/templates/biographies.html:53
+#: landing/templates/search-results.html:60
 msgid "All hometowns"
 msgstr "جميع المواطن"
 
+#: landing/templates/biographies.html:60
+#: landing/templates/search-results.html:67
 msgid "All birthplaces"
 msgstr "جميع أماكن الولادة"
 
+#: landing/templates/biographies.html:66
+#: landing/templates/search-results.html:73
 msgid "Death location"
 msgstr "مكان الوفاة"
 
+#: landing/templates/biographies.html:67
+#: landing/templates/search-results.html:74
 msgid "All death locations"
 msgstr "جميع أماكن الوفاة"
 
+#: landing/templates/biographies.html:74
+#: landing/templates/search-results.html:81
 msgid "All attributes"
 msgstr "جميع الصفات والتصنيفات"
 
+#: landing/templates/biographies.html:82
+#: landing/templates/search-results.html:89
 msgid "Sort by"
 msgstr "ترتيب حسب"
 
+#: landing/templates/biographies.html:83
+#: landing/templates/search-results.html:91
 msgid "Name (A–Z)"
 msgstr "الاسم (أ–ي)"
 
+#: landing/templates/biographies.html:84
+#: landing/templates/search-results.html:92
 msgid "Name (Z–A)"
 msgstr "الاسم (ي–أ)"
 
+#: landing/templates/biographies.html:85
+#: landing/templates/search-results.html:93
 msgid "Death year (earliest)"
 msgstr "سنة الوفاة (الأقدم)"
 
+#: landing/templates/biographies.html:86
+#: landing/templates/search-results.html:94
 msgid "Death year (latest)"
 msgstr "سنة الوفاة (الأحدث)"
 
+#: landing/templates/biographies.html:87
+#: landing/templates/search-results.html:95
 msgid "Isnad rank (best)"
 msgstr "مرتبة الإسناد (الأفضل)"
 
+#: landing/templates/biographies.html:96
+#: landing/templates/search-results.html:104
 msgid "Clear filters"
 msgstr "مسح عوامل التصفية"
 
+#: landing/templates/biographies.html:143
+#: landing/templates/search-results.html:156
 #, python-format
 msgid "Rank %(rank)s"
 msgstr "المرتبة %(rank)s"
 
+#: landing/templates/biographies.html:154
+#: landing/templates/search-results.html:167
 msgid "Page navigation"
 msgstr "التنقل بين الصفحات"
 
+#: landing/templates/biographies.html:159
+#: landing/templates/biographies.html:164
+#: landing/templates/search-results.html:172
+#: landing/templates/search-results.html:177
 msgid "Previous"
 msgstr "السابق"
 
+#: landing/templates/biographies.html:181
+#: landing/templates/biographies.html:186
+#: landing/templates/search-results.html:194
+#: landing/templates/search-results.html:199
 msgid "Next"
 msgstr "التالي"
 
+#: landing/templates/biographies.html:195
+#: landing/templates/search-results.html:208
 msgid "No matching biographies were found."
 msgstr "لم يتم العثور على سِيَر مطابقة."
 
+#: landing/templates/biography.html:64
 msgid "Born"
 msgstr "وُلد"
 
+#: landing/templates/biography.html:71
 msgid "Died"
 msgstr "توفي"
 
+#: landing/templates/biography.html:81
 msgid "Share this biography"
 msgstr "شارك هذه الترجمة"
 
+#: landing/templates/biography.html:84 landing/templates/blog-detail.html:99
 msgid "Share on WhatsApp"
 msgstr "شارك عبر واتساب"
 
+#: landing/templates/biography.html:90 landing/templates/blog-detail.html:103
 msgid "Share on Telegram"
 msgstr "شارك عبر تيليجرام"
 
+#: landing/templates/biography.html:96 landing/templates/blog-detail.html:107
 msgid "Share on X"
 msgstr "شارك عبر إكس"
 
+#: landing/templates/biography.html:102 landing/templates/blog-detail.html:111
 msgid "Share on Facebook"
 msgstr "شارك عبر فيسبوك"
 
+#: landing/templates/biography.html:108 landing/templates/blog-detail.html:115
 msgid "Copy link"
 msgstr "نسخ الرابط"
 
+#: landing/templates/biography.html:129
 msgid "This biography is not completed yet."
 msgstr "هذه السيرة لم تكتمل بعد."
 
+#: landing/templates/biography.html:130
 msgid "We are still working on this biography. Please check back later."
 msgstr "ما زلنا نعمل على هذه السيرة. يرجى العودة لاحقًا."
 
-msgid "Unpublished — visible to staff only."
-msgstr "غير منشورة — مرئية للموظفين فقط."
+#: landing/templates/biography.html:136
+msgid "This biography is unpublished and is not visible to visitors."
+msgstr "هذه السيرة غير منشورة ولن تظهر للزوار."
 
+#: landing/templates/biography.html:147
 msgid "Identity"
 msgstr "الهوية"
 
+#: landing/templates/biography.html:151 landing/templates/signup.html:34
+#: landing/templates/signup.html:37
 msgid "Full Name"
 msgstr "الاسم الكامل"
 
+#: landing/templates/biography.html:181 landing/templates/biography.html:208
 msgid "Hijri Date"
 msgstr "التاريخ الهجري"
 
+#: landing/templates/biography.html:184 landing/templates/biography.html:191
+#: landing/templates/biography.html:211 landing/templates/biography.html:218
 msgid "Approximate date — day and month may not be exact"
 msgstr "تاريخ تقريبي — قد لا يكون اليوم والشهر دقيقين"
 
+#: landing/templates/biography.html:188 landing/templates/biography.html:215
 msgid "Gregorian Date"
 msgstr "التاريخ الميلادي"
 
+#: landing/templates/biography.html:235
 #, python-format
 msgid "Chain #%(num)s"
 msgstr "سند رقم %(num)s"
 
+#: landing/templates/biography.html:250
 msgid "Comments"
 msgstr "فوائد وملاحظات"
 
+#: landing/templates/biography.html:346 landing/templates/biography.html:348
+#: landing/templates/blog-detail.html:178
+#: landing/templates/blog-detail.html:180
 msgid "Copy this link"
 msgstr "انسخ هذا الرابط"
 
+#: landing/templates/blog-detail.html:64
 msgid "Author"
 msgstr "المؤلف"
 
+#: landing/templates/blog-detail.html:76
 msgid "Details"
 msgstr "التفاصيل"
 
+#: landing/templates/blog-detail.html:86
 msgid "Category"
 msgstr "التصنيف"
 
+#: landing/templates/blog-detail.html:96
 msgid "Share this post"
 msgstr "شارك هذه المقالة"
 
+#: landing/templates/blog-detail.html:128
 msgid "Related Blogs"
 msgstr "مقالات ذات صلة"
 
+#: landing/templates/blog-detail.html:151 landing/templates/home.html:88
 msgid "Read More"
 msgstr "إقرأ المزيد"
 
+#: landing/templates/home.html:72
 msgid "Who We Are ?"
 msgstr "من نحن ؟"
 
+#: landing/templates/home.html:77
 msgid "Our Company Story"
 msgstr "قصتنا"
 
+#: landing/templates/home.html:83
 msgid ""
 "Join our landmark initiative to research, document, and preserve the "
 "biographies and chains of transmission of the world's greatest Quran "
@@ -725,9 +1108,11 @@ msgstr ""
 "انضم إلى مبادرتنا الرائدة لبحث وتوثيق وحفظ سِيَر وأسانيد أعظم قرّاء القرآن "
 "الكريم في العالم."
 
+#: landing/templates/home.html:186
 msgid "Contribute to preserving the history of the reciters"
 msgstr "ساهم في حفظ تاريخ القراء"
 
+#: landing/templates/home.html:192
 msgid ""
 "Join our landmark initiative to preserve the legacy of the world’s greatest "
 "Quran reciters."
@@ -735,12 +1120,15 @@ msgstr ""
 "انضم إلينا في هذا المشروع العلمي الرائد وساهم في توثيق تاريخ قراء القرآن "
 "الكريم"
 
+#: landing/templates/home.html:197
 msgid "Get Started !"
 msgstr "ابدأ الآن !"
 
+#: landing/templates/home.html:221
 msgid "Latest News"
 msgstr "آخر الأخبار"
 
+#: landing/templates/home.html:227
 msgid ""
 "Follow our latest stories, articles, and updates documenting the lives of "
 "the world’s greatest Quran reciters and our ongoing efforts to preserve "
@@ -749,66 +1137,107 @@ msgstr ""
 "تابعوا أحدث قصصنا ومقالاتنا والمستجدات التي توثّق سِيَر أعظم قرّاء القرآن الكريم "
 "في العالم، وجهودنا المتواصلة في صون إرثهم الخالد."
 
+#: landing/templates/home.html:280
 msgid "Get In Touch !"
 msgstr "يسعدنا تواصلكم"
 
+#: landing/templates/home.html:286
 msgid ""
 "We’re always happy to connect! Please feel free to reach out with any "
 "questions, feedback, or ideas"
 msgstr "لا تترددوا في طرح أي استفسارات، أو تقديم آرائكم ومقترحاتكم"
 
+#: landing/templates/home.html:303
 msgid "Name :"
 msgstr "الاسم :"
 
+#: landing/templates/home.html:306
 msgid "Email :"
 msgstr "البريد الإلكتروني :"
 
+#: landing/templates/home.html:311
 msgid "Subject :"
 msgstr "الموضوع :"
 
+#: landing/templates/home.html:314
 msgid "Message :"
 msgstr "الرسالة :"
 
+#: landing/templates/home.html:318
 msgid "Send Message"
 msgstr "إرسال الرسالة"
 
+#: landing/templates/home.html:337
 msgid "Please enter your name."
 msgstr "يرجى إدخال اسمك."
 
+#: landing/templates/home.html:343
 msgid "Please enter a valid email address."
 msgstr "يرجى إدخال بريد إلكتروني صالح."
 
+#: landing/templates/home.html:347
 msgid "You have entered an invalid email address. Please try again."
 msgstr "لقد أدخلت بريداً إلكترونياً غير صالح. يرجى المحاولة مرة أخرى."
 
+#: landing/templates/home.html:352
 msgid "Please enter the subject."
 msgstr "يرجى إدخال الموضوع."
 
+#: landing/templates/home.html:357
 msgid "Please enter your message."
 msgstr "يرجى إدخال رسالتك."
 
+#: landing/templates/home.html:385
 msgid "Phone"
 msgstr "الهاتف"
 
+#: landing/templates/home.html:401
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
+#: landing/templates/login.html:35 landing/templates/signup.html:41
+msgid "Email Address"
+msgstr "البريد الإلكتروني"
+
+#: landing/templates/login.html:42 landing/templates/login.html:44
+#: landing/templates/signup.html:48 landing/templates/signup.html:50
+msgid "Password"
+msgstr "كلمة المرور"
+
+#: landing/templates/login.html:50 landing/templates/signup.html:62
+msgid "Sign in"
+msgstr "تسجيل الدخول"
+
+#: landing/templates/login.html:55
+msgid "Don't have an account ?"
+msgstr "ليس لديك حساب؟"
+
+#: landing/templates/login.html:56
+msgid "Sign Up"
+msgstr "إنشاء حساب"
+
+#: landing/templates/search-results.html:21
 msgid "Search Results"
 msgstr "نتائج البحث"
 
+#: landing/templates/search-results.html:23
 #, python-format
 msgid "Searching for: %(query)s"
 msgstr "البحث عن: %(query)s"
 
+#: landing/templates/search-results.html:23
 msgid "Enter a keyword to search biographies"
 msgstr "أدخل كلمة مفتاحية للبحث في السِيَر"
 
+#: landing/templates/search-results.html:45
 msgid "Filters & sorting"
 msgstr "التصفية والترتيب"
 
+#: landing/templates/search-results.html:90
 msgid "Relevance"
 msgstr "الأكثر صلة"
 
+#: landing/templates/search-results.html:125
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
@@ -819,51 +1248,317 @@ msgstr[3] "%(counter)s نتائج"
 msgstr[4] "%(counter)s نتيجة"
 msgstr[5] "%(counter)s نتيجة"
 
+#: landing/templates/search-results.html:211
 msgid "Type a keyword in the field above to begin."
 msgstr "اكتب كلمة مفتاحية في الحقل أعلاه للبدء."
 
+#: landing/templates/signup.html:22
+msgid "Signup"
+msgstr "إنشاء حساب"
+
+#: landing/templates/signup.html:56
+msgid "Register"
+msgstr "إنشاء حساب"
+
+#: landing/templates/signup.html:61
+msgid "Already have an account ?"
+msgstr "لديك حساب بالفعل؟"
+
+#: templates/admin/base_site.html:11
 msgid "Select language"
 msgstr "اختر اللغة"
 
+#: templates/admin/core/biography/change_form.html:11
 msgid "Submitted by"
 msgstr "أُضيف بواسطة"
 
+#: templates/admin/core/biography/change_form.html:15
 msgid "Last modified by"
 msgstr "آخر تعديل بواسطة"
 
+#: templates/admin/core/biography/change_form.html:19
 msgid "Created"
 msgstr "تاريخ الإنشاء"
 
+#: templates/admin/core/biography/change_form.html:23
 msgid "Updated"
 msgstr "تاريخ التحديث"
 
+#: templates/admin/core/biography/change_form.html:35
+#: templates/admin/core/esnad/change_form.html:8
 msgid "Load from Template"
 msgstr "تحميل من قالب"
 
+#: templates/admin/core/biography/change_form.html:41
 #, python-format
 msgid "Esnad #%(pk)s"
 msgstr "إسناد #%(pk)s"
 
+#: templates/admin/core/biography/change_form.html:43
+#: templates/admin/core/esnad/change_form.html:13
 msgid "Select a template"
 msgstr "اختر قالباً"
 
+#: templates/admin/core/biography/change_form.html:49
+#: templates/admin/core/esnad/change_form.html:19
 msgid ""
 "This will replace the current chain with the selected template. Continue?"
 msgstr "سيُستبدل التسلسل الحالي بالقالب المختار. هل تريد المتابعة؟"
 
+#: templates/admin/core/biography/change_form.html:50
+#: templates/admin/core/esnad/change_form.html:20
 msgid "Apply"
 msgstr "تطبيق"
 
+#: templates/admin/core/biography/change_form.html:55
+#: templates/admin/core/esnad/change_form.html:23
 msgid ""
 "The holder biography is automatically excluded if present in the template."
 msgstr "يُستثنى صاحب الترجمة تلقائياً إن كان موجوداً في القالب."
 
+#: templates/admin/core/biography/change_list.html:7
+#: templates/admin/core/biography/csv_import.html:9
+#: templates/admin/core/biography/csv_import_review.html:9
+msgid "Import CSV"
+msgstr "استيراد CSV"
+
+#: templates/admin/core/biography/csv_import.html:15
+msgid ""
+"Upload a CSV file of biographies. After uploading you will see a preview "
+"where you can resolve any conflicts with existing records before anything is "
+"saved."
+msgstr ""
+"ارفع ملف CSV يحتوي على التراجم. بعد الرفع ستظهر لك معاينة يمكنك من خلالها حل "
+"أي تعارضات مع السجلات الموجودة قبل حفظ أي شيء."
+
+#: templates/admin/core/biography/csv_import.html:19
+msgid "Download Excel Template"
+msgstr "تنزيل قالب Excel"
+
+#: templates/admin/core/biography/csv_import.html:22
+msgid ""
+"The Excel template has dropdown lists of your existing locations and "
+"attributes to prevent typos. Fill it in and upload it back here."
+msgstr ""
+"يحتوي قالب Excel على قوائم منسدلة بالمواقع والخصائص الموجودة لديك لتجنّب "
+"الأخطاء الإملائية. املأه ثم أعد رفعه هنا."
+
+#: templates/admin/core/biography/csv_import.html:30
+msgid "Upload and preview"
+msgstr "رفع ومعاينة"
+
+#: templates/admin/core/biography/csv_import.html:35
+msgid "Expected columns"
+msgstr "الأعمدة المتوقّعة"
+
+#: templates/admin/core/biography/csv_import.html:37
+msgid ""
+"Match biographies are identified by the 'full_name_ar' column (required). "
+"Empty cells are ignored and never overwrite existing data."
+msgstr ""
+"يتم تحديد التراجم المطابِقة عبر عمود 'full_name_ar' (إلزامي). تُتجاهَل الخلايا "
+"الفارغة ولا تستبدل البيانات الموجودة أبداً."
+
+#: templates/admin/core/biography/csv_import.html:39
+msgid "Names: full_name_ar (required), full_name_en, alias_ar, alias_en"
+msgstr "الأسماء: full_name_ar (إلزامي)، full_name_en، alias_ar، alias_en"
+
+#: templates/admin/core/biography/csv_import.html:40
+msgid ""
+"Birth/Death dates: birth_hijri_year/month/day, birth_greg_year/month/day and "
+"the death_* equivalents"
+msgstr ""
+"تواريخ الميلاد/الوفاة: birth_hijri_year/month/day و birth_greg_year/month/"
+"day وما يقابلها من death_*"
+
+#: templates/admin/core/biography/csv_import.html:41
+msgid ""
+"Locations: birthplace_city_ar/city_en/country_ar/country_en, plus hometown_* "
+"and death_location_* (new locations are created automatically; Arabic city + "
+"country required)"
+msgstr ""
+"المواقع: birthplace_city_ar/city_en/country_ar/country_en، إضافة إلى "
+"hometown_* و death_location_* (تُنشأ المواقع الجديدة تلقائياً؛ يلزم اسم "
+"المدينة والدولة بالعربية)"
+
+#: templates/admin/core/biography/csv_import.html:42
+msgid ""
+"Attributes: one per column in attribute_1 … attribute_6 (each a dropdown in "
+"the Excel template), or a single 'attributes' column with names separated by "
+"';'. Unknown attributes are skipped with a warning."
+msgstr ""
+"الخصائص: واحدة في كل عمود من attribute_1 … attribute_6 (كلٌّ قائمة منسدلة في "
+"قالب Excel)، أو عمود واحد باسم 'attributes' تُفصل أسماؤه بفاصلة منقوطة ';'. "
+"تُتخطّى الخصائص غير المعروفة مع تنبيه."
+
+#: templates/admin/core/biography/csv_import.html:43
+msgid "comments_ar, comments_en, published (yes/no)"
+msgstr "comments_ar، comments_en، published (نعم/لا)"
+
+#: templates/admin/core/biography/csv_import_review.html:16
+#, python-format
+msgid "Reviewing %(counter)s row."
+msgid_plural "Reviewing %(counter)s rows."
+msgstr[0] "لا توجد صفوف للمراجعة."
+msgstr[1] "مراجعة صف واحد."
+msgstr[2] "مراجعة صفّين."
+msgstr[3] "مراجعة %(counter)s صفوف."
+msgstr[4] "مراجعة %(counter)s صفاً."
+msgstr[5] "مراجعة %(counter)s صف."
+
+#: templates/admin/core/biography/csv_import_review.html:17
+msgid "Nothing is saved until you press Confirm import."
+msgstr "لا يُحفظ أي شيء حتى تضغط على \"تأكيد الاستيراد\"."
+
+#: templates/admin/core/biography/csv_import_review.html:27
+#, python-format
+msgid "%(counter)s location not found exactly"
+msgid_plural "%(counter)s locations not found exactly"
+msgstr[0] "لا توجد مواقع غير مطابِقة تماماً"
+msgstr[1] "موقع واحد لم يُطابَق تماماً"
+msgstr[2] "موقعان لم يُطابَقا تماماً"
+msgstr[3] "%(counter)s مواقع لم تُطابَق تماماً"
+msgstr[4] "%(counter)s موقعاً لم يُطابَق تماماً"
+msgstr[5] "%(counter)s موقع لم يُطابَق تماماً"
+
+#: templates/admin/core/biography/csv_import_review.html:29
+msgid ""
+"These typed locations have no exact match. Pick a similar existing location "
+"to avoid duplicates, or create a new one."
+msgstr ""
+"هذه المواقع المُدخلة ليس لها مطابقة تامة. اختر موقعاً موجوداً مشابهاً لتجنّب "
+"التكرار، أو أنشئ موقعاً جديداً."
+
+#: templates/admin/core/biography/csv_import_review.html:37
+#, python-format
+msgid "Use existing: %(name)s (similarity %(score)s)"
+msgstr "استخدام الموجود: %(name)s (نسبة التشابه %(score)s)"
+
+#: templates/admin/core/biography/csv_import_review.html:43
+#, python-format
+msgid "Create new location: %(name)s"
+msgstr "إنشاء موقع جديد: %(name)s"
+
+#: templates/admin/core/biography/csv_import_review.html:54
+#, python-format
+msgid "%(counter)s conflict with an existing record"
+msgid_plural "%(counter)s conflicts with existing records"
+msgstr[0] "لا توجد تعارضات مع سجلات موجودة"
+msgstr[1] "تعارض واحد مع سجل موجود"
+msgstr[2] "تعارضان مع سجلات موجودة"
+msgstr[3] "%(counter)s تعارضات مع سجلات موجودة"
+msgstr[4] "%(counter)s تعارضاً مع سجلات موجودة"
+msgstr[5] "%(counter)s تعارض مع سجلات موجودة"
+
+#: templates/admin/core/biography/csv_import_review.html:56
+msgid ""
+"These names already exist with different data. Choose whether to apply the "
+"import values or keep the website version."
+msgstr ""
+"هذه الأسماء موجودة بالفعل ببيانات مختلفة. اختر ما إذا كنت تريد تطبيق قيم "
+"الاستيراد أو الإبقاء على نسخة الموقع."
+
+#: templates/admin/core/biography/csv_import_review.html:59
+#, python-format
+msgid "Row %(row)s: %(name)s"
+msgstr "الصف %(row)s: %(name)s"
+
+#: templates/admin/core/biography/csv_import_review.html:63
+msgid "Field"
+msgstr "الحقل"
+
+#: templates/admin/core/biography/csv_import_review.html:64
+msgid "Website version"
+msgstr "نسخة الموقع"
+
+#: templates/admin/core/biography/csv_import_review.html:65
+msgid "Import version"
+msgstr "نسخة الاستيراد"
+
+#: templates/admin/core/biography/csv_import_review.html:82
+msgid "Keep website version"
+msgstr "الإبقاء على نسخة الموقع"
+
+#: templates/admin/core/biography/csv_import_review.html:86
+msgid "Apply import version"
+msgstr "تطبيق نسخة الاستيراد"
+
+#: templates/admin/core/biography/csv_import_review.html:90
+msgid "Skip this row"
+msgstr "تخطّي هذا الصف"
+
+#: templates/admin/core/biography/csv_import_review.html:102
+#, python-format
+msgid "%(counter)s new biography will be created"
+msgid_plural "%(counter)s new biographies will be created"
+msgstr[0] "لن تُنشأ أي تراجم جديدة"
+msgstr[1] "ستُنشأ ترجمة جديدة واحدة"
+msgstr[2] "ستُنشأ ترجمتان جديدتان"
+msgstr[3] "ستُنشأ %(counter)s تراجم جديدة"
+msgstr[4] "ستُنشأ %(counter)s ترجمة جديدة"
+msgstr[5] "ستُنشأ %(counter)s ترجمة جديدة"
+
+#: templates/admin/core/biography/csv_import_review.html:104
+#: templates/admin/core/biography/csv_import_review.html:123
+#: templates/admin/core/biography/csv_import_review.html:138
+#: templates/admin/core/biography/csv_import_review.html:154
+msgid "Row"
+msgstr "الصف"
+
+#: templates/admin/core/biography/csv_import_review.html:121
+#, python-format
+msgid "%(counter)s row unchanged (will be skipped)"
+msgid_plural "%(counter)s rows unchanged (will be skipped)"
+msgstr[0] "لا توجد صفوف دون تغيير (ستُتخطّى)"
+msgstr[1] "صف واحد دون تغيير (سيُتخطّى)"
+msgstr[2] "صفّان دون تغيير (سيُتخطّيان)"
+msgstr[3] "%(counter)s صفوف دون تغيير (ستُتخطّى)"
+msgstr[4] "%(counter)s صفاً دون تغيير (سيُتخطّى)"
+msgstr[5] "%(counter)s صف دون تغيير (سيُتخطّى)"
+
+#: templates/admin/core/biography/csv_import_review.html:136
+#, python-format
+msgid "%(counter)s ambiguous row (will be skipped)"
+msgid_plural "%(counter)s ambiguous rows (will be skipped)"
+msgstr[0] "لا توجد صفوف غامضة (ستُتخطّى)"
+msgstr[1] "صف واحد غامض (سيُتخطّى)"
+msgstr[2] "صفّان غامضان (سيُتخطّيان)"
+msgstr[3] "%(counter)s صفوف غامضة (ستُتخطّى)"
+msgstr[4] "%(counter)s صفاً غامضاً (سيُتخطّى)"
+msgstr[5] "%(counter)s صف غامض (سيُتخطّى)"
+
+#: templates/admin/core/biography/csv_import_review.html:152
+#, python-format
+msgid "%(counter)s row has errors (will be skipped)"
+msgid_plural "%(counter)s rows have errors (will be skipped)"
+msgstr[0] "لا توجد صفوف بها أخطاء (ستُتخطّى)"
+msgstr[1] "صف واحد به أخطاء (سيُتخطّى)"
+msgstr[2] "صفّان بهما أخطاء (سيُتخطّيان)"
+msgstr[3] "%(counter)s صفوف بها أخطاء (ستُتخطّى)"
+msgstr[4] "%(counter)s صفاً به أخطاء (سيُتخطّى)"
+msgstr[5] "%(counter)s صف به أخطاء (سيُتخطّى)"
+
+#: templates/admin/core/biography/csv_import_review.html:154
+msgid "Errors"
+msgstr "الأخطاء"
+
+#: templates/admin/core/biography/csv_import_review.html:169
+msgid "Confirm import"
+msgstr "تأكيد الاستيراد"
+
+#: templates/admin/core/biography/csv_import_review.html:170
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: users/admin.py:18
 msgid "Personal info"
 msgstr "المعلومات الشخصية"
 
+#: users/admin.py:20
 msgid "Role & permissions"
 msgstr "الدور والصلاحيات"
 
+#: users/admin.py:24
 msgid ""
 "User type: Admin (full access), Staff (manage via groups above), Reciter "
 "(limited)."
@@ -871,180 +1566,37 @@ msgstr ""
 "نوع المستخدم: مدير (صلاحية كاملة)، موظف (إدارة عبر المجموعات أعلاه)، قارئ "
 "(محدود)."
 
+#: users/admin.py:28
 msgid "Important dates"
 msgstr "التواريخ المهمة"
 
+#: users/apps.py:7
 msgid "Users"
 msgstr "المستخدمون"
 
+#: landing/templates/base.html
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+#: users/models.py:41
 msgid "Admin"
 msgstr "مدير"
 
+#: users/models.py:42
 msgid "Staff"
 msgstr "موظف"
 
+#: users/models.py:45
 msgid "email address"
 msgstr "البريد الإلكتروني"
 
+#: users/models.py:58
 msgid "user"
 msgstr "مستخدم"
 
+#: users/models.py:59
 msgid "users"
 msgstr "المستخدمون"
 
-#~ msgid "Written by"
-#~ msgstr "بقلم"
-
-#~ msgid "Button text (Arabic)"
-#~ msgstr "نص الزر (عربي)"
-
-#~ msgid "Button text (English)"
-#~ msgstr "نص الزر (إنجليزي)"
-
-#~ msgid "Button link (URL or #anchor)"
-#~ msgstr "رابط الزر (URL أو #anchor)"
-
-#~ msgid "Active"
-#~ msgstr "نشط"
-
-#~ msgid "Hero slide"
-#~ msgstr "شريحة العرض الرئيسي"
-
-#~ msgid "Hero slides"
-#~ msgstr "شرائح العرض الرئيسي"
-
-#~ msgid "Featured posts"
-#~ msgstr "مقالات مميزة"
-
-#~ msgid "Donate"
-#~ msgstr "تبرع"
-
-#~ msgid "Footer main block"
-#~ msgstr "الكتلة الرئيسية للتذييل"
-
-#~ msgid "Footer title (Arabic)"
-#~ msgstr "عنوان التذييل (عربي)"
-
-#~ msgid "Footer title (English)"
-#~ msgstr "عنوان التذييل (إنجليزي)"
-
-#, fuzzy
-#~| msgid "Site name (Arabic)"
-#~ msgid "Services overline (Arabic)"
-#~ msgstr "اسم الموقع (عربي)"
-
-#, fuzzy
-#~| msgid "Site name (English)"
-#~ msgid "Services overline (English)"
-#~ msgstr "اسم الموقع (إنجليزي)"
-
-#~ msgid "Welcome"
-#~ msgstr "الترحيب"
-
-#~ msgid "Team"
-#~ msgstr "الفريق"
-
-#~ msgid "Lead / subtitle (Arabic)"
-#~ msgstr "المقدمة / العنوان الفرعي (عربي)"
-
-#~ msgid "Lead / subtitle (English)"
-#~ msgstr "المقدمة / العنوان الفرعي (إنجليزي)"
-
-#~ msgid "Section"
-#~ msgstr "القسم"
-
-#~ msgid "Sections"
-#~ msgstr "الأقسام"
-
-#~ msgid "Lead (Arabic)"
-#~ msgstr "المقدمة (عربي)"
-
-#~ msgid "Lead (English)"
-#~ msgstr "المقدمة (إنجليزي)"
-
-#~ msgid "e.g. fa fa-3x fa-book"
-#~ msgstr "مثال: fa fa-3x fa-book"
-
-#~ msgid "Animate from"
-#~ msgstr "التحريك من"
-
-#~ msgid "Value to display"
-#~ msgstr "القيمة المعروضة"
-
-#~ msgid "Label (Arabic)"
-#~ msgstr "التسمية (عربي)"
-
-#~ msgid "Label (English)"
-#~ msgstr "التسمية (إنجليزي)"
-
-#~ msgid "Stat counter"
-#~ msgstr "عداد إحصائي"
-
-#~ msgid "Stat counters"
-#~ msgstr "عدادات إحصائية"
-
-#~ msgid "Name (alt text)"
-#~ msgstr "الاسم (نص بديل)"
-
-#~ msgid "Client"
-#~ msgstr "العميل"
-
-#~ msgid "Name"
-#~ msgstr "الاسم"
-
-#~ msgid "Role / title"
-#~ msgstr "الدور / المسمى"
-
-#~ msgid "Photo"
-#~ msgstr "الصورة"
-
-#~ msgid "Team member"
-#~ msgstr "عضو الفريق"
-
-#~ msgid "Team members"
-#~ msgstr "أعضاء الفريق"
-
-#~ msgid "Column title (legacy)"
-#~ msgstr "عنوان العمود (قديم)"
-
-#~ msgid "Fallback if Arabic/English not set"
-#~ msgstr "احتياطي إذا لم يُضبط العربي/الإنجليزي"
-
-#~ msgid "Column title (Arabic)"
-#~ msgstr "عنوان العمود (عربي)"
-
-#~ msgid "Column title (English)"
-#~ msgstr "عنوان العمود (إنجليزي)"
-
-#~ msgid "Footer column"
-#~ msgstr "عمود التذييل"
-
-#~ msgid "Footer columns"
-#~ msgstr "أعمدة التذييل"
-
-#~ msgid "Label (legacy)"
-#~ msgstr "التسمية (قديم)"
-
-#~ msgid "URL"
-#~ msgstr "الرابط"
-
-#~ msgid "Footer links"
-#~ msgstr "روابط التذييل"
-
-#~ msgid "Library"
-#~ msgstr "المكتبة"
-
-#~ msgid "Activities"
-#~ msgstr "الأنشطة"
-
-#~ msgid "C/54 Northwest Freeway, Suite 558, Houston, USA 485"
-#~ msgstr "C/54 نورث وست فريواي، جناح 558، هيوستن، الولايات المتحدة 485"
-
-#~ msgid "Notes (Arabic)"
-#~ msgstr "ملاحظات (عربي)"
-
-#~ msgid "Notes (English)"
-#~ msgstr "ملاحظات (إنجليزي)"
-
-#~ msgid "This narrator already appears in this chain."
-#~ msgstr "هذا الراوي موجود مسبقاً في هذه السلسلة."
+#~ msgid "Your Name"
+#~ msgstr "اسمك"

@@ -51,15 +51,28 @@ window.addEventListener('scroll', (ev) => {
 })
 
 // Navbar Active Class
+// Only init Gumshoe when the current page actually has anchor targets the
+// navbar links point to. Otherwise its internal list is empty and it throws
+// "Cannot read properties of undefined (reading 'content')" when you scroll to
+// the bottom of the page (the try/catch below only guards construction, not the
+// scroll-driven requestAnimationFrame callbacks).
 try {
-    var spy = new Gumshoe('#navbar-navlist a', {
-        // Active classes
-        // navClass: 'active', // applied to the nav list item
-        // contentClass: 'active', // applied to the content
-        offset: 80
-    });
+    var hasScrollSpyTarget = Array.prototype.some.call(
+        document.querySelectorAll('#navbar-navlist a[href*="#"]'),
+        function (link) {
+            return link.hash && document.getElementById(decodeURIComponent(link.hash.substr(1)));
+        }
+    );
+    if (hasScrollSpyTarget) {
+        var spy = new Gumshoe('#navbar-navlist a', {
+            // Active classes
+            // navClass: 'active', // applied to the nav list item
+            // contentClass: 'active', // applied to the content
+            offset: 80
+        });
+    }
 } catch (error) {
-    
+
 }
 
 
