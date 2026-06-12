@@ -258,7 +258,7 @@
             {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
             <div class="{% if not forloop.first %}mt-10 pt-10 border-t border-dashed border-gray-200 dark:border-gray-700{% endif %}">
               <div class="text-center mb-6">
-                <span class="inline-block bg-orange-600/10 text-orange-600 border border-orange-600/30 rounded-full px-4 py-1 text-sm font-medium">{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</span>
+                <span class="inline-block bg-orange-600 text-white rounded-full px-4 py-1 text-sm font-medium">{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</span>
                 {% if esnad.isnad_rank and terminal %}
                 <p class="text-sm text-slate-400 mb-0 mt-2">
                   {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
