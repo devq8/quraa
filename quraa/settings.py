@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'storages',
+    'tinymce',
     'nested_admin',
     'adminsortable2',
     'landing',
@@ -215,6 +216,19 @@ LOGGING = {
             "propagate": False,
         },
     },
+}
+
+
+# TinyMCE rich-text editor (used for description fields in the admin)
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 320,
+    "menubar": False,
+    "plugins": "advlist autolink lists link image charmap preview anchor "
+               "searchreplace visualblocks code fullscreen "
+               "insertdatetime media table paste code help wordcount directionality",
+    "toolbar": "undo redo | formatselect | bold italic underline | "
+               "ltr rtl | alignleft aligncenter alignright | "
+               "bullist numlist outdent indent | link image | removeformat | code | help",
 }
 
 

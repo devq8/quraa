@@ -1,0 +1,322 @@
+<!doctype html>
+{% load static i18n %} {% get_current_language as LANGUAGE_CODE %}
+
+<html lang="{{ LANGUAGE_CODE }}" class="light scroll-smooth" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+
+<head>
+  <!-- Set theme from system preference before render to avoid flash -->
+  <script>
+    (function () {
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.remove('light', 'dark');
+      document.documentElement.classList.add(prefersDark ? 'dark' : 'light');
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% if site_settings %}{% if LANGUAGE_CODE == 'ar' %}{{ site_settings.site_name_ar }}{% else %}{{ site_settings.site_name_en }}{% endif %}{% else %}{% trans "The International Center for the History and Documentation of Quran Reciters" %}{% endif %}</title>
+  <meta name="description" content="The International Center for the History and Documentation of Quran Reciters — researching, documenting, and preserving the biographies and chains of transmission of Quran reciters." />
+  <meta name="keywords" content="Quraa, Quran, reciters, Quran reciters, history, documentation, biography, isnad, chains of transmission, Islamic, Qira'at" />
+  <meta name="author" content="The International Center for the History and Documentation of Quran Reciters" />
+  <meta name="website" content="https://quraa.org" />
+  <meta name="email" content="info@quraa.org" />
+  <meta name="version" content="1.0.0" />
+  <!-- favicon -->
+  <link href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'assets/images/favicon.ico' %}{% endif %}" rel="shortcut icon" />
+
+  <!-- Css -->
+  <link href="{% static 'assets/libs/tobii/css/tobii.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'assets/libs/tiny-slider/tiny-slider.css' %}" rel="stylesheet" />
+  <!-- Main Css -->
+  <link href="{% static 'assets/libs/@iconscout/unicons/css/line.css' %}" type="text/css" rel="stylesheet" />
+  <link href="{% static 'assets/libs/@mdi/font/css/materialdesignicons.min.css' %}" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <!-- Google Fonts - Noto Naskh Arabic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}" />
+  <!-- Utility layer rebuilt from templates (see tailwind.config.js / `npm run tw:build`) -->
+  <link rel="stylesheet" href="{% static 'assets/css/tailwind-utilities.css' %}" />
+  <style>
+    /* Single source of truth — change this one line to swap the heading/paragraph font everywhere. */
+    :root {
+      --font-heading: 'Noto Naskh Arabic', serif;
+    }
+
+    h1, h2, h3, h4, h5, h6, p {
+      font-family: var(--font-heading);
+    }
+
+    /* Navbar uses Rubik */
+    #navbar, #navbar .nav-link {
+      font-family: 'Rubik', sans-serif;
+    }
+  </style>
+
+</head>
+
+<body class="font-rubik text-base text-slate-900 dark:text-white dark:bg-slate-900 flex flex-col min-h-screen">
+  <!-- Navbar Start -->
+  <nav class="navbar" id="navbar">
+    <div class="container flex flex-wrap items-center justify-end">
+      {% block navlink %}{% endblock navlink %}
+
+      <div class="nav-icons flex items-center lg_992:order-2 ms-auto">
+        <!-- Navbar Button -->
+        <ul class="list-none menu-social mb-0">
+          {% if site_settings.facebook_url %}
+          <li class="inline">
+            <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener">
+              <span class="login-btn-primary"><span class="btn btn-sm btn-icon rounded-full bg-orange-600 hover:bg-orange-700 border-orange-600 hover:border-orange-700 text-white"><i class="uil uil-facebook-f"></i></span></span>
+              <span class="login-btn-light"><span class="btn btn-sm btn-icon rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-gray-700 hover:border-gray-100 dark:border-gray-700 dark:hover:border-gray-700"><i
+                    class="uil uil-facebook-f"></i></span></span>
+            </a>
+          </li>
+          {% endif %}
+          {% if site_settings.twitter_url %}
+          <li class="inline">
+            <a href="{{ site_settings.twitter_url }}" target="_blank" rel="noopener">
+              <span class="login-btn-primary"><span class="btn btn-sm btn-icon rounded-full bg-orange-600 hover:bg-orange-700 border-orange-600 hover:border-orange-700 text-white"><i class="fa-brands fa-x-twitter"></i></span></span>
+              <span class="login-btn-light"><span class="btn btn-sm btn-icon rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-gray-700 hover:border-gray-100 dark:border-gray-700 dark:hover:border-gray-700"><i
+                    class="fa-brands fa-x-twitter"></i></span></span>
+            </a>
+          </li>
+          {% endif %}
+          {% if site_settings.instagram_url %}
+          <li class="inline">
+            <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener">
+              <span class="login-btn-primary"><span class="btn btn-sm btn-icon rounded-full bg-orange-600 hover:bg-orange-700 border-orange-600 hover:border-orange-700 text-white"><i class="uil uil-instagram"></i></span></span>
+              <span class="login-btn-light"><span class="btn btn-sm btn-icon rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-gray-700 hover:border-gray-100 dark:border-gray-700 dark:hover:border-gray-700"><i
+                    class="uil uil-instagram"></i></span></span>
+            </a>
+          </li>
+          {% endif %}
+          {% if site_settings.contact_email %}
+          <li class="inline">
+            <a href="mailto:{{ site_settings.contact_email }}">
+              <span class="login-btn-primary"><span class="btn btn-sm btn-icon rounded-full bg-orange-600 hover:bg-orange-700 border-orange-600 hover:border-orange-700 text-white"><i class="uil uil-envelope"></i></span></span>
+              <span class="login-btn-light"><span class="btn btn-sm btn-icon rounded-full bg-gray-50 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-gray-700 hover:border-gray-100 dark:border-gray-700 dark:hover:border-gray-700"><i
+                    class="uil uil-envelope"></i></span></span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+        <!-- Navbar Collapse Manu Button -->
+        <button data-collapse="menu-collapse" type="button" class="collapse-btn inline-flex items-center ms-3 text-dark dark:text-white lg_992:hidden" aria-controls="menu-collapse" aria-expanded="false">
+          <span class="sr-only">{% trans "Navigation Menu" %}</span>
+          <i class="mdi mdi-menu mdi-24px"></i>
+        </button>
+      </div>
+
+      <!-- Navbar Manu -->
+      <div class="navigation lg_992:order-1 lg_992:flex hidden" id="menu-collapse">
+        <ul class="navbar-nav nav-light" id="navbar-navlist">
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'landing:landing' %}#home">{% trans "Home" %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'landing:biographies' %}">{% trans "Biographies" %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'landing:landing' %}#about">{% trans "About us" %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'landing:landing' %}#services">{% trans "Services" %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'landing:landing' %}#blog">{% trans "Blog" %}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'landing:landing' %}#contact">{% trans "Contact us" %}</a>
+          </li>
+          {% comment %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'landing:landing' %}#donate">{% trans "Donate" %}</a>
+          </li>
+          {% endcomment %}
+          <li class="nav-item">
+            <form action="{% url 'set_language' %}" method="post" class="inline">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}" />
+              {% if LANGUAGE_CODE == 'ar' %}
+              <input type="hidden" name="language" value="en" />
+              <button type="submit" class="nav-link bg-transparent border-0 cursor-pointer p-0">English</button>
+              {% else %}
+              <input type="hidden" name="language" value="ar" />
+              <button type="submit" class="nav-link bg-transparent border-0 cursor-pointer p-0">العربية</button>
+              {% endif %}
+            </form>
+          </li>
+          <li class="nav-item">
+            {% if user.is_authenticated %}
+            <a class="nav-link" href="{% url 'logout' %}">{% trans "Logout" %}</a>
+            {% else %}
+            <a class="nav-link" href="{% url 'login' %}">{% trans "Login" %}</a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Navbar End -->
+
+  <main class="flex-grow">
+    {% block Hero %} {% endblock Hero%}
+  </main>
+
+  <!-- Start Footer -->
+  <footer class="py-8 bg-slate-800 dark:bg-gray-900">
+    <div class="container">
+      <div class="grid md:grid-cols-12 items-center">
+        <div class="md:col-span-3">
+          <a href="#" class="logo-footer">
+            <img src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'assets/images/logo-light.png' %}{% endif %}" class="md:ms-0 mx-auto" alt="" />
+          </a>
+        </div>
+
+        <div class="md:col-span-5 md:mt-0 mt-8">
+          <div class="text-center">
+            <p class="text-gray-400">
+              {% if site_settings %}{% if LANGUAGE_CODE == 'ar' %}{{ site_settings.copyright_ar }}{% else %}{{ site_settings.copyright_en }}{% endif %}{% else %}Designed & Developed in Kuwait{% endif %}
+              ©
+              <script>
+                document.write(new Date().getFullYear());
+              </script>
+            </p>
+          </div>
+        </div>
+
+        <div class="md:col-span-4 md:mt-0 mt-8">
+          <ul class="list-none foot-icon ltr:md:text-right rtl:md:text-left text-center">
+            {% if site_settings.facebook_url %}
+            <li class="inline">
+              <a href="{{ site_settings.facebook_url}}" target="_blank"
+                class="btn btn-icon btn-sm border rounded-md border-slate-700 dark:border-slate-800 hover:border-orange-600 bg-slate-800 dark:bg-gray-900 hover:bg-orange-600 dark:hover:bg-orange-600 text-gray-400 hover:text-white"><i
+                  class="uil uil-facebook-f align-middle" title="facebook"></i></a>
+            </li>
+            {% endif %}
+            {% if site_settings.instagram_url %}
+            <li class="inline">
+              <a href="{{ site_settings.instagram_url}}" target="_blank"
+                class="btn btn-icon btn-sm border rounded-md border-slate-700 dark:border-slate-800 hover:border-orange-600 bg-slate-800 dark:bg-gray-900 hover:bg-orange-600 dark:hover:bg-orange-600 text-gray-400 hover:text-white"><i
+                  class="uil uil-instagram align-middle" title="instagram"></i></a>
+            </li>
+            {% endif %}
+            {% if site_settings.twitter_url %}
+            <li class="inline">
+              <a href="{{ site_settings.twitter_url}}" target="_blank"
+                class="btn btn-icon btn-sm border rounded-md border-slate-700 dark:border-slate-800 hover:border-orange-600 bg-slate-800 dark:bg-gray-900 hover:bg-orange-600 dark:hover:bg-orange-600 text-gray-400 hover:text-white"><i
+                  class="fa-brands fa-x-twitter align-middle" title="X"></i></a>
+            </li>
+            {% endif %}
+            {% if site_settings.contact_email %}
+            <li class="inline">
+              <a href="mailto:{{ site_settings.contact_email}}"
+                class="btn btn-icon btn-sm border rounded-md border-slate-700 dark:border-slate-800 hover:border-orange-600 bg-slate-800 dark:bg-gray-900 hover:bg-orange-600 dark:hover:bg-orange-600 text-gray-400 hover:text-white"><i
+                  class="uil uil-envelope align-middle" title="email"></i></a>
+            </li>
+            {% endif %}
+          </ul>
+          <!--end icon-->
+        </div>
+        <!--end col-->
+      </div>
+      <!--end row-->
+    </div>
+    <!--end container-->
+  </footer>
+  <!--end footer-->
+  <!-- End Footer -->
+
+  <!-- Back to top -->
+  <a href="#" onclick="topFunction()" id="back-to-top" class="back-to-top fixed hidden text-lg rounded-full z-10 bottom-5 end-5 size-9 text-center bg-orange-600 text-white leading-9"><i class="uil uil-arrow-up"></i></a>
+  <!-- Back to top -->
+
+  <!-- Switcher -->
+  {% comment %} Dark mode toggle hidden — kept for future use
+  <div class="fixed top-1/4 -right-2 z-3">
+    <span class="relative inline-block rotate-90">
+      <input type="checkbox" class="checkbox opacity-0 absolute" id="chk" />
+      <label class="label bg-slate-900 dark:bg-white shadow dark:shadow-gray-800 cursor-pointer rounded-full flex justify-between items-center p-1 w-14 h-8" for="chk">
+        <i class="uil uil-moon text-[20px] text-yellow-500"></i>
+        <i class="uil uil-sun text-[20px] text-yellow-500"></i>
+        <span class="ball bg-white dark:bg-slate-900 rounded-full absolute top-[2px] left-[2px] size-7"></span>
+      </label>
+    </span>
+  </div>
+  {% endcomment %}
+  <!-- Switcher -->
+
+  <!-- JAVASCRIPTS -->
+  <script src="{% static 'assets/libs/gumshoejs/gumshoe.polyfills.min.js' %}"></script>
+  <script src="{% static 'assets/libs/tobii/js/tobii.min.js' %}"></script>
+  <script src="{% static 'assets/libs/tiny-slider/min/tiny-slider.js' %}"></script>
+  <script src="{% static 'assets/js/plugins.init.js' %}"></script>
+  <script src="{% static 'assets/js/app.js' %}"></script>
+  <!-- JAVASCRIPTS -->
+
+  <script>
+    document.getElementById("submit").addEventListener("click", function() {
+      var name = document.getElementById("name").value;
+      var email = document.getElementById("email").value;
+      var subject = document.getElementById("subject").value;
+      var comments = document.getElementById("comments").value;
+
+      var errors = {};
+
+      if (!name) {
+        errors["name"] = "You must enter your name.";
+      }
+      if (!email) {
+        errors["email"] = "Please enter a valid email address.";
+      } else if (!email.includes("@")) {
+        errors["email"] =
+          "You have entered an invalid email address. Please try again.";
+      }
+      if (!subject) {
+        errors["subject"] = "Please enter a subject.";
+      }
+      if (!comments) {
+        errors["comments"] = "Please enter your message.";
+      }
+
+      if (Object.keys(errors).length > 0) {
+        Object.keys(errors).forEach(function(key) {
+          document.getElementById(key + "Error").textContent = errors[key];
+        });
+      } else {
+        document.getElementById("error-msg").textContent = ""; // Clear any previous error message
+        fetch("", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              subject: subject,
+              comments: comments,
+            }),
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              document.getElementById("simple-msg").innerHTML =
+                '<div class="success_message">{% trans "Email Sent Successfully." %}</div>';
+            } else {
+              document.getElementById("simple-msg").innerHTML =
+                '<div class="error_message">{% trans "Error sending email. Please try again later." %}</div>';
+            }
+          })
+          .catch((error) => {
+            document.getElementById("simple-msg").innerHTML =
+              '<div class="error_message">{% trans "Error sending email. Please try again later." %}</div>';
+          });
+      }
+    });
+  </script>
+</body>
+
+</html>

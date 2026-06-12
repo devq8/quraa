@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block navlink %}
+<a class="navbar-brand" href="{% url 'landing:landing' %}">
+  <span class="inline-block dark:hidden">
+    <img src="{% if site_settings.logo_dark %}{{ site_settings.logo_dark.url }}{% else %}{% static 'assets/images/logo-dark.png' %}{% endif %}" class="l-dark" alt="">
+    <img src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'assets/images/logo-light.png' %}{% endif %}" class="l-light" alt="">
+  </span>
+  <img src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'assets/images/logo-light.png' %}{% endif %}" class="hidden dark:inline-block" alt="">
+</a>
+{% endblock navlink %}
+
+{% block Hero %}
+
+<!-- Hero Start -->
+<section class="py-28 w-full table relative bg-center bg-cover {% if not post.image %}bg-top bg-no-repeat{% endif %}"
+  style="background-image: url('{% if post.image %}{{ post.image.url }}{% else %}{% static 'assets/images/bg/quraan_1080.jpg' %}{% endif %}');">
+  <div class="absolute inset-0 bg-black opacity-80"></div>
+
+  <div class="container relative">
+    <div class="grid grid-cols-1 pb-4 text-center mt-6">
+      {% if post.category_ar or post.category_en %}
+      <span class="inline-block mx-auto bg-orange-600/90 text-white text-xs font-semibold uppercase tracking-wide rounded-full px-4 py-1 mb-3">
+        {% if LANGUAGE_CODE == 'ar' %}{{ post.category_ar|default:post.category_en }}{% else %}{{ post.category_en|default:post.category_ar }}{% endif %}
+      </span>
+      {% endif %}
+
+      <h3 class="mb-3 text-4xl leading-normal font-medium text-white">
+        {% if LANGUAGE_CODE == 'ar' %}{{ post.title_ar }}{% else %}{{ post.title_en|default:post.title_ar }}{% endif %}
+      </h3>
+    </div>
+    <!--end grid-->
+  </div>
+  <!--end container-->
+</section>
+<!--end section-->
+<!-- Hero End -->
+
+<section class="relative md:py-24 py-16">
+  <div class="container">
+    <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
+      <!-- Article -->
+      <div class="lg:col-span-8 md:col-span-7">
+        <div class="p-6 rounded-md shadow dark:shadow-gray-800">
+          {% if post.image %}
+          <img src="{{ post.image.url }}" class="rounded-md w-full" alt="{% if LANGUAGE_CODE == 'ar' %}{{ post.title_ar }}{% else %}{{ post.title_en|default:post.title_ar }}{% endif %}">
+          {% endif %}
+
+          <div class="{% if post.image %}mt-6{% endif %} prose-content text-slate-400">
+            {% if post.body_ar or post.body_en %}
+              {% if LANGUAGE_CODE == 'ar' %}{{ post.body_ar|default:post.body_en|safe }}{% else %}{{ post.body_en|default:post.body_ar|safe }}{% endif %}
+            {% else %}
+              <p class="text-slate-400">{% if LANGUAGE_CODE == 'ar' %}{{ post.excerpt_ar|default:post.excerpt_en|linebreaks }}{% else %}{{ post.excerpt_en|default:post.excerpt_ar|linebreaks }}{% endif %}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Details sidebar -->
+      <div class="lg:col-span-4 md:col-span-5">
+        <div class="sticky top-20">
+          {% if post.author_ar or post.author_en %}
+          <h5 class="text-lg font-medium bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 rounded-md p-2 text-center">{% trans "Author" %}</h5>
+          <div class="text-center mt-8">
+            <span class="size-24 mx-auto rounded-full shadow mb-4 inline-flex items-center justify-center bg-orange-600/10 text-orange-600">
+              <i class="uil uil-user text-4xl"></i>
+            </span>
+            <span class="block text-lg font-medium h5">{% if LANGUAGE_CODE == 'ar' %}{{ post.author_ar|default:post.author_en }}{% else %}{{ post.author_en|default:post.author_ar }}{% endif %}</span>
+            {% if post.author_role_ar or post.author_role_en %}
+            <p class="text-slate-400">{% if LANGUAGE_CODE == 'ar' %}{{ post.author_role_ar|default:post.author_role_en }}{% else %}{{ post.author_role_en|default:post.author_role_ar }}{% endif %}</p>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <h5 class="text-lg font-medium bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 rounded-md p-2 text-center {% if post.author_ar or post.author_en %}mt-8{% endif %}">{% trans "Details" %}</h5>
+          <ul class="list-none mt-8">
+            {% if post.published_at %}
+            <li class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+              <span class="font-medium dark:text-white">{% trans "Date" %}</span>
+              <span class="text-slate-400">{{ post.published_at|date:"d F Y" }}</span>
+            </li>
+            {% endif %}
+            {% if post.category_ar or post.category_en %}
+            <li class="flex items-center justify-between py-2">
+              <span class="font-medium dark:text-white">{% trans "Category" %}</span>
+              <span class="inline-block bg-orange-600/10 text-orange-600 border border-orange-600/30 rounded-full px-3 py-1 text-sm font-medium">
+                {% if LANGUAGE_CODE == 'ar' %}{{ post.category_ar|default:post.category_en }}{% else %}{{ post.category_en|default:post.category_ar }}{% endif %}
+              </span>
+            </li>
+            {% endif %}
+          </ul>
+
+          <!-- Share -->
+          {% with share_url=request.build_absolute_uri share_title=post.title_ar|default:post.title_en %}
+          <h5 class="text-lg font-medium bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 rounded-md p-2 text-center mt-8">{% trans "Share this post" %}</h5>
+          <ul class="list-none text-center mt-8">
+            <li class="inline">
+              <a href="https://wa.me/?text={{ share_title|urlencode }}%20{{ share_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on WhatsApp' %}" title="{% trans 'Share on WhatsApp' %}"
+                class="size-8 inline-flex items-center text-center justify-center text-base font-normal tracking-wide align-middle transition duration-500 ease-in-out border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-orange-600 hover:text-white hover:bg-orange-600"><i class="fa-brands fa-whatsapp align-middle"></i></a>
+            </li>
+            <li class="inline">
+              <a href="https://t.me/share/url?url={{ share_url|urlencode }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Telegram' %}" title="{% trans 'Share on Telegram' %}"
+                class="size-8 inline-flex items-center text-center justify-center text-base font-normal tracking-wide align-middle transition duration-500 ease-in-out border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-orange-600 hover:text-white hover:bg-orange-600"><i class="fa-brands fa-telegram align-middle"></i></a>
+            </li>
+            <li class="inline">
+              <a href="https://twitter.com/intent/tweet?url={{ share_url|urlencode }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on X' %}" title="{% trans 'Share on X' %}"
+                class="size-8 inline-flex items-center text-center justify-center text-base font-normal tracking-wide align-middle transition duration-500 ease-in-out border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-orange-600 hover:text-white hover:bg-orange-600"><i class="fa-brands fa-x-twitter align-middle"></i></a>
+            </li>
+            <li class="inline">
+              <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Facebook' %}" title="{% trans 'Share on Facebook' %}"
+                class="size-8 inline-flex items-center text-center justify-center text-base font-normal tracking-wide align-middle transition duration-500 ease-in-out border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-orange-600 hover:text-white hover:bg-orange-600"><i class="fa-brands fa-facebook-f align-middle"></i></a>
+            </li>
+            <li class="inline">
+              <button type="button" onclick="copyPostLink(this)" data-url="{{ share_url }}" aria-label="{% trans 'Copy link' %}" title="{% trans 'Copy link' %}"
+                class="size-8 inline-flex items-center text-center justify-center text-base font-normal tracking-wide align-middle transition duration-500 ease-in-out border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-orange-600 hover:text-white hover:bg-orange-600"><i class="fa fa-link align-middle"></i></button>
+            </li>
+          </ul>
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if related_posts %}
+  <div class="container lg:mt-24 mt-16">
+    <div class="grid grid-cols-1 pb-8 text-center">
+      <h3 class="mb-4 md:text-2xl text-xl font-medium dark:text-white">{% trans "Related Blogs" %}</h3>
+    </div>
+    <!--end grid-->
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-6 mt-8">
+      {% for related in related_posts %}
+      <div class="blog relative rounded-md shadow shadow-slate-200 dark:shadow-slate-800 overflow-hidden">
+        {% if related.image %}
+        <img src="{{ related.image.url }}" class="w-full h-56 object-cover" alt="{% if LANGUAGE_CODE == 'ar' %}{{ related.title_ar }}{% else %}{{ related.title_en|default:related.title_ar }}{% endif %}">
+        {% else %}
+        <img src="{% static 'assets/images/blog/1.jpg' %}" class="w-full h-56 object-cover" alt="">
+        {% endif %}
+
+        <div class="content p-6">
+          <a href="{% url 'landing:post_detail' related.pk %}" class="text-lg hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition-all duration-500 ease-in-out font-medium">
+            {% if LANGUAGE_CODE == 'ar' %}{{ related.title_ar }}{% else %}{{ related.title_en|default:related.title_ar }}{% endif %}
+          </a>
+          <p class="text-slate-400 mt-3">
+            {% if LANGUAGE_CODE == 'ar' %}{{ related.excerpt_ar|truncatewords:20 }}{% else %}{{ related.excerpt_en|default:related.excerpt_ar|truncatewords:20 }}{% endif %}
+          </p>
+
+          <div class="mt-5">
+            <a href="{% url 'landing:post_detail' related.pk %}" class="btn btn-link hover:text-orange-600 dark:hover:text-orange-600 after:bg-orange-600 dark:text-white transition duration-500">
+              {% trans "Read More" %}
+              {% if LANGUAGE_CODE == 'ar' %}<i class="uil uil-arrow-left"></i>{% else %}<i class="uil uil-arrow-right"></i>{% endif %}
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <!--end grid-->
+  </div>
+  <!--end container-->
+  {% endif %}
+</section>
+<!--end section-->
+<!-- End -->
+
+<script>
+  function copyPostLink(btn) {
+    var url = btn.getAttribute('data-url');
+    var done = function () {
+      var icon = btn.querySelector('i');
+      if (!icon) return;
+      var original = icon.className;
+      icon.className = 'fa fa-check';
+      setTimeout(function () { icon.className = original; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(function () { window.prompt('{% trans "Copy this link" %}', url); });
+    } else {
+      window.prompt('{% trans "Copy this link" %}', url);
+    }
+  }
+</script>
+
+{% endblock Hero %}
