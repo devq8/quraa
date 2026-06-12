@@ -4,16 +4,29 @@ from django import forms
 from django.contrib import admin
 from django.contrib import messages
 from django.db import models
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _, get_language
+from . import csv_import
 from .models import (
     Attribute, Biography,
     Esnad, EsnadLink,
     EsnadTemplate, EsnadTemplateLink,
     Location, Note, Source, TeacherStudentRelationship,
 )
+
+
+class CSVImportForm(forms.Form):
+    """Upload form for the Biography importer (CSV or Excel .xlsx)."""
+    csv_file = forms.FileField(
+        label=_("CSV or Excel file"),
+        help_text=_(
+            "A UTF-8 CSV or an .xlsx file. Download the Excel template for "
+            "dropdown lists of existing locations and attributes."
+        ),
+    )
 
 
 def _lang_ordering(ar_fields, en_fields):
@@ -103,6 +116,118 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     )
     inlines = [TeacherInline, StudentInline, EsnadInline, SourceInline]
     change_form_template = "admin/core/biography/change_form.html"
+    change_list_template = "admin/core/biography/change_list.html"
+
+    # Session key holding the parsed-but-not-yet-committed CSV rows.
+    _CSV_SESSION_KEY = "biography_csv_rows"
+
+    # --- CSV import -----------------------------------------------------
+
+    def get_urls(self):
+        custom = [
+            path(
+                "import-csv/",
+                self.admin_site.admin_view(self.import_csv_view),
+                name="core_biography_import_csv",
+            ),
+            path(
+                "import-csv/template-xlsx/",
+                self.admin_site.admin_view(self.import_xlsx_template_view),
+                name="core_biography_import_xlsx_template",
+            ),
+        ]
+        return custom + super().get_urls()
+
+    def import_xlsx_template_view(self, request):
+        response = HttpResponse(
+            csv_import.build_template_xlsx(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = "attachment; filename=biography_import_template.xlsx"
+        return response
+
+    def import_csv_view(self, request):
+        if not self.has_add_permission(request):
+            messages.error(request, _("You do not have permission to import biographies."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        context = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "title": _("Import biographies from CSV"),
+            "form": CSVImportForm(),
+        }
+
+        # Step 3: the user confirmed the review page — commit.
+        if request.method == "POST" and request.POST.get("step") == "confirm":
+            rows = request.session.get(self._CSV_SESSION_KEY)
+            if not rows:
+                messages.error(request, _("Your import session expired. Please upload the file again."))
+                return HttpResponseRedirect(request.path)
+            resolutions = {}
+            location_choices = {}
+            for key, value in request.POST.items():
+                if key.startswith("resolve_"):
+                    try:
+                        resolutions[int(key[len("resolve_"):])] = value
+                    except ValueError:
+                        continue
+                elif key.startswith("loc_"):
+                    try:
+                        location_choices[int(key[len("loc_"):])] = value
+                    except ValueError:
+                        continue
+            summary = csv_import.commit_rows(
+                rows, resolutions, request.user, location_choices
+            )
+            request.session.pop(self._CSV_SESSION_KEY, None)
+            messages.success(
+                request,
+                _("Import complete: %(created)d created, %(updated)d updated, "
+                  "%(skipped)d skipped, %(errors)d with errors.") % summary,
+            )
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        # Step 2: a file was uploaded — parse, analyze, show the review page.
+        if request.method == "POST":
+            form = CSVImportForm(request.POST, request.FILES)
+            if form.is_valid():
+                try:
+                    rows = csv_import.parse_upload(form.cleaned_data["csv_file"])
+                except csv_import.CSVImportError as exc:
+                    messages.error(request, str(exc))
+                    context["form"] = form
+                    return TemplateResponse(
+                        request, "admin/core/biography/csv_import.html", context
+                    )
+                if not rows:
+                    messages.warning(request, _("No data rows were found in the file."))
+                    context["form"] = form
+                    return TemplateResponse(
+                        request, "admin/core/biography/csv_import.html", context
+                    )
+                request.session[self._CSV_SESSION_KEY] = rows
+                plans = csv_import.analyze_rows(rows)
+                location_specs = [
+                    s for s in csv_import.collect_location_specs(plans)
+                    if s["status"] == "new"
+                ]
+                context.update({
+                    "plans": plans,
+                    "new_plans": [p for p in plans if p.status == "new"],
+                    "conflict_plans": [p for p in plans if p.status == "conflict"],
+                    "identical_plans": [p for p in plans if p.status == "identical"],
+                    "ambiguous_plans": [p for p in plans if p.status == "ambiguous"],
+                    "error_plans": [p for p in plans if p.status == "error"],
+                    "location_specs": location_specs,
+                })
+                return TemplateResponse(
+                    request, "admin/core/biography/csv_import_review.html", context
+                )
+            context["form"] = form
+
+        # Step 1: show the upload form.
+        return TemplateResponse(request, "admin/core/biography/csv_import.html", context)
 
     def get_ordering(self, request):
         return _lang_ordering(("full_name_ar",), ("full_name_en", "full_name_ar"))
@@ -232,7 +357,6 @@ class NoteAdmin(admin.ModelAdmin):
             "fields": (
                 ("short_name_ar", "short_name_en"),
                 ("long_name_ar", "long_name_en"),
-                ("description_ar", "description_en"),
             ),
         }),
     )

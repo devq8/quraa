@@ -1,0 +1,48 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; {% trans 'Import CSV' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <p>{% trans "Upload a CSV file of biographies. After uploading you will see a preview where you can resolve any conflicts with existing records before anything is saved." %}</p>
+
+  <p>
+    <a class="button default" href="{% url 'admin:core_biography_import_xlsx_template' %}">
+      {% trans "Download Excel Template" %}
+    </a>
+  </p>
+  <p class="help">{% trans "The Excel template has dropdown lists of your existing locations and attributes to prevent typos. Fill it in and upload it back here." %}</p>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      {{ form.as_div }}
+    </fieldset>
+    <div class="submit-row">
+      <input type="submit" class="default" value="{% trans 'Upload and preview' %}">
+    </div>
+  </form>
+
+  <div class="module" style="margin-top:1.5em;">
+    <h2>{% trans "Expected columns" %}</h2>
+    <div style="padding:.6em 1em;">
+      <p class="help">{% trans "Match biographies are identified by the 'full_name_ar' column (required). Empty cells are ignored and never overwrite existing data." %}</p>
+      <ul>
+        <li>{% trans "Names: full_name_ar (required), full_name_en, alias_ar, alias_en" %}</li>
+        <li>{% trans "Birth/Death dates: birth_hijri_year/month/day, birth_greg_year/month/day and the death_* equivalents" %}</li>
+        <li>{% trans "Locations: birthplace_city_ar/city_en/country_ar/country_en, plus hometown_* and death_location_* (new locations are created automatically; Arabic city + country required)" %}</li>
+        <li>{% trans "Attributes: one per column in attribute_1 … attribute_6 (each a dropdown in the Excel template), or a single 'attributes' column with names separated by ';'. Unknown attributes are skipped with a warning." %}</li>
+        <li>{% trans "comments_ar, comments_en, published (yes/no)" %}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

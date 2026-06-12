@@ -1,0 +1,174 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; {% trans 'Import CSV' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <p class="help">
+    {% blocktrans count counter=plans|length %}Reviewing {{ counter }} row.{% plural %}Reviewing {{ counter }} rows.{% endblocktrans %}
+    {% trans "Nothing is saved until you press Confirm import." %}
+  </p>
+
+  <form method="post" action="{% url 'admin:core_biography_import_csv' %}">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="confirm">
+
+    {# --- New / typo'd locations --- #}
+    {% if location_specs %}
+    <div class="module">
+      <h2>{% blocktrans count counter=location_specs|length %}{{ counter }} location not found exactly{% plural %}{{ counter }} locations not found exactly{% endblocktrans %}</h2>
+      <div style="padding:.5em 1em;">
+        <p class="help">{% trans "These typed locations have no exact match. Pick a similar existing location to avoid duplicates, or create a new one." %}</p>
+        {% for spec in location_specs %}
+        <div style="border:1px solid #ddd;margin-bottom:.8em;padding:.6em 1em;background:#fff;">
+          <p style="margin:.2em 0;"><strong>{{ spec.label }}</strong></p>
+          {% for cand in spec.candidates %}
+          <label style="display:block;margin:.15em 0;">
+            <input type="radio" name="loc_{{ spec.index }}" value="{{ cand.loc.pk }}"
+                   {% if spec.suggested and spec.suggested.pk == cand.loc.pk %}checked{% endif %}>
+            {% blocktrans with name=cand.loc score=cand.score %}Use existing: {{ name }} (similarity {{ score }}){% endblocktrans %}
+          </label>
+          {% endfor %}
+          <label style="display:block;margin:.15em 0;">
+            <input type="radio" name="loc_{{ spec.index }}" value="new"
+                   {% if not spec.suggested %}checked{% endif %}>
+            {% blocktrans with name=spec.label %}Create new location: {{ name }}{% endblocktrans %}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# --- Conflicts: require a decision --- #}
+    {% if conflict_plans %}
+    <div class="module">
+      <h2>{% blocktrans count counter=conflict_plans|length %}{{ counter }} conflict with an existing record{% plural %}{{ counter }} conflicts with existing records{% endblocktrans %}</h2>
+      <div style="padding:.5em 1em;">
+        <p class="help">{% trans "These names already exist with different data. Choose whether to apply the import values or keep the website version." %}</p>
+        {% for plan in conflict_plans %}
+        <div style="border:1px solid #ddd;margin-bottom:1em;padding:.6em 1em;background:#fff;">
+          <h3 style="margin:.2em 0;">{% blocktrans with name=plan.name row=plan.index %}Row {{ row }}: {{ name }}{% endblocktrans %}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>{% trans "Field" %}</th>
+                <th>{% trans "Website version" %}</th>
+                <th>{% trans "Import version" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for diff in plan.diffs %}
+              <tr>
+                <th>{{ diff.label }}</th>
+                <td>{{ diff.existing }}</td>
+                <td style="background:#fffbe6;">{{ diff.importv }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% for w in plan.warnings %}<p class="help">⚠ {{ w }}</p>{% endfor %}
+          <p style="margin:.5em 0 0;">
+            <label style="margin-inline-end:1.2em;">
+              <input type="radio" name="resolve_{{ plan.index }}" value="existing" checked>
+              {% trans "Keep website version" %}
+            </label>
+            <label style="margin-inline-end:1.2em;">
+              <input type="radio" name="resolve_{{ plan.index }}" value="import">
+              {% trans "Apply import version" %}
+            </label>
+            <label>
+              <input type="radio" name="resolve_{{ plan.index }}" value="skip">
+              {% trans "Skip this row" %}
+            </label>
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# --- New records --- #}
+    {% if new_plans %}
+    <div class="module">
+      <h2>{% blocktrans count counter=new_plans|length %}{{ counter }} new biography will be created{% plural %}{{ counter }} new biographies will be created{% endblocktrans %}</h2>
+      <table>
+        <thead><tr><th>{% trans "Row" %}</th><th>{% trans "Full Name (Arabic)" %}</th><th>{% trans "Notes" %}</th></tr></thead>
+        <tbody>
+          {% for plan in new_plans %}
+          <tr>
+            <td>{{ plan.index }}</td>
+            <td>{{ plan.name }}</td>
+            <td>{% for w in plan.warnings %}⚠ {{ w }}<br>{% endfor %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# --- Identical (skipped) --- #}
+    {% if identical_plans %}
+    <div class="module">
+      <h2>{% blocktrans count counter=identical_plans|length %}{{ counter }} row unchanged (will be skipped){% plural %}{{ counter }} rows unchanged (will be skipped){% endblocktrans %}</h2>
+      <table>
+        <thead><tr><th>{% trans "Row" %}</th><th>{% trans "Full Name (Arabic)" %}</th></tr></thead>
+        <tbody>
+          {% for plan in identical_plans %}
+          <tr><td>{{ plan.index }}</td><td>{{ plan.name }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# --- Ambiguous (skipped) --- #}
+    {% if ambiguous_plans %}
+    <div class="module">
+      <h2>{% blocktrans count counter=ambiguous_plans|length %}{{ counter }} ambiguous row (will be skipped){% plural %}{{ counter }} ambiguous rows (will be skipped){% endblocktrans %}</h2>
+      <table>
+        <thead><tr><th>{% trans "Row" %}</th><th>{% trans "Full Name (Arabic)" %}</th><th>{% trans "Notes" %}</th></tr></thead>
+        <tbody>
+          {% for plan in ambiguous_plans %}
+          <tr><td>{{ plan.index }}</td><td>{{ plan.name }}</td>
+            <td>{% for w in plan.warnings %}{{ w }}{% endfor %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# --- Errors --- #}
+    {% if error_plans %}
+    <div class="module">
+      <h2 style="color:#ba2121;">{% blocktrans count counter=error_plans|length %}{{ counter }} row has errors (will be skipped){% plural %}{{ counter }} rows have errors (will be skipped){% endblocktrans %}</h2>
+      <table>
+        <thead><tr><th>{% trans "Row" %}</th><th>{% trans "Full Name (Arabic)" %}</th><th>{% trans "Errors" %}</th></tr></thead>
+        <tbody>
+          {% for plan in error_plans %}
+          <tr>
+            <td>{{ plan.index }}</td>
+            <td>{{ plan.name|default:"—" }}</td>
+            <td style="color:#ba2121;">{% for e in plan.errors %}{{ e }}<br>{% endfor %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <div class="submit-row">
+      <input type="submit" class="default" value="{% trans 'Confirm import' %}">
+      <a href="{% url 'admin:core_biography_changelist' %}" class="button cancel-link">{% trans 'Cancel' %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

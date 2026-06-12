@@ -29,7 +29,6 @@
   <link href="{% static 'assets/libs/tiny-slider/tiny-slider.css' %}" rel="stylesheet" />
   <!-- Main Css -->
   <link href="{% static 'assets/libs/@iconscout/unicons/css/line.css' %}" type="text/css" rel="stylesheet" />
-  <link href="{% static 'assets/libs/@mdi/font/css/materialdesignicons.min.css' %}" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <!-- Google Fonts - Noto Naskh Arabic -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -105,7 +104,7 @@
         <!-- Navbar Collapse Manu Button -->
         <button data-collapse="menu-collapse" type="button" class="collapse-btn inline-flex items-center ms-3 text-dark dark:text-white lg_992:hidden" aria-controls="menu-collapse" aria-expanded="false">
           <span class="sr-only">{% trans "Navigation Menu" %}</span>
-          <i class="mdi mdi-menu mdi-24px"></i>
+          <i class="uil uil-bars text-[24px]"></i>
         </button>
       </div>
 
@@ -257,7 +256,9 @@
   <!-- JAVASCRIPTS -->
 
   <script>
-    document.getElementById("submit").addEventListener("click", function() {
+    var submitBtn = document.getElementById("submit");
+    if (submitBtn) {
+    submitBtn.addEventListener("click", function() {
       var name = document.getElementById("name").value;
       var email = document.getElementById("email").value;
       var subject = document.getElementById("subject").value;
@@ -316,6 +317,7 @@
           });
       }
     });
+    }
   </script>
 </body>
 
