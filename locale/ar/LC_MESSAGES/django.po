@@ -1574,6 +1574,10 @@ msgstr "التواريخ المهمة"
 msgid "Users"
 msgstr "المستخدمون"
 
+#: landing/templates/base.html
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
 #: users/models.py:41
 msgid "Admin"
 msgstr "مدير"
