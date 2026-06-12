@@ -3,6 +3,7 @@ from difflib import SequenceMatcher
 from django.core.mail import send_mail
 
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import get_language
@@ -43,6 +44,47 @@ def landing(request):
         "featured_posts": featured_posts,
     }
     return render(request, "home.html", context)
+
+
+def blog(request):
+    """List every blog post, with a category sidebar to filter the list."""
+    active_category = (request.GET.get("category") or "").strip()
+    lang = get_language() or ""
+    is_ar = lang.startswith("ar")
+
+    posts = Post.objects.all()
+    if active_category:
+        posts = posts.filter(
+            Q(category_ar=active_category) | Q(category_en=active_category)
+        )
+    posts = list(posts)
+
+    # Build the category list (display value in the active language) with counts,
+    # keyed off every post so the sidebar is independent of the active filter.
+    counts = {}
+    total_posts_all = 0
+    for post in Post.objects.all():
+        total_posts_all += 1
+        label = (post.category_ar if is_ar else post.category_en) or post.category_en or post.category_ar
+        if not label:
+            continue
+        counts[label] = counts.get(label, 0) + 1
+    categories = [
+        {"label": label, "count": count}
+        for label, count in sorted(counts.items(), key=lambda item: item[0])
+    ]
+
+    site_settings = SiteSettings.objects.first()
+    context = {
+        "posts": posts,
+        "categories": categories,
+        "active_category": active_category,
+        "total_posts": len(posts),
+        "total_posts_all": total_posts_all,
+        "site_settings": site_settings,
+        "user": request.user,
+    }
+    return render(request, "blog.html", context)
 
 
 def post_detail(request, pk):

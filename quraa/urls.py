@@ -17,8 +17,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import logout
+from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 
 from core import views as core_views
 
@@ -43,6 +44,41 @@ urlpatterns = [
     path("accounts/login/", core_views.login_view, name="login"),
     path("accounts/signup/", core_views.signup_view, name="signup"),
     path("accounts/logout/", logout_redirect_landing, name="logout"),
+    # Password reset flow (Django's built-in, secure token-based views) styled
+    # with project templates. Defined before the auth-urls include so these
+    # names resolve to our templates rather than Django's defaults.
+    path(
+        "accounts/password_reset/",
+        auth_views.PasswordResetView.as_view(
+            template_name="reset-password.html",
+            email_template_name="reset-password-email.html",
+            subject_template_name="reset-password-subject.txt",
+            success_url=reverse_lazy("password_reset_done"),
+        ),
+        name="password_reset",
+    ),
+    path(
+        "accounts/password_reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="reset-password-done.html"
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "accounts/reset/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="reset-password-confirm.html",
+            success_url=reverse_lazy("password_reset_complete"),
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "accounts/reset/done/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="reset-password-complete.html"
+        ),
+        name="password_reset_complete",
+    ),
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("landing.urls")),
 ]
