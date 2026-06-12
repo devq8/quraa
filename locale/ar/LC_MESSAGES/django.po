@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-12 14:37+0300\n"
+"POT-Creation-Date: 2026-06-12 15:26+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -853,7 +853,8 @@ msgstr "الرئيسية"
 msgid "About us"
 msgstr "من نحن"
 
-#: landing/templates/base.html:127 landing/templates/home.html:216
+#: landing/templates/base.html:127 landing/templates/blog.html:21
+#: landing/templates/home.html:216
 msgid "Blog"
 msgstr "المدونة"
 
@@ -862,18 +863,22 @@ msgid "Contact us"
 msgstr "اتصل بنا"
 
 #: landing/templates/base.html:153
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+#: landing/templates/base.html:158
 msgid "Logout"
 msgstr "الخروج"
 
-#: landing/templates/base.html:155 landing/templates/login.html:22
+#: landing/templates/base.html:160 landing/templates/login.html:22
 msgid "Login"
 msgstr "تسجيل الدخول"
 
-#: landing/templates/base.html:310
+#: landing/templates/base.html:315
 msgid "Email Sent Successfully."
 msgstr "تم إرسال البريد الإلكتروني بنجاح."
 
-#: landing/templates/base.html:313 landing/templates/base.html:318
+#: landing/templates/base.html:318 landing/templates/base.html:323
 msgid "Error sending email. Please try again later."
 msgstr "حدث خطأ أثناء إرسال البريد الإلكتروني. يرجى المحاولة لاحقاً."
 
@@ -1057,6 +1062,22 @@ msgstr "التاريخ الميلادي"
 msgid "Chain #%(num)s"
 msgstr "سند رقم %(num)s"
 
+#: landing/templates/biography.html:236
+msgid "View as chain"
+msgstr "عرض كسلسلة"
+
+#: landing/templates/biography.html:236
+msgid "View as list"
+msgstr "عرض كقائمة"
+
+#: landing/templates/_esnad_timeline_node.html:3
+msgid "Esnad holder"
+msgstr "صاحب الإسناد"
+
+#: landing/templates/_esnad_timeline_node.html:3
+msgid "Terminal narrator"
+msgstr "الراوي الأعلى"
+
 #: landing/templates/biography.html:250
 msgid "Comments"
 msgstr "فوائد وملاحظات"
@@ -1090,6 +1111,26 @@ msgstr "مقالات ذات صلة"
 #: landing/templates/blog-detail.html:151 landing/templates/home.html:88
 msgid "Read More"
 msgstr "إقرأ المزيد"
+
+#: landing/templates/blog.html:22
+msgid "Browse all our articles and updates"
+msgstr "تصفّح جميع مقالاتنا وتحديثاتنا"
+
+#: landing/templates/blog.html:38
+msgid "Categories"
+msgstr "التصنيفات"
+
+#: landing/templates/blog.html:43
+msgid "All posts"
+msgstr "جميع المقالات"
+
+#: landing/templates/blog.html:66
+msgid "Clear filter"
+msgstr "مسح عوامل التصفية"
+
+#: landing/templates/blog.html:110
+msgid "No posts were found."
+msgstr "لم يتم العثور على مقالات."
 
 #: landing/templates/home.html:72
 msgid "Who We Are ?"
@@ -1195,7 +1236,8 @@ msgstr "الهاتف"
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
-#: landing/templates/login.html:35 landing/templates/signup.html:41
+#: landing/templates/login.html:35 landing/templates/reset-password.html:37
+#: landing/templates/signup.html:41
 msgid "Email Address"
 msgstr "البريد الإلكتروني"
 
@@ -1204,17 +1246,125 @@ msgstr "البريد الإلكتروني"
 msgid "Password"
 msgstr "كلمة المرور"
 
-#: landing/templates/login.html:50 landing/templates/signup.html:62
+#: landing/templates/login.html:48
+msgid "Forgot password ?"
+msgstr "هل نسيت كلمة المرور؟"
+
+#: landing/templates/login.html:54
+#: landing/templates/reset-password-complete.html:27
+#: landing/templates/reset-password.html:52 landing/templates/signup.html:62
 msgid "Sign in"
 msgstr "تسجيل الدخول"
 
-#: landing/templates/login.html:55
+#: landing/templates/login.html:59
 msgid "Don't have an account ?"
 msgstr "ليس لديك حساب؟"
 
-#: landing/templates/login.html:56
+#: landing/templates/login.html:60
 msgid "Sign Up"
 msgstr "إنشاء حساب"
+
+#: landing/templates/reset-password-complete.html:22
+msgid "Password Changed"
+msgstr "تم تغيير كلمة المرور"
+
+#: landing/templates/reset-password-complete.html:24
+msgid ""
+"Your password has been set successfully. You can now sign in with your new "
+"password."
+msgstr "تم تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة."
+
+#: landing/templates/reset-password-confirm.html:23
+msgid "Set a New Password"
+msgstr "تعيين كلمة مرور جديدة"
+
+#: landing/templates/reset-password-confirm.html:36
+#: landing/templates/reset-password-confirm.html:38
+msgid "New Password"
+msgstr "كلمة المرور الجديدة"
+
+#: landing/templates/reset-password-confirm.html:42
+#: landing/templates/reset-password-confirm.html:44
+msgid "Confirm New Password"
+msgstr "تأكيد كلمة المرور الجديدة"
+
+#: landing/templates/reset-password-confirm.html:50
+msgid "Change Password"
+msgstr "تغيير كلمة المرور"
+
+#: landing/templates/reset-password-confirm.html:55
+msgid "Invalid Link"
+msgstr "رابط غير صالح"
+
+#: landing/templates/reset-password-confirm.html:57
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used or has expired. Please request a new password reset."
+msgstr "رابط إعادة تعيين كلمة المرور غير صالح، ربما لأنه استُخدم من قبل أو انتهت صلاحيته. يُرجى طلب إعادة تعيين كلمة المرور من جديد."
+
+#: landing/templates/reset-password-confirm.html:60
+msgid "Request a New Link"
+msgstr "طلب رابط جديد"
+
+#: landing/templates/reset-password-done.html:22
+msgid "Check Your Email"
+msgstr "تحقّق من بريدك الإلكتروني"
+
+#: landing/templates/reset-password-done.html:24
+msgid ""
+"We've emailed you instructions for setting your password. If an account "
+"exists with the email you entered, you should receive them shortly."
+msgstr "أرسلنا إليك عبر البريد الإلكتروني تعليمات تعيين كلمة المرور. إذا كان هناك حساب مرتبط بالبريد الذي أدخلته، فستصلك التعليمات قريباً."
+
+#: landing/templates/reset-password-done.html:26
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr "إذا لم تصلك رسالة، فيُرجى التأكد من إدخال العنوان الذي سجّلت به، وتفقّد مجلد البريد غير المرغوب فيه."
+
+#: landing/templates/reset-password-done.html:29
+msgid "Back to Sign in"
+msgstr "العودة إلى تسجيل الدخول"
+
+#: landing/templates/reset-password-email.html:2
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"account."
+msgstr "تتلقّى هذه الرسالة لأنك طلبت إعادة تعيين كلمة المرور لحسابك."
+
+#: landing/templates/reset-password-email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "يُرجى الانتقال إلى الصفحة التالية واختيار كلمة مرور جديدة:"
+
+#: landing/templates/reset-password-email.html:8
+msgid "If you didn't request this, you can safely ignore this email."
+msgstr "إذا لم تكن أنت من طلب ذلك، فيمكنك تجاهل هذه الرسالة بأمان."
+
+#: landing/templates/reset-password-email.html:10
+msgid "Thanks,"
+msgstr "شكراً،"
+
+#: landing/templates/reset-password-subject.txt:1
+msgid "Reset your password"
+msgstr "إعادة تعيين كلمة المرور"
+
+#: landing/templates/reset-password.html:22
+msgid "Reset Your Password"
+msgstr "إعادة تعيين كلمة المرور"
+
+#: landing/templates/reset-password.html:24
+msgid ""
+"Please enter your email address. You will receive a link to create a new "
+"password via email."
+msgstr "يُرجى إدخال عنوان بريدك الإلكتروني. ستصلك رسالة عبر البريد الإلكتروني تحتوي على رابط لإنشاء كلمة مرور جديدة."
+
+#: landing/templates/reset-password.html:46
+msgid "Send"
+msgstr "إرسال"
+
+#: landing/templates/reset-password.html:51
+msgid "Remember your password ?"
+msgstr "هل تتذكّر كلمة المرور؟"
 
 #: landing/templates/search-results.html:21
 msgid "Search Results"
@@ -1574,10 +1724,6 @@ msgstr "التواريخ المهمة"
 msgid "Users"
 msgstr "المستخدمون"
 
-#: landing/templates/base.html
-msgid "Dashboard"
-msgstr "لوحة التحكم"
-
 #: users/models.py:41
 msgid "Admin"
 msgstr "مدير"
@@ -1600,3 +1746,4 @@ msgstr "المستخدمون"
 
 #~ msgid "Your Name"
 #~ msgstr "اسمك"
+

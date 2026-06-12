@@ -229,18 +229,51 @@
         <!-- Asanid -->
         {% if esnads %}
         <div class="asanid-section bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
-          <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Asanid" %}</h5>
-          {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
-          <div class="bio-esnad-item">
-            <small>{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</small>
-            <div>{{ esnad.chain_display }}</div>
-            {% if esnad.isnad_rank and terminal %}
-            <div class="bio-esnad-rank">
-              {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
-            </div>
-            {% endif %}
+          <div class="flex items-center justify-between flex-wrap gap-3 border-b border-gray-100 dark:border-gray-700 pb-3 mb-4">
+            <h5 class="text-lg font-medium dark:text-white mb-0">{% trans "Asanid" %}</h5>
+            <button type="button" id="asanid-view-toggle" onclick="toggleAsanidView(this)"
+              class="btn btn-sm inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white border border-orange-600 hover:border-orange-700 rounded-md transition duration-500">
+              <i class="uil uil-channel text-base"></i>
+              <span data-label-timeline="{% trans 'View as chain' %}" data-label-list="{% trans 'View as list' %}">{% trans "View as chain" %}</span>
+            </button>
           </div>
-          {% endwith %}{% endfor %}
+
+          <!-- List view (default) -->
+          <div id="asanid-list-view">
+            {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
+            <div class="bio-esnad-item">
+              <small>{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</small>
+              <div>{{ esnad.chain_display }}</div>
+              {% if esnad.isnad_rank and terminal %}
+              <div class="bio-esnad-rank">
+                {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% endwith %}{% endfor %}
+          </div>
+
+          <!-- Chain view (toggled, styled like the Work Process timeline) -->
+          <div id="asanid-timeline-view" class="hidden">
+            {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
+            <div class="{% if not forloop.first %}mt-10 pt-10 border-t border-dashed border-gray-200 dark:border-gray-700{% endif %}">
+              <div class="text-center mb-6">
+                <span class="inline-block bg-orange-600/10 text-orange-600 border border-orange-600/30 rounded-full px-4 py-1 text-sm font-medium">{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</span>
+                {% if esnad.isnad_rank and terminal %}
+                <p class="text-sm text-slate-400 mb-0 mt-2">
+                  {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
+                </p>
+                {% endif %}
+              </div>
+              <div class="timeline relative">
+                {% include "_esnad_timeline_node.html" with node=biography step=0 is_first=True is_holder=True is_terminal=False left=True %}
+                {% for link in esnad.links.all %}
+                {% include "_esnad_timeline_node.html" with node=link.narrator step=forloop.counter is_first=False is_holder=False is_terminal=forloop.last left=forloop.counter|divisibleby:2 %}
+                {% endfor %}
+              </div>
+            </div>
+            {% endwith %}{% endfor %}
+          </div>
         </div>
         {% endif %}
 
@@ -333,6 +366,25 @@
 <!--end section-->
 
 <script>
+  function toggleAsanidView(btn) {
+    var listView = document.getElementById('asanid-list-view');
+    var timelineView = document.getElementById('asanid-timeline-view');
+    var label = btn.querySelector('span');
+    var icon = btn.querySelector('i');
+    if (!listView || !timelineView) return;
+    var showTimeline = listView.classList.contains('hidden') === false;
+    listView.classList.toggle('hidden', showTimeline);
+    timelineView.classList.toggle('hidden', !showTimeline);
+    if (label) {
+      label.textContent = showTimeline
+        ? label.getAttribute('data-label-list')
+        : label.getAttribute('data-label-timeline');
+    }
+    if (icon) {
+      icon.className = showTimeline ? 'uil uil-list-ul text-base' : 'uil uil-channel text-base';
+    }
+  }
+
   function copyBiographyLink(btn) {
     var url = btn.getAttribute('data-url');
     var done = function () {
