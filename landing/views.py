@@ -1,7 +1,9 @@
 import logging
+from difflib import SequenceMatcher
 from itertools import groupby
+from django.core.mail import send_mail
 
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from core.models import Biography
@@ -10,16 +12,10 @@ from core.search import normalize_arabic
 logger = logging.getLogger(__name__)
 
 from .models import (
-    Client,
-    FeaturedPost,
-    FooterColumn,
+    Post,
     HeroSlide,
-    LandingSection,
     Service,
     SiteSettings,
-    StatCounter,
-    TeamMember,
-    WelcomeSection,
 )
 
 
@@ -27,59 +23,34 @@ def landing(request):
     """Landing page view: pass all editable content from models."""
     # Singleton / optional: use first() and allow None
     site_settings = SiteSettings.objects.first()
-    welcome_section = WelcomeSection.objects.first()
 
     # Sections headings (by slug); default None for missing so template can use {% if sections.welcome %}
-    section_slugs = ["welcome", "services", "blog", "clients", "team"]
+    section_slugs = ["services", "blog", "clients", "team"]
     sections = {slug: None for slug in section_slugs}
-    for s in LandingSection.objects.filter(slug__in=section_slugs):
-        sections[s.slug] = s
-
+    
+    # Singleton hero section
+    hero = HeroSlide.objects.first()
     # Ordered lists
-    hero_slides = list(HeroSlide.objects.filter(is_active=True))
     services = list(Service.objects.all())
-    stat_counters = list(StatCounter.objects.all())
-    featured_posts = list(FeaturedPost.objects.all())
-    clients = list(Client.objects.all())
-    team_members = list(TeamMember.objects.all())
-    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
+    featured_posts = list(Post.objects.filter(show_as_featured=True))
 
     context = {
         "site_settings": site_settings,
-        "welcome_section": welcome_section,
         "sections": sections,
-        "hero_slides": hero_slides,
+        "hero": hero,
         "services": services,
-        "stat_counters": stat_counters,
         "featured_posts": featured_posts,
-        "clients": clients,
-        "team_members": team_members,
-        "footer_columns": footer_columns,
     }
-    return render(request, "landing.html", context)
-
-
-def contact_us(request):
-    """Contact us page."""
-    site_settings = SiteSettings.objects.first()
-    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
-    context = {
-        "site_settings": site_settings,
-        "footer_columns": footer_columns,
-        "user": request.user,
-    }
-    return render(request, "contact-us.html", context)
+    return render(request, "home.html", context)
 
 
 def post_detail(request, pk):
-    """Single featured post page (FeaturedPost by pk)."""
-    post = get_object_or_404(FeaturedPost, pk=pk)
+    """Single post page (Post by pk)."""
+    post = get_object_or_404(Post, pk=pk)
     site_settings = SiteSettings.objects.first()
-    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
     context = {
         "post": post,
         "site_settings": site_settings,
-        "footer_columns": footer_columns,
         "user": request.user,
     }
     return render(request, "post.html", context)
@@ -169,7 +140,6 @@ def biography_detail(request, pk):
     esnads = list(biography.esnads.all())
 
     site_settings = SiteSettings.objects.first()
-    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
 
     context = {
         "biography": biography,
@@ -180,7 +150,6 @@ def biography_detail(request, pk):
         "sources": sources,
         "esnads": esnads,
         "site_settings": site_settings,
-        "footer_columns": footer_columns,
         "user": request.user,
     }
     return render(request, "biography.html", context)
@@ -194,11 +163,9 @@ def biographies_alphabetical(request):
         .order_by("full_name_ar", "full_name_en")
     )
     site_settings = SiteSettings.objects.first()
-    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
     context = {
         "biographies": biographies,
         "site_settings": site_settings,
-        "footer_columns": footer_columns,
         "user": request.user,
     }
     return render(request, "biographies-alphabetical.html", context)
@@ -216,14 +183,38 @@ def biographies_by_city(request):
         for loc, bios in groupby(qs, key=lambda b: b.hometown)
     ]
     site_settings = SiteSettings.objects.first()
-    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
     context = {
         "groups": groups,
         "site_settings": site_settings,
-        "footer_columns": footer_columns,
         "user": request.user,
     }
     return render(request, "biographies-by-city.html", context)
+
+
+# Minimum token-similarity (0-1) for a biography to surface as a "similar"
+# (fuzzy) match when it isn't an exact substring hit. Tuned to catch typos
+# and spelling variants without flooding the page with unrelated names.
+SIMILARITY_THRESHOLD = 0.8
+# Cap on how many similar matches we show, best-scoring first.
+SIMILARITY_MAX_RESULTS = 12
+
+
+def _token_similarity(query_words, target_text):
+    """Best average per-token similarity between the query and a target.
+
+    For each query word we find the closest word in ``target_text`` (using
+    :class:`difflib.SequenceMatcher`) and average those best scores. Returns a
+    float in ``0..1``; higher means a closer fuzzy match.
+    """
+    target_words = target_text.split()
+    if not query_words or not target_words:
+        return 0.0
+    total = 0.0
+    for qw in query_words:
+        total += max(
+            SequenceMatcher(None, qw, tw).ratio() for tw in target_words
+        )
+    return total / len(query_words)
 
 
 def search_results(request):
@@ -231,7 +222,9 @@ def search_results(request):
 
     Matching is tashkeel-insensitive and treats multi-word queries as AND:
     every word in the (normalized) query must appear somewhere in the
-    biography's normalized name/alias text.
+    biography's normalized name/alias text. Biographies that don't match
+    exactly are scored for fuzzy similarity and, when close enough, surfaced
+    separately as "similar" results with a match percentage.
     """
     query = (request.GET.get("q") or "").strip()
 
@@ -249,14 +242,55 @@ def search_results(request):
             logger.debug("search_results SQL=%s", qs.query)
             results = list(qs.select_related("hometown").order_by("full_name_ar"))
 
+            # Fold in fuzzy "similar" matches: biographies that aren't exact
+            # substring hits but are close enough in spelling. They're appended
+            # after the exact matches, best similarity first.
+            exact_ids = {bio.pk for bio in results}
+            candidates = (
+                Biography.objects.filter(published=True)
+                .exclude(pk__in=exact_ids)
+                .select_related("hometown")
+            )
+            scored = []
+            for bio in candidates:
+                score = _token_similarity(words, bio.name_search)
+                if score >= SIMILARITY_THRESHOLD:
+                    scored.append((score, bio))
+            scored.sort(key=lambda item: item[0], reverse=True)
+            results.extend(bio for _, bio in scored[:SIMILARITY_MAX_RESULTS])
+
     logger.info("search_results query=%r matched %d biographies", query, len(results))
     site_settings = SiteSettings.objects.first()
-    footer_columns = list(FooterColumn.objects.prefetch_related("links").all())
     context = {
         "query": query,
         "results": results,
         "site_settings": site_settings,
-        "footer_columns": footer_columns,
         "user": request.user,
     }
     return render(request, "search-results.html", context)
+
+def contact_form(request):
+    if request.method == 'POST':
+        # Extract form data from request
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        comments = request.POST.get('comments')
+
+        # Check if any field is empty
+        if not all([name, email, subject, comments]):
+            return JsonResponse({'error': 'Please fill out all fields.'}, status=400)
+
+        # Send email
+        send_mail(
+            subject,
+            comments,
+            email,
+            ['kalghanimdev@gmail.com'], #change email id 
+            fail_silently=False,
+        )
+
+        return JsonResponse({'message': 'Success! Your message has been sent.'})
+
+    # GET request or invalid form submission
+    return JsonResponse({'error': 'Invalid request.'}, status=400)

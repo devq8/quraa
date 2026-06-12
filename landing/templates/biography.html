@@ -1,723 +1,290 @@
-{% load static %}
-<!doctype html>
-<html lang="ar">
+{% extends "base.html" %}
+{% load static i18n %}
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <link rel="icon" type="image/png" href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'images/favicon.png' %}{% endif %}" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>
-    {% if site_settings %} {{ site_settings.site_name_en }}{% else %}Quraa{% endif %} | {{ biography.alias_ar|default:biography.alias_en }}
-  </title>
-  <script>
-    (function() {
-      var lang = localStorage.getItem("quraa-lang") || "ar";
-      var d = document.documentElement;
-      d.setAttribute("lang", lang);
-      d.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-      window.quraaLang = lang;
-      if (lang === "ar") {
-        var link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href = '{% static "css/rtl.css" %}';
-        document.head.appendChild(link);
-      }
-    })();
-  </script>
-  <link href="{% static 'css/plugins.css' %}" rel="stylesheet" />
-  <link href="{% static 'css/style.css' %}" rel="stylesheet" />
-  <style>
-    .btn-primary,
-    .btn-inverted:hover,
-    a.btn-primary,
-    a.btn-inverted:hover {
-      background-color: #c4a574 !important;
-      border-color: #c4a574 !important;
-    }
+{% block navlink %}
+<a class="navbar-brand" href="{% url 'landing:landing' %}">
+  <span class="inline-block dark:hidden">
+    <img src="{% if site_settings.logo_dark %}{{ site_settings.logo_dark.url }}{% else %}{% static 'assets/images/logo-dark.png' %}{% endif %}" class="l-dark" alt="">
+    <img src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'assets/images/logo-light.png' %}{% endif %}" class="l-light" alt="">
+  </span>
+  <img src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'assets/images/logo-light.png' %}{% endif %}" class="hidden dark:inline-block" alt="">
+</a>
+{% endblock navlink %}
 
-    .btn-primary:hover,
-    .btn-inverted,
-    a.btn-primary:hover,
-    a.btn-inverted {
-      background-color: #a68b5c !important;
-      border-color: #a68b5c !important;
-    }
+{% block Hero %}
 
-    #scrollTop:after,
-    #scrollTop:hover:after {
-      background-color: #c4a574 !important;
-    }
+<style>
+  /* Scope Noto Naskh Arabic to this page only (navbar keeps its own font). */
+  body, body dl, body dt, body dd, body small { font-family: 'Noto Naskh Arabic', serif; }
+  .asanid-section, .asanid-section * { font-family: 'Noto Naskh Arabic', serif; }
 
-    #header #mainMenu nav>ul>li:hover>a,
-    #header #mainMenu nav>ul>li.hover-active>a,
-    #header #mainMenu nav>ul>li.current>a {
-      color: #c4a574 !important;
-    }
+  /* Chain items — ported verbatim from the old biography design. */
+  .bio-esnad-item {
+    background-color: #faf6ee;
+    border-inline-start: 3px solid #c4a574;
+    padding: 12px 18px;
+    margin-bottom: 12px;
+    line-height: 1.9;
+    direction: rtl;
+    text-align: right;
+    color: #444;
+  }
 
-    #header #mainMenu nav>ul>li .dropdown-menu>li>a:hover {
-      color: #c4a574 !important;
-    }
+  html[dir="ltr"] .bio-esnad-item {
+    direction: ltr;
+    text-align: left;
+  }
 
-    #header .header-extras .p-dropdown>a:hover,
-    #header .header-extras .p-dropdown>a:hover i {
-      color: #c4a574 !important;
-    }
+  .bio-esnad-item small {
+    color: #999;
+  }
 
-    .bio-section .heading-text.heading-section h2::before {
-      background-color: #c4a574 !important;
-    }
+  .bio-esnad-rank {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #d6c9a8;
+    color: #6b563b;
+    font-weight: 600;
+    font-size: 14px;
+  }
+</style>
 
-    .bio-attribute-badge {
-      display: inline-block;
-      background-color: #f3ece0;
-      color: #6b563b;
-      border: 1px solid #c4a574;
-      border-radius: 999px;
-      padding: 4px 14px;
-      margin: 0 4px 6px 0;
-      font-size: 13px;
-      font-weight: 500;
-    }
+<!-- Hero Start -->
+<section class="py-28 w-full table relative bg-center bg-cover" style="background-image: url('{% static 'assets/images/bg/quraan_1080.jpg' %}');">
+  <div class="absolute inset-0 bg-black opacity-80"></div>
+  <div class="container relative">
+    <div class="grid grid-cols-1 pb-8 text-center mt-10">
+      <h3 class="mb-3 text-4xl leading-normal font-medium text-white">
+        {% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.alias_en }}{% else %}{{ biography.alias_en|default:biography.alias_ar }}{% endif %}
+      </h3>
 
-    .bio-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+      <ul class="list-none text-white opacity-50 text-lg">
+        {% if biography.birthplace or biography.birth_hijri_year or biography.birth_greg_year %}
+        <li class="inline mx-2">
+          <span>{% trans "Born" %}:</span>
+          {% if biography.birthplace %}{{ biography.birthplace }}{% endif %}
+          {% if biography.birth_hijri_year %}({{ biography.birth_hijri_year }} {% if LANGUAGE_CODE == 'ar' %}هـ{% else %}AH{% endif %}){% elif biography.birth_greg_year %}({{ biography.birth_greg_year }} {% if LANGUAGE_CODE == 'ar' %}م{% else %}CE{% endif %}){% endif %}
+        </li>
+        {% endif %}
+        {% if biography.death_location or biography.death_hijri_year or biography.death_greg_year %}
+        <li class="inline mx-2">
+          <span>{% trans "Died" %}:</span>
+          {% if biography.death_location %}{{ biography.death_location }}{% endif %}
+          {% if biography.death_hijri_year %}({{ biography.death_hijri_year }} {% if LANGUAGE_CODE == 'ar' %}هـ{% else %}AH{% endif %}){% elif biography.death_greg_year %}({{ biography.death_greg_year }} {% if LANGUAGE_CODE == 'ar' %}م{% else %}CE{% endif %}){% endif %}
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+    <!--end grid-->
+  </div>
+  <!--end container-->
+</section>
+<!--end section-->
+<!-- Hero End -->
 
-    .bio-table th,
-    .bio-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid #eee;
-      vertical-align: top;
-    }
+<section class="relative md:py-24 py-16">
+  <div class="container">
 
-    .bio-table th {
-      width: 30%;
-      font-weight: 600;
-      color: #6b563b;
-      text-align: start;
-      white-space: nowrap;
-    }
+    {% if not biography.published %}
+    <div class="mb-8 px-4 py-3 rounded-md bg-yellow-500/10 border border-yellow-500/40 text-yellow-700 dark:text-yellow-500 text-sm">
+      {% trans "Unpublished biography (visible to staff only)" %}
+    </div>
+    {% endif %}
 
-    .bio-table td {
-      color: #444;
-    }
+    <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
 
-    .bio-empty {
-      color: #999;
-      font-style: italic;
-    }
+      <!-- Main column -->
+      <div class="lg:col-span-8 md:col-span-7 flex flex-col gap-[30px]">
 
-    .bio-status-draft {
-      display: inline-block;
-      background-color: #fff4e5;
-      color: #b76e00;
-      border: 1px solid #ffcc80;
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-size: 13px;
-      margin-bottom: 18px;
-    }
+        <!-- Identity -->
+        <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+          <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Identity" %}</h5>
+          <dl class="grid grid-cols-12 mb-0">
+            
 
-    .bio-relation-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Full Name" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">
+              {% if LANGUAGE_CODE == 'ar' %}{{ biography.full_name_ar|default:biography.full_name_en|default:"—" }}{% else %}{{ biography.full_name_en|default:biography.full_name_ar|default:"—" }}{% endif %}
+            </dd>
 
-    .bio-relation-list>li {
-      padding: 10px 0;
-      border-bottom: 1px solid #f1ece2;
-    }
+            {% if biography.hometown %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Hometown" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">{{ biography.hometown }}</dd>
+            {% endif %}
 
-    .bio-relation-list>li:last-child {
-      border-bottom: 0;
-    }
-
-    .bio-relation-list .relation-notes {
-      display: block;
-      color: #888;
-      font-size: 13px;
-      margin-top: 2px;
-    }
-
-    .bio-source-link {
-      color: #a68b5c;
-      text-decoration: none;
-    }
-
-    .bio-source-link:hover {
-      color: #c4a574;
-    }
-
-    .bio-esnad-item {
-      background-color: #faf6ee;
-      border-inline-start: 3px solid #c4a574;
-      padding: 12px 18px;
-      margin-bottom: 12px;
-      line-height: 1.9;
-      direction: rtl;
-      text-align: right;
-    }
-
-    html[dir="ltr"] .bio-esnad-item {
-      direction: ltr;
-      text-align: left;
-    }
-
-    .bio-esnad-rank {
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px dashed #d6c9a8;
-      color: #6b563b;
-      font-weight: 600;
-      font-size: 14px;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="body-inner">
-    <!-- Header -->
-    <header id="header" data-transparent="true" data-fullwidth="true" class="dark submenu-light">
-      <div class="header-inner">
-        <div class="container">
-          <div id="logo">
-            <a href="/">
-              <img class="logo-default" src="{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'images/old_book_logo.png' %}{% endif %}"
-                alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" />
-              <img class="logo-dark" src="{% if site_settings.logo_dark %}{{ site_settings.logo_dark.url }}{% elif site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'images/old_book_logo.png' %}{% endif %}"
-                alt="{% if site_settings %}{{ site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}" />
-            </a>
-          </div>
-          <div id="search">
-            <a id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i class="icon-x"></i></a>
-            <form class="search-form" action="{% url 'landing:search_results' %}" method="get">
-              <input class="form-control" name="q" type="text" placeholder="" data-ar-placeholder="ابحث..." data-en-placeholder="Type & Search..." />
-              <span class="text-muted" data-ar="ابدأ بالكتابة ثم اضغط Enter أو ESC للإغلاق" data-en='Start typing &amp; press "Enter" or "ESC" to close'></span>
-            </form>
-          </div>
-          <div class="header-extras">
-            <ul>
-              <li>
-                <a id="btn-search" href="#"><i class="icon-search"></i></a>
-              </li>
-              <li>
-                <div class="p-dropdown">
-                  <a href="#"><i class="icon-globe"></i><span id="lang-label" data-ar=" " data-en=" ">العربية</span></a>
-                  <ul class="p-dropdown-content">
-                    <li><a href="#" data-lang="ar">عربي</a></li>
-                    <li><a href="#" data-lang="en">English</a></li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div id="mainMenu-trigger">
-            <a class="lines-button x"><span class="lines"></span></a>
-          </div>
-          <div id="mainMenu">
-            <div class="container">
-              <nav>
-                <ul>
-                  <li>
-                    <a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
-                  </li>
-                  <li class="dropdown">
-                    <a href="/#services" data-ar="خدماتنا" data-en="Services">خدماتنا</a>
-                  </li>
-                  <li class="dropdown current">
-                    <a href="#" data-ar="التراجم" data-en="Biographies">التراجم</a>
-                    <ul class="dropdown-menu">
-                      <li>
-                        <a href="{% url 'landing:biographies_alphabetical' %}" data-ar="قائمة أبجدية" data-en="Alphabetical List">قائمة أبجدية</a>
-                      </li>
-                      <li>
-                        <a href="{% url 'landing:biographies_by_city' %}" data-ar="حسب المدينة" data-en="By City">حسب المدينة</a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="dropdown">
-                    <a href="/#blog-section" data-ar="المقالات" data-en="Blog">المقالات</a>
-                  </li>
-                  <li class="dropdown mega-menu-item">
-                    <a href="#" data-ar="إصداراتنا" data-en="Publications">إصداراتنا</a>
-                  </li>
-                  <li class="dropdown">
-                    <a href="/#welcome" data-ar="عن المركز" data-en="About Us">عن المركز</a>
-                  </li>
-                  <li>
-                    <a href="{% url 'landing:contact_us' %}" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a>
-                  </li>
-                  {% if user.is_authenticated %} {% if user.is_staff %}
-                  <li>
-                    <a href="{% url 'admin:index' %}" data-ar="الإدارة" data-en="Admin">الإدارة</a>
-                  </li>
-                  {% endif %}
-                  <li>
-                    <a href="{% url 'logout' %}" data-ar="تسجيل الخروج" data-en="Logout">تسجيل الخروج</a>
-                  </li>
-                  {% else %}
-                  <li>
-                    <a href="{% url 'login' %}" data-ar="حسابي" data-en="My Account">حسابي</a>
-                  </li>
-                  {% endif %}
-                </ul>
-              </nav>
-            </div>
-          </div>
+            {% if attributes %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Attributes" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2">
+              {% for attr in attributes %}
+              <span class="inline-block bg-orange-600/10 text-orange-600 border border-orange-600/30 rounded-full px-3 py-1 text-sm font-medium me-1 mb-1"
+                title="{% if LANGUAGE_CODE == 'ar' %}{{ attr.description_ar|default:attr.long_name_ar|default:attr.description_en|default:attr.long_name_en }}{% else %}{{ attr.description_en|default:attr.long_name_en|default:attr.description_ar|default:attr.long_name_ar }}{% endif %}">
+                {% if LANGUAGE_CODE == 'ar' %}{{ attr.short_name_ar|default:attr.short_name_en }}{% else %}{{ attr.short_name_en|default:attr.short_name_ar }}{% endif %}
+              </span>
+              {% endfor %}
+            </dd>
+            {% endif %}
+          </dl>
         </div>
-      </div>
-    </header>
-    <!-- end: Header -->
 
-    <!-- Hero -->
-    <section class="parallax text-light halfscreen" data-bg-parallax="{% static 'images/parallax/paper_texture.jpg' %}">
-      <div class="bg-overlay"></div>
-      <div class="container">
-        <div class="container-fullscreen">
-          <div class="text-middle text-center">
-            <h1 class="text-uppercase text-medium" data-animate="fadeInDown" data-animate-delay="100" data-ar="{{ biography.alias_ar }}" data-en="{{ biography.alias_en|default:biography.alias_ar }}">
-              {{ biography.alias_ar|default:biography.alias_en }}
-            </h1>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- end: Hero -->
-
-    <!-- Identity & Vital Records -->
-    <section class="bio-section">
-      <div class="container">
-        {% if not biography.published %}
-        <div class="bio-status-draft" data-ar="هذه الترجمة غير منشورة (مرئية للمشرفين فقط)" data-en="Unpublished biography (visible to staff only)">
-          هذه الترجمة غير منشورة (مرئية للمشرفين فقط)
+        <!-- Birth -->
+        {% if dates.birth_hijri or dates.birth_greg or biography.birthplace %}
+        <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+          <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Birth" %}</h5>
+          <dl class="grid grid-cols-12 mb-0">
+            {% if dates.birth_hijri %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Hijri Date" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">
+              {% if LANGUAGE_CODE == 'ar' %}{{ dates.birth_hijri.ar }}{% else %}{{ dates.birth_hijri.en }}{% endif %}
+              {% if dates.birth_hijri.approximate %}<i class="fa fa-info-circle text-orange-600 ms-1" title="{% trans 'Approximate date — day and month may not be exact' %}"></i>{% endif %}
+            </dd>
+            {% endif %}
+            {% if dates.birth_greg %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Gregorian Date" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">
+              {% if LANGUAGE_CODE == 'ar' %}{{ dates.birth_greg.ar }}{% else %}{{ dates.birth_greg.en }}{% endif %}
+              {% if dates.birth_greg.approximate %}<i class="fa fa-info-circle text-orange-600 ms-1" title="{% trans 'Approximate date — day and month may not be exact' %}"></i>{% endif %}
+            </dd>
+            {% endif %}
+            {% if biography.birthplace %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Birthplace" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">{{ biography.birthplace }}</dd>
+            {% endif %}
+          </dl>
         </div>
         {% endif %}
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="التعريف" data-en="Identity">التعريف</h2>
-            </div>
-          </div>
-          <div class="col-lg-9">
-            <table class="bio-table">
-              {% if biography.alias_ar %}
-              <tr>
-                <th data-ar="الكنية / اللقب" data-en="Alias">الكنية / اللقب</th>
-                <td data-ar="{{ biography.alias_ar }}" data-en="{{ biography.alias_en|default:biography.alias_ar }}">{{ biography.alias_ar }}</td>
-              </tr>
-              {% endif %}
-              <tr>
-                <th data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</th>
-                <td>{{ biography.full_name_ar|default:"—" }}</td>
-              </tr>
-              <!-- <tr>
-                <th data-ar="الاسم بالإنجليزية" data-en="Name (English)">الاسم بالإنجليزية</th>
-                <td>{% if biography.full_name_en %}{{ biography.full_name_en }}{% else %}<span class="bio-empty" data-ar="غير محدد" data-en="Not provided">غير محدد</span>{% endif %}</td>
-              </tr> -->
-              <!-- {% if biography.alias_ar or biography.alias_en %}
-              <tr>
-                <th data-ar="الكنية / اللقب" data-en="Alias">الكنية / اللقب</th>
-                <td data-ar="{{ biography.alias_ar|default:biography.alias_en }}" data-en="{{ biography.alias_en|default:biography.alias_ar }}">{{ biography.alias_ar|default:biography.alias_en }}</td>
-              </tr>
-              {% endif %} -->
-              {% if biography.hometown %}
-              <tr>
-                <th data-ar="الموطن" data-en="Hometown">الموطن</th>
-                <td>{{ biography.hometown }}</td>
-              </tr>
-              {% endif %} {% if attributes %}
-              <tr>
-                <th data-ar="صفات وتصنيفات" data-en="Attributes">
-                  صفات وتصنيفات
-                </th>
-                <td>
-                  {% for attr in attributes %}
-                  <span class="bio-attribute-badge" title="{{ attr.description_ar|default:attr.description_en|default:attr.long_name_ar|default:attr.long_name_en }}"
-                    data-ar-title="{{ attr.description_ar|default:attr.long_name_ar|default:attr.description_en|default:attr.long_name_en }}"
-                    data-en-title="{{ attr.description_en|default:attr.long_name_en|default:attr.description_ar|default:attr.long_name_ar }}" data-ar="{{ attr.short_name_ar|default:attr.short_name_en }}"
-                    data-en="{{ attr.short_name_en|default:attr.short_name_ar }}">{{ attr.short_name_ar|default:attr.short_name_en }}</span>
-                  {% endfor %}
-                </td>
-              </tr>
-              {% endif %}
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- end: Identity -->
 
-    <!-- Birth -->
-    {% if dates.birth_hijri or dates.birth_greg or biography.birthplace %}
-    <section class="bio-section bg-light">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="الميلاد" data-en="Birth">الميلاد</h2>
-            </div>
-          </div>
-          <div class="col-lg-9">
-            <table class="bio-table">
-              {% if dates.birth_hijri %}
-              <tr>
-                <th data-ar="التاريخ الهجري" data-en="Hijri Date">
-                  التاريخ الهجري
-                </th>
-                <td>
-                  <span data-ar="{{ dates.birth_hijri.ar }}" data-en="{{ dates.birth_hijri.en }}">{{ dates.birth_hijri.ar }}</span>
-                  {% if dates.birth_hijri.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
-                </td>
-              </tr>
-              {% endif %} {% if dates.birth_greg %}
-              <tr>
-                <th data-ar="التاريخ الميلادي" data-en="Gregorian Date">
-                  التاريخ الميلادي
-                </th>
-                <td>
-                  <span data-ar="{{ dates.birth_greg.ar }}" data-en="{{ dates.birth_greg.en }}">{{ dates.birth_greg.ar }}</span>
-                  {% if dates.birth_greg.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
-                </td>
-              </tr>
-              {% endif %} {% if biography.birthplace %}
-              <tr>
-                <th data-ar="مكان الميلاد" data-en="Birthplace">
-                  مكان الميلاد
-                </th>
-                <td>{{ biography.birthplace }}</td>
-              </tr>
-              {% endif %}
-            </table>
-          </div>
+        <!-- Death -->
+        {% if dates.death_hijri or dates.death_greg or biography.death_location %}
+        <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+          <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Death" %}</h5>
+          <dl class="grid grid-cols-12 mb-0">
+            {% if dates.death_hijri %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Hijri Date" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">
+              {% if LANGUAGE_CODE == 'ar' %}{{ dates.death_hijri.ar }}{% else %}{{ dates.death_hijri.en }}{% endif %}
+              {% if dates.death_hijri.approximate %}<i class="fa fa-info-circle text-orange-600 ms-1" title="{% trans 'Approximate date — day and month may not be exact' %}"></i>{% endif %}
+            </dd>
+            {% endif %}
+            {% if dates.death_greg %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Gregorian Date" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">
+              {% if LANGUAGE_CODE == 'ar' %}{{ dates.death_greg.ar }}{% else %}{{ dates.death_greg.en }}{% endif %}
+              {% if dates.death_greg.approximate %}<i class="fa fa-info-circle text-orange-600 ms-1" title="{% trans 'Approximate date — day and month may not be exact' %}"></i>{% endif %}
+            </dd>
+            {% endif %}
+            {% if biography.death_location %}
+            <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Death Location" %}</dt>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">{{ biography.death_location }}</dd>
+            {% endif %}
+          </dl>
         </div>
-      </div>
-    </section>
-    {% endif %}
-    <!-- end: Birth -->
+        {% endif %}
 
-    <!-- Death -->
-    {% if dates.death_hijri or dates.death_greg or biography.death_location %}
-    <section class="bio-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="الوفاة" data-en="Death">الوفاة</h2>
+        <!-- Asanid -->
+        {% if esnads %}
+        <div class="asanid-section bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+          <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Asanid" %}</h5>
+          {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
+          <div class="bio-esnad-item">
+            <small>{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</small>
+            <div>{{ esnad.chain_display }}</div>
+            {% if esnad.isnad_rank and terminal %}
+            <div class="bio-esnad-rank">
+              {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
             </div>
+            {% endif %}
           </div>
-          <div class="col-lg-9">
-            <table class="bio-table">
-              {% if dates.death_hijri %}
-              <tr>
-                <th data-ar="التاريخ الهجري" data-en="Hijri Date">
-                  التاريخ الهجري
-                </th>
-                <td>
-                  <span data-ar="{{ dates.death_hijri.ar }}" data-en="{{ dates.death_hijri.en }}">{{ dates.death_hijri.ar }}</span>
-                  {% if dates.death_hijri.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
-                </td>
-              </tr>
-              {% endif %} {% if dates.death_greg %}
-              <tr>
-                <th data-ar="التاريخ الميلادي" data-en="Gregorian Date">
-                  التاريخ الميلادي
-                </th>
-                <td>
-                  <span data-ar="{{ dates.death_greg.ar }}" data-en="{{ dates.death_greg.en }}">{{ dates.death_greg.ar }}</span>
-                  {% if dates.death_greg.approximate %}<i class="fa fa-info-circle text-warning" style="margin: 0 4px;" data-ar-title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين" data-en-title="Approximate date — day and month may not be exact" title="تاريخ تقريبي - قد لا يكون اليوم والشهر دقيقَين"></i>{% endif %}
-                </td>
-              </tr>
-              {% endif %} {% if biography.death_location %}
-              <tr>
-                <th data-ar="مكان الوفاة" data-en="Death Location">
-                  مكان الوفاة
-                </th>
-                <td>{{ biography.death_location }}</td>
-              </tr>
-              {% endif %}
-            </table>
-          </div>
+          {% endwith %}{% endfor %}
         </div>
-      </div>
-    </section>
-    {% endif %}
-    <!-- end: Death -->
+        {% endif %}
 
-    <!-- Teachers -->
-    {% if teachers %}
-    <section class="bio-section bg-light">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="أبرز الشيوخ" data-en="Teachers">أبرز الشيوخ</h2>
-            </div>
-          </div>
-          <div class="col-lg-9">
-            <ul class="bio-relation-list">
+        <!-- Comments -->
+        {% if biography.comments_ar or biography.comments_en %}
+        <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+          <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Comments" %}</h5>
+          <p class="text-slate-400 mb-0">
+            {% if LANGUAGE_CODE == 'ar' %}{{ biography.comments_ar|default:biography.comments_en|linebreaksbr }}{% else %}{{ biography.comments_en|default:biography.comments_ar|linebreaksbr }}{% endif %}
+          </p>
+        </div>
+        {% endif %}
+
+      </div>
+      <!--end main column-->
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-4 md:col-span-5">
+        <div class="sticky top-20 grid grid-cols-1 gap-[30px]">
+
+          <!-- Teachers -->
+          {% if teachers %}
+          <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+            <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Teachers" %}</h5>
+            <ul class="list-none mb-0">
               {% for rel in teachers %}
-              <li>
-                <a href="{% url 'landing:biography_detail' rel.teacher.pk %}" data-ar="{{ rel.teacher.alias_ar|default:rel.teacher.full_name_ar|default:rel.teacher.alias_en|default:rel.teacher.full_name_en }}" data-en="{{ rel.teacher.alias_en|default:rel.teacher.full_name_en|default:rel.teacher.alias_ar|default:rel.teacher.full_name_ar }}">{{
-                    rel.teacher.alias_ar|default:rel.teacher.full_name_ar|default:rel.teacher.alias_en|default:rel.teacher.full_name_en
-                    }}</a>
+              <li class="py-2 {% if not forloop.last %}border-b border-gray-100 dark:border-gray-700{% endif %}">
+                <a href="{% url 'landing:biography_detail' rel.teacher.pk %}" class="hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+                  {% if LANGUAGE_CODE == 'ar' %}{{ rel.teacher.alias_ar|default:rel.teacher.full_name_ar|default:rel.teacher.alias_en|default:rel.teacher.full_name_en }}{% else %}{{ rel.teacher.alias_en|default:rel.teacher.full_name_en|default:rel.teacher.alias_ar|default:rel.teacher.full_name_ar }}{% endif %}
+                </a>
                 {% for note in rel.notes.all %}
-                <span class="relation-notes" data-ar="{{ note.short_name_ar|default:note.short_name_en }}" data-en="{{ note.short_name_en|default:note.short_name_ar }}">{{ note.short_name_ar|default:note.short_name_en }}</span>
+                <span class="block text-slate-400 text-sm mt-1">{% if LANGUAGE_CODE == 'ar' %}{{ note.short_name_ar|default:note.short_name_en }}{% else %}{{ note.short_name_en|default:note.short_name_ar }}{% endif %}</span>
                 {% endfor %}
               </li>
               {% endfor %}
             </ul>
           </div>
-        </div>
-      </div>
-    </section>
-    {% endif %}
-    <!-- end: Teachers -->
+          {% endif %}
 
-    <!-- Students -->
-    {% if students %}
-    <section class="bio-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="أبرز التلاميذ" data-en="Students">
-                أبرز التلاميذ
-              </h2>
-            </div>
-          </div>
-          <div class="col-lg-9">
-            <ul class="bio-relation-list">
+          <!-- Students -->
+          {% if students %}
+          <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+            <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Students" %}</h5>
+            <ul class="list-none mb-0">
               {% for rel in students %}
-              <li>
-                <a href="{% url 'landing:biography_detail' rel.student.pk %}" data-ar="{{ rel.student.alias_ar|default:rel.student.full_name_ar|default:rel.student.alias_en|default:rel.student.full_name_en }}" data-en="{{ rel.student.alias_en|default:rel.student.full_name_en|default:rel.student.alias_ar|default:rel.student.full_name_ar }}">{{
-                    rel.student.alias_ar|default:rel.student.full_name_ar|default:rel.student.alias_en|default:rel.student.full_name_en
-                    }}</a>
+              <li class="py-2 {% if not forloop.last %}border-b border-gray-100 dark:border-gray-700{% endif %}">
+                <a href="{% url 'landing:biography_detail' rel.student.pk %}" class="hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+                  {% if LANGUAGE_CODE == 'ar' %}{{ rel.student.alias_ar|default:rel.student.full_name_ar|default:rel.student.alias_en|default:rel.student.full_name_en }}{% else %}{{ rel.student.alias_en|default:rel.student.full_name_en|default:rel.student.alias_ar|default:rel.student.full_name_ar }}{% endif %}
+                </a>
                 {% for note in rel.notes.all %}
-                <span class="relation-notes" data-ar="{{ note.short_name_ar|default:note.short_name_en }}" data-en="{{ note.short_name_en|default:note.short_name_ar }}">{{ note.short_name_ar|default:note.short_name_en }}</span>
+                <span class="block text-slate-400 text-sm mt-1">{% if LANGUAGE_CODE == 'ar' %}{{ note.short_name_ar|default:note.short_name_en }}{% else %}{{ note.short_name_en|default:note.short_name_ar }}{% endif %}</span>
                 {% endfor %}
               </li>
               {% endfor %}
             </ul>
           </div>
-        </div>
-      </div>
-    </section>
-    {% endif %}
-    <!-- end: Students -->
+          {% endif %}
 
-    <!-- Asanid -->
-    {% if esnads %}
-    <section class="bio-section bg-light">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="الأسانيد" data-en="Asanid">الأسانيد</h2>
-            </div>
-          </div>
-          <div class="col-lg-9">
-            {% for esnad in esnads %} {% with terminal=esnad.terminal_link %}
-            <div class="bio-esnad-item">
-              <small class="text-muted" data-ar="سند رقم {{ forloop.counter }}" data-en="Chain #{{ forloop.counter }}">سند رقم {{ forloop.counter }}</small>
-              <div>{{ esnad.chain_display }}</div>
-              {% if esnad.isnad_rank and terminal %}
-              <div class="bio-esnad-rank" data-ar="الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}"
-                data-en="Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}">
-                الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{
-                  terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en
-                  }}
-              </div>
-              {% endif %}
-            </div>
-            {% endwith %} {% endfor %}
-          </div>
-        </div>
-      </div>
-    </section>
-    {% endif %}
-    <!-- end: Asanid -->
-
-    <!-- Sources -->
-    {% if sources %}
-    <section class="bio-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="المصادر" data-en="Sources">المصادر</h2>
-            </div>
-          </div>
-          <div class="col-lg-9">
-            <ul class="bio-relation-list">
+          <!-- Sources -->
+          {% if sources %}
+          <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
+            <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Sources" %}</h5>
+            <ul class="list-none mb-0">
               {% for source in sources %}
-              <li>
+              <li class="py-2 {% if not forloop.last %}border-b border-gray-100 dark:border-gray-700{% endif %}">
                 {% if source.link %}
-                <a class="bio-source-link" href="{{ source.link }}" target="_blank" rel="noopener" data-ar="{{ source.name_ar|default:source.name_en }}"
-                  data-en="{{ source.name_en|default:source.name_ar }}">{{ source.name_ar|default:source.name_en }}</a>
+                <a class="hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500" href="{{ source.link }}" target="_blank" rel="noopener">
+                  {% if LANGUAGE_CODE == 'ar' %}{{ source.name_ar|default:source.name_en }}{% else %}{{ source.name_en|default:source.name_ar }}{% endif %}
+                </a>
                 {% else %}
-                <span data-ar="{{ source.name_ar|default:source.name_en }}" data-en="{{ source.name_en|default:source.name_ar }}">{{ source.name_ar|default:source.name_en }}</span>
+                <span class="text-slate-400">{% if LANGUAGE_CODE == 'ar' %}{{ source.name_ar|default:source.name_en }}{% else %}{{ source.name_en|default:source.name_ar }}{% endif %}</span>
                 {% endif %}
               </li>
               {% endfor %}
             </ul>
           </div>
-        </div>
-      </div>
-    </section>
-    {% endif %}
-    <!-- end: Sources -->
+          {% endif %}
 
-    <!-- Comments / ملاحظات -->
-    {% if biography.comments_ar %}
-    <section class="bio-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="heading-text heading-section">
-              <h2 data-ar="فوائد وملاحظات" data-en="Comments">فوائد وملاحظات</h2>
-            </div>
-          </div>
-          <div class="col-lg-9">
-            <p class="mb-5" data-ar="{{biography.comments_ar}}" data-en="{{biography.comments_en}}">
-              {{ biography.comments_ar|default:biography.comments_en }}
-            </p>
-          </div>
         </div>
       </div>
-    </section>
-    {% endif %}
-    <hr class="space" />
+      <!--end sidebar-->
 
-    <!-- Footer -->
-    <footer id="footer">
-      <div class="footer-content">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-5">
-              <div class="widget">
-                <div class="widget-title" data-ar="{% if site_settings %}{{ site_settings.footer_title_ar|default:site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء{% endif %}"
-                  data-en="{% if site_settings %}{{ site_settings.footer_title_en|default:site_settings.site_name_en }}{% else %}The International Center for the History and Documentation of Quran Reciters{% endif %}">
-                  {% if site_settings and site_settings.footer_title_ar %}{{
-                    site_settings.footer_title_ar }}{% elif site_settings %}{{
-                    site_settings.site_name_ar }}{% else %}المركز العالمي لتاريخ
-                  ووثائق القرآء{% endif %}
-                </div>
-                <p class="mb-5" data-ar="{% if site_settings %}{{ site_settings.footer_description_ar }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}"
-                  data-en="{% if site_settings %}{{ site_settings.footer_description_en }}{% else %}We are dedicated to the heritage of the people of the Qur'an{% endif %}">
-                  {% if site_settings %}{{ site_settings.footer_description_ar
-                    }}{% else %}نعتني بتاريخ أهل القرآن{% endif %}
-                </p>
-                <a href="{% if site_settings and site_settings.footer_button_link %}{{ site_settings.footer_button_link }}{% else %}#{% endif %}" class="btn btn-inverted" target="_blank"
-                  data-ar="{% if site_settings %}{{ site_settings.footer_button_text_ar }}{% else %}سجّل الآن{% endif %}" data-en="{% if site_settings %}{{ site_settings.footer_button_text_en }}{% else %}Register Now{% endif %}">
-                  {% if site_settings %}{{ site_settings.footer_button_text_ar }}{% else %}سجّل الآن{% endif %}</a>
-              </div>
-            </div>
-            <div class="col-lg-7">
-              <div class="row">
-                {% for column in footer_columns %}
-                <div class="col-lg-3">
-                  <div class="widget">
-                    <div class="widget-title" data-ar="{% firstof column.title_ar column.title %}" data-en="{% firstof column.title_en column.title %}">
-                      {% firstof column.title_ar column.title %}
-                    </div>
-                    <ul class="list">
-                      {% for link in column.links.all %}
-                      <li>
-                        <a href="{% if link.url %}{{ link.url }}{% else %}#{% endif %}" data-ar="{% firstof link.label_ar link.label %}" data-en="{% firstof link.label_en link.label %}">{% firstof link.label_ar link.label %}</a>
-                      </li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                </div>
-                {% empty %}
-                <div class="col-lg-3">
-                  <div class="widget">
-                    <div class="widget-title" data-ar="اكتشف" data-en="Discover">
-                      اكتشف
-                    </div>
-                    <ul class="list">
-                      <li>
-                        <a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
-                      </li>
-                      <li>
-                        <a href="{% url 'landing:contact_us' %}" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="copyright-content">
-        <div class="container">
-          <div class="copyright-text text-center">
-            © <span id="copyright-year"></span>
-            <span data-ar="{% if site_settings %}{{ site_settings.copyright_ar }}{% else %}المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة.{% endif %}"
-              data-en="{% if site_settings %}{{ site_settings.copyright_en }}{% else %}The International Center for the History and Documentation of Quran Reciters. All rights reserved.{% endif %}">
-              {% if site_settings %} {{ site_settings.copyright_ar }}
-              {% else %} المركز العالمي لتاريخ ووثائق القرآء. جميع الحقوق محفوظة. {% endif %}
-            </span>
-          </div>
-        </div>
-      </div>
-    </footer>
-    <!-- end: Footer -->
+    </div>
+    <!--end grid-->
+
+    
+
   </div>
-  <!-- end: Body Inner -->
-  <a id="scrollTop"><i class="icon-chevron-up"></i><i class="icon-chevron-up"></i></a>
-  <script src="{% static 'js/jquery.js' %}"></script>
-  <script src="{% static 'js/plugins.js' %}"></script>
-  <script src="{% static 'js/functions.js' %}"></script>
-  <script>
-    (function() {
-      var lang = window.quraaLang || "ar";
-      var attr = lang === "ar" ? "data-ar" : "data-en";
-      var placeholderAttr =
-        lang === "ar" ? "data-ar-placeholder" : "data-en-placeholder";
-      var titleAttr = lang === "ar" ? "data-ar-title" : "data-en-title";
+  <!--end container-->
+</section>
+<!--end section-->
 
-      function applyLanguage() {
-        document.querySelectorAll("[" + attr + "]").forEach(function(el) {
-          var val = el.getAttribute(attr);
-          if (val !== null && val !== "") el.textContent = val;
-        });
-        document
-          .querySelectorAll("[" + placeholderAttr + "]")
-          .forEach(function(el) {
-            var val = el.getAttribute(placeholderAttr);
-            if (val !== null) el.placeholder = val;
-          });
-        document
-          .querySelectorAll("[" + titleAttr + "]")
-          .forEach(function(el) {
-            var val = el.getAttribute(titleAttr);
-            if (val !== null && val !== "") el.title = val;
-          });
-      }
-
-      applyLanguage();
-
-      var yearEl = document.getElementById("copyright-year");
-      if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-      document.querySelectorAll("[data-lang]").forEach(function(a) {
-        a.addEventListener("click", function(e) {
-          e.preventDefault();
-          var newLang = this.getAttribute("data-lang");
-          if (newLang && newLang !== lang) {
-            localStorage.setItem("quraa-lang", newLang);
-            window.location.reload();
-          }
-        });
-      });
-    })();
-  </script>
-</body>
-
-</html>
+{% endblock Hero %}

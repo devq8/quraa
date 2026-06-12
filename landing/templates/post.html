@@ -86,7 +86,7 @@
                                     <li class="dropdown current"><a href="/#blog-section" data-ar="المقالات" data-en="Blog">المقالات</a></li>
                                     <li class="dropdown mega-menu-item"><a href="#" data-ar="إصداراتنا" data-en="Publications">إصداراتنا</a></li>
                                     <li class="dropdown"><a href="/#welcome" data-ar="عن المركز" data-en="About Us">عن المركز</a></li>
-                                    <li><a href="{% url 'landing:contact_us' %}" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a></li>
+                                    <li><a href="/#contact" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a></li>
                                     {% if user.is_authenticated %}
                                     {% if user.is_staff %}<li><a href="{% url 'admin:index' %}" data-ar="الإدارة" data-en="Admin">الإدارة</a></li>{% endif %}
                                     <li><a href="{% url 'logout' %}" data-ar="تسجيل الخروج" data-en="Logout">تسجيل الخروج</a></li>
@@ -143,7 +143,11 @@
                             -->
                             <div class="post-item-description">
                                 <div class="post-content">
-                                    <span data-ar="{{ post.excerpt_ar|striptags|escape }}" data-en="{{ post.excerpt_en|striptags|default:post.excerpt_ar|striptags|escape }}">{{ post.excerpt_ar|default:post.excerpt_en|linebreaks }}</span>
+                                    {% if post.body_ar or post.body_en %}
+                                        {{ post.body_ar|default:post.body_en|safe }}
+                                    {% else %}
+                                        <span data-ar="{{ post.excerpt_ar|striptags|escape }}" data-en="{{ post.excerpt_en|striptags|default:post.excerpt_ar|striptags|escape }}">{{ post.excerpt_ar|default:post.excerpt_en|linebreaks }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="post-navigation m-t-40">
@@ -184,7 +188,7 @@
                                     </div>
                                 </div>
                                 {% empty %}
-                                <div class="col-lg-3"><div class="widget"><div class="widget-title" data-ar="اكتشف" data-en="Discover">اكتشف</div><ul class="list"><li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li><li><a href="{% url 'landing:contact_us' %}" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a></li></ul></div></div>
+                                <div class="col-lg-3"><div class="widget"><div class="widget-title" data-ar="اكتشف" data-en="Discover">اكتشف</div><ul class="list"><li><a href="/" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li><li><a href="/#contact" data-ar="اتصل بنا" data-en="Contact Us">اتصل بنا</a></li></ul></div></div>
                                 {% endfor %}
                             </div>
                         </div>

@@ -38,6 +38,7 @@ admin.site.logout = admin_logout_redirect
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
+    path("tinymce/", include("tinymce.urls")),
     path("admin/", admin.site.urls),
     path("accounts/login/", core_views.login_view, name="login"),
     path("accounts/logout/", logout_redirect_landing, name="logout"),

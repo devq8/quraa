@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-05 17:41+0300\n"
+"POT-Creation-Date: 2026-06-11 21:25+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgid "Template \"%(name)s\" applied."
 msgstr "تم تطبيق القالب \"%(name)s\"."
 
 msgid "Chain"
-msgstr "السلسلة"
+msgstr "سند"
 
 msgid "Core"
 msgstr "الأساسي"
@@ -117,7 +117,7 @@ msgid "Birth Gregorian Approximate"
 msgstr "تاريخ الميلاد الميلادي تقريبي"
 
 msgid "Hometown"
-msgstr "مكان النشأة"
+msgstr "الموطن"
 
 msgid "Death Location"
 msgstr "مكان الوفاة"
@@ -147,7 +147,7 @@ msgid "Death Gregorian Approximate"
 msgstr "تاريخ الوفاة الميلادي تقريبي"
 
 msgid "Attributes"
-msgstr "الصفات"
+msgstr "صفات وتصنيفات"
 
 msgid "Comments (Arabic)"
 msgstr "فوائد وملاحظات (عربي)"
@@ -275,8 +275,23 @@ msgstr "علاقة شيخ-تلميذ"
 msgid "Teacher-Student Relationships"
 msgstr "علاقات الشيوخ والتلاميذ"
 
-msgid "Footer main block"
-msgstr "الكتلة الرئيسية للتذييل"
+msgid "About us section"
+msgstr "قسم من نحن"
+
+msgid "Services section header"
+msgstr "عنوان قسم الخدمات"
+
+msgid "Donate section"
+msgstr "قسم التبرع"
+
+msgid "Blog section header"
+msgstr "عنوان قسم المدونة"
+
+msgid "Contact section"
+msgstr "قسم اتصل بنا"
+
+msgid "Social media links"
+msgstr "روابط وسائل التواصل الاجتماعي"
 
 msgid "Copyright"
 msgstr "حقوق النشر"
@@ -299,26 +314,125 @@ msgstr "الشعار (داكن)"
 msgid "Favicon"
 msgstr "أيقونة المفضلة"
 
-msgid "Footer title (Arabic)"
-msgstr "عنوان التذييل (عربي)"
+msgid "About us heading (Arabic)"
+msgstr "عنوان من نحن (عربي)"
 
-msgid "Footer title (English)"
-msgstr "عنوان التذييل (إنجليزي)"
+msgid "About us heading (English)"
+msgstr "عنوان من نحن (إنجليزي)"
 
-msgid "Footer description (Arabic)"
-msgstr "وصف التذييل (عربي)"
+msgid "About us subheading (Arabic)"
+msgstr "العنوان الفرعي لمن نحن (عربي)"
 
-msgid "Footer description (English)"
-msgstr "وصف التذييل (إنجليزي)"
+msgid "About us subheading (English)"
+msgstr "العنوان الفرعي لمن نحن (إنجليزي)"
 
-msgid "Footer button (Arabic)"
-msgstr "زر التذييل (عربي)"
+msgid "About us description (Arabic)"
+msgstr "وصف من نحن (عربي)"
 
-msgid "Footer button (English)"
-msgstr "زر التذييل (إنجليزي)"
+msgid "About us description (English)"
+msgstr "وصف من نحن (إنجليزي)"
 
-msgid "Footer button URL"
-msgstr "رابط زر التذييل"
+msgid "About us image"
+msgstr "صورة من نحن"
+
+msgid "About us URL"
+msgstr "رابط من نحن"
+
+msgid "Services heading (Arabic)"
+msgstr "عنوان الخدمات (عربي)"
+
+msgid "Services heading (English)"
+msgstr "عنوان الخدمات (إنجليزي)"
+
+msgid "Services subheading (Arabic)"
+msgstr "العنوان الفرعي للخدمات (عربي)"
+
+msgid "Services subheading (English)"
+msgstr "العنوان الفرعي للخدمات (إنجليزي)"
+
+msgid "Services description (Arabic)"
+msgstr "وصف الخدمات (عربي)"
+
+msgid "Services description (English)"
+msgstr "وصف الخدمات (إنجليزي)"
+
+msgid "Donate heading (Arabic)"
+msgstr "عنوان التبرع (عربي)"
+
+msgid "Donate heading (English)"
+msgstr "عنوان التبرع (إنجليزي)"
+
+msgid "Donate subheading (Arabic)"
+msgstr "العنوان الفرعي للتبرع (عربي)"
+
+msgid "Donate subheading (English)"
+msgstr "العنوان الفرعي للتبرع (إنجليزي)"
+
+msgid "Donate button (Arabic)"
+msgstr "زر التبرع (عربي)"
+
+msgid "Donate button (English)"
+msgstr "زر التبرع (إنجليزي)"
+
+msgid "Donate button URL"
+msgstr "رابط زر التبرع"
+
+msgid "Blog heading (Arabic)"
+msgstr "عنوان المدونة (عربي)"
+
+msgid "Blog heading (English)"
+msgstr "عنوان المدونة (إنجليزي)"
+
+msgid "Blog subheading (Arabic)"
+msgstr "العنوان الفرعي للمدونة (عربي)"
+
+msgid "Blog subheading (English)"
+msgstr "العنوان الفرعي للمدونة (إنجليزي)"
+
+msgid "Blog description (Arabic)"
+msgstr "وصف المدونة (عربي)"
+
+msgid "Blog description (English)"
+msgstr "وصف المدونة (إنجليزي)"
+
+msgid "Contact heading (Arabic)"
+msgstr "عنوان اتصل بنا (عربي)"
+
+msgid "Contact heading (English)"
+msgstr "عنوان اتصل بنا (إنجليزي)"
+
+msgid "Contact subheading (Arabic)"
+msgstr "العنوان الفرعي لاتصل بنا (عربي)"
+
+msgid "Contact subheading (English)"
+msgstr "العنوان الفرعي لاتصل بنا (إنجليزي)"
+
+msgid "Contact description (Arabic)"
+msgstr "وصف اتصل بنا (عربي)"
+
+msgid "Contact description (English)"
+msgstr "وصف اتصل بنا (إنجليزي)"
+
+msgid "Contact email"
+msgstr "البريد الإلكتروني للتواصل"
+
+msgid "Contact phone"
+msgstr "هاتف التواصل"
+
+msgid "Contact address (Arabic)"
+msgstr "عنوان التواصل (عربي)"
+
+msgid "Contact address (English)"
+msgstr "عنوان التواصل (إنجليزي)"
+
+msgid "Facebook URL"
+msgstr "رابط فيسبوك"
+
+msgid "Twitter URL"
+msgstr "رابط تويتر"
+
+msgid "Instagram URL"
+msgstr "رابط إنستغرام"
 
 msgid "Copyright (Arabic)"
 msgstr "حقوق النشر (عربي)"
@@ -328,39 +442,6 @@ msgstr "حقوق النشر (إنجليزي)"
 
 msgid "Site settings"
 msgstr "إعدادات الموقع"
-
-msgid "Welcome"
-msgstr "الترحيب"
-
-msgid "Services"
-msgstr "الخدمات"
-
-msgid "Blog"
-msgstr "المدونة"
-
-msgid "Clients"
-msgstr "العملاء"
-
-msgid "Team"
-msgstr "الفريق"
-
-msgid "Heading (Arabic)"
-msgstr "العنوان (عربي)"
-
-msgid "Heading (English)"
-msgstr "العنوان (إنجليزي)"
-
-msgid "Lead / subtitle (Arabic)"
-msgstr "المقدمة / العنوان الفرعي (عربي)"
-
-msgid "Lead / subtitle (English)"
-msgstr "المقدمة / العنوان الفرعي (إنجليزي)"
-
-msgid "Section"
-msgstr "القسم"
-
-msgid "Sections"
-msgstr "الأقسام"
 
 msgid "Title (Arabic)"
 msgstr "العنوان (عربي)"
@@ -374,14 +455,8 @@ msgstr "العنوان الفرعي (عربي)"
 msgid "Subtitle (English)"
 msgstr "العنوان الفرعي (إنجليزي)"
 
-msgid "Button text (Arabic)"
-msgstr "نص الزر (عربي)"
-
-msgid "Button text (English)"
-msgstr "نص الزر (إنجليزي)"
-
-msgid "Button link (URL or #anchor)"
-msgstr "رابط الزر (URL أو #anchor)"
+msgid "Show search bar"
+msgstr "إظهار شريط البحث"
 
 msgid "Video URL or path"
 msgstr "رابط أو مسار الفيديو"
@@ -392,26 +467,8 @@ msgstr "مثال: مسار تحت static مثل 'video/quran_video.mp4' أو ر�
 msgid "Image (if no video)"
 msgstr "الصورة (إن لم يكن فيديو)"
 
-msgid "Active"
-msgstr "نشط"
-
-msgid "Hero slide"
-msgstr "شريحة البطل"
-
-msgid "Hero slides"
-msgstr "شرائح البطل"
-
-msgid "Lead (Arabic)"
-msgstr "المقدمة (عربي)"
-
-msgid "Lead (English)"
-msgstr "المقدمة (إنجليزي)"
-
-msgid "Image"
-msgstr "الصورة"
-
-msgid "Welcome section"
-msgstr "قسم الترحيب"
+msgid "Hero section"
+msgstr "القسم الرئيسي"
 
 msgid "Icon class (FontAwesome)"
 msgstr "فئة الأيقونة (FontAwesome)"
@@ -422,26 +479,11 @@ msgstr "مثال: fa fa-book, fa fa-clipboard-check"
 msgid "Service"
 msgstr "الخدمة"
 
-msgid "e.g. fa fa-3x fa-book"
-msgstr "مثال: fa fa-3x fa-book"
+msgid "Services"
+msgstr "الخدمات"
 
-msgid "Animate from"
-msgstr "التحريك من"
-
-msgid "Value to display"
-msgstr "القيمة المعروضة"
-
-msgid "Label (Arabic)"
-msgstr "التسمية (عربي)"
-
-msgid "Label (English)"
-msgstr "التسمية (إنجليزي)"
-
-msgid "Stat counter"
-msgstr "عداد إحصائي"
-
-msgid "Stat counters"
-msgstr "عدادات إحصائية"
+msgid "Image"
+msgstr "الصورة"
 
 msgid "Category (Arabic)"
 msgstr "الفئة (عربي)"
@@ -455,80 +497,159 @@ msgstr "المقتطف (عربي)"
 msgid "Excerpt (English)"
 msgstr "المقتطف (إنجليزي)"
 
+msgid "Body (Arabic)"
+msgstr "المحتوى (عربي)"
+
+msgid "Body (English)"
+msgstr "المحتوى (إنجليزي)"
+
+msgid "Show as featured post"
+msgstr "عرض كمقال مميز"
+
 msgid "Date"
 msgstr "التاريخ"
 
-msgid "Featured post"
-msgstr "مقال مميز"
+msgid "Post"
+msgstr "مقال"
 
-msgid "Featured posts"
-msgstr "مقالات مميزة"
+msgid "Posts"
+msgstr "المقالات"
 
-msgid "Name (alt text)"
-msgstr "الاسم (نص بديل)"
+msgid ""
+"The International Center for the History and Documentation of Quran Reciters"
+msgstr "المركز الدولي لتاريخ وتوثيق قرّاء القرآن الكريم"
 
-msgid "Client"
-msgstr "العميل"
+msgid "Home"
+msgstr "الرئيسية"
 
-msgid "Name"
-msgstr "الاسم"
+msgid "About us"
+msgstr "من نحن"
 
-msgid "Role / title"
-msgstr "الدور / المسمى"
+msgid "Blog"
+msgstr "المدونة"
 
-msgid "Short bio"
-msgstr "نبذة قصيرة"
+msgid "Contact us"
+msgstr "اتصل بنا"
 
-msgid "Photo"
-msgstr "الصورة"
+msgid "Logout"
+msgstr "الخروج"
 
-msgid "Facebook"
-msgstr "فيسبوك"
+msgid "Login"
+msgstr "الدخول"
 
-msgid "Twitter"
-msgstr "تويتر"
+msgid "Born"
+msgstr "وُلد"
 
-msgid "Instagram"
-msgstr "إنستغرام"
+msgid "Died"
+msgstr "توفي"
+
+msgid "Unpublished biography (visible to staff only)"
+msgstr "سيرة غير منشورة (مرئية للموظفين فقط)"
+
+msgid "Identity"
+msgstr "الهوية"
+
+msgid "Full Name"
+msgstr "الاسم الكامل"
+
+msgid "Hijri Date"
+msgstr "التاريخ الهجري"
+
+msgid "Approximate date — day and month may not be exact"
+msgstr "تاريخ تقريبي — قد لا يكون اليوم والشهر دقيقين"
+
+msgid "Gregorian Date"
+msgstr "التاريخ الميلادي"
+
+#, python-format
+msgid "Chain #%(num)s"
+msgstr "سند رقم %(num)s"
+
+msgid "Comments"
+msgstr "فوائد وملاحظات"
+
+msgid "Who We Are ?"
+msgstr "من نحن ؟"
+
+msgid "Our Company Story"
+msgstr "قصتنا"
+
+msgid ""
+"Join our landmark initiative to research, document, and preserve the "
+"biographies and chains of transmission of the world's greatest Quran "
+"reciters."
+msgstr "انضم إلى مبادرتنا الرائدة لبحث وتوثيق وحفظ سِيَر وأسانيد أعظم قرّاء القرآن الكريم في العالم."
+
+msgid "Read More"
+msgstr "إقرأ المزيد"
+
+msgid "Contribute to preserving the history of the reciters"
+msgstr "ساهم في حفظ تاريخ القراء"
+
+msgid ""
+"Join our landmark initiative to preserve the legacy of the world’s greatest "
+"Quran reciters."
+msgstr ""
+"انضم إلينا في هذا المشروع العلمي الرائد وساهم في توثيق تاريخ قراء القرآن "
+"الكريم"
+
+msgid "Get Started !"
+msgstr "ابدأ الآن !"
+
+msgid "Latest News"
+msgstr "آخر الأخبار"
+
+msgid ""
+"Follow our latest stories, articles, and updates documenting the lives of "
+"the world’s greatest Quran reciters and our ongoing efforts to preserve "
+"their enduring legacy."
+msgstr ""
+"تابعوا أحدث قصصنا ومقالاتنا والمستجدات التي توثّق سِيَر أعظم قرّاء القرآن الكريم "
+"في العالم، وجهودنا المتواصلة في صون إرثهم الخالد."
+
+msgid "Get In Touch !"
+msgstr "يسعدنا تواصلكم"
+
+msgid ""
+"We’re always happy to connect! Please feel free to reach out with any "
+"questions, feedback, or ideas"
+msgstr "لا تترددوا في طرح أي استفسارات، أو تقديم آرائكم ومقترحاتكم"
+
+msgid "Name :"
+msgstr "الاسم :"
+
+msgid "Email :"
+msgstr "البريد الإلكتروني :"
+
+msgid "Subject :"
+msgstr "الموضوع :"
+
+msgid "Message :"
+msgstr "الرسالة :"
+
+msgid "Send Message"
+msgstr "إرسال الرسالة"
+
+msgid "Please enter your name."
+msgstr "يرجى إدخال اسمك."
+
+msgid "Please enter a valid email address."
+msgstr "يرجى إدخال بريد إلكتروني صالح."
+
+msgid "You have entered an invalid email address. Please try again."
+msgstr "لقد أدخلت بريداً إلكترونياً غير صالح. يرجى المحاولة مرة أخرى."
+
+msgid "Please enter the subject."
+msgstr "يرجى إدخال الموضوع."
+
+msgid "Please enter your message."
+msgstr "يرجى إدخال رسالتك."
+
+msgid "Phone"
+msgstr "الهاتف"
 
 msgid "Email"
 msgstr "البريد الإلكتروني"
-
-msgid "Team member"
-msgstr "عضو الفريق"
-
-msgid "Team members"
-msgstr "أعضاء الفريق"
-
-msgid "Column title (legacy)"
-msgstr "عنوان العمود (قديم)"
-
-msgid "Fallback if Arabic/English not set"
-msgstr "احتياطي إذا لم يُضبط العربي/الإنجليزي"
-
-msgid "Column title (Arabic)"
-msgstr "عنوان العمود (عربي)"
-
-msgid "Column title (English)"
-msgstr "عنوان العمود (إنجليزي)"
-
-msgid "Footer column"
-msgstr "عمود التذييل"
-
-msgid "Footer columns"
-msgstr "أعمدة التذييل"
-
-msgid "Label (legacy)"
-msgstr "التسمية (قديم)"
-
-msgid "URL"
-msgstr "الرابط"
-
-msgid "Footer link"
-msgstr "رابط التذييل"
-
-msgid "Footer links"
-msgstr "روابط التذييل"
 
 msgid "Select language"
 msgstr "اختر اللغة"
@@ -599,6 +720,157 @@ msgstr "مستخدم"
 
 msgid "users"
 msgstr "المستخدمون"
+
+#~ msgid "Button text (Arabic)"
+#~ msgstr "نص الزر (عربي)"
+
+#~ msgid "Button text (English)"
+#~ msgstr "نص الزر (إنجليزي)"
+
+#~ msgid "Button link (URL or #anchor)"
+#~ msgstr "رابط الزر (URL أو #anchor)"
+
+#~ msgid "Active"
+#~ msgstr "نشط"
+
+#~ msgid "Hero slide"
+#~ msgstr "شريحة العرض الرئيسي"
+
+#~ msgid "Hero slides"
+#~ msgstr "شرائح العرض الرئيسي"
+
+#~ msgid "Featured posts"
+#~ msgstr "مقالات مميزة"
+
+#~ msgid "Donate"
+#~ msgstr "تبرع"
+
+#~ msgid "Footer main block"
+#~ msgstr "الكتلة الرئيسية للتذييل"
+
+#~ msgid "Footer title (Arabic)"
+#~ msgstr "عنوان التذييل (عربي)"
+
+#~ msgid "Footer title (English)"
+#~ msgstr "عنوان التذييل (إنجليزي)"
+
+#, fuzzy
+#~| msgid "Site name (Arabic)"
+#~ msgid "Services overline (Arabic)"
+#~ msgstr "اسم الموقع (عربي)"
+
+#, fuzzy
+#~| msgid "Site name (English)"
+#~ msgid "Services overline (English)"
+#~ msgstr "اسم الموقع (إنجليزي)"
+
+#~ msgid "Welcome"
+#~ msgstr "الترحيب"
+
+#~ msgid "Team"
+#~ msgstr "الفريق"
+
+#~ msgid "Lead / subtitle (Arabic)"
+#~ msgstr "المقدمة / العنوان الفرعي (عربي)"
+
+#~ msgid "Lead / subtitle (English)"
+#~ msgstr "المقدمة / العنوان الفرعي (إنجليزي)"
+
+#~ msgid "Section"
+#~ msgstr "القسم"
+
+#~ msgid "Sections"
+#~ msgstr "الأقسام"
+
+#~ msgid "Lead (Arabic)"
+#~ msgstr "المقدمة (عربي)"
+
+#~ msgid "Lead (English)"
+#~ msgstr "المقدمة (إنجليزي)"
+
+#~ msgid "e.g. fa fa-3x fa-book"
+#~ msgstr "مثال: fa fa-3x fa-book"
+
+#~ msgid "Animate from"
+#~ msgstr "التحريك من"
+
+#~ msgid "Value to display"
+#~ msgstr "القيمة المعروضة"
+
+#~ msgid "Label (Arabic)"
+#~ msgstr "التسمية (عربي)"
+
+#~ msgid "Label (English)"
+#~ msgstr "التسمية (إنجليزي)"
+
+#~ msgid "Stat counter"
+#~ msgstr "عداد إحصائي"
+
+#~ msgid "Stat counters"
+#~ msgstr "عدادات إحصائية"
+
+#~ msgid "Name (alt text)"
+#~ msgstr "الاسم (نص بديل)"
+
+#~ msgid "Client"
+#~ msgstr "العميل"
+
+#~ msgid "Name"
+#~ msgstr "الاسم"
+
+#~ msgid "Role / title"
+#~ msgstr "الدور / المسمى"
+
+#~ msgid "Short bio"
+#~ msgstr "نبذة قصيرة"
+
+#~ msgid "Photo"
+#~ msgstr "الصورة"
+
+#~ msgid "Team member"
+#~ msgstr "عضو الفريق"
+
+#~ msgid "Team members"
+#~ msgstr "أعضاء الفريق"
+
+#~ msgid "Column title (legacy)"
+#~ msgstr "عنوان العمود (قديم)"
+
+#~ msgid "Fallback if Arabic/English not set"
+#~ msgstr "احتياطي إذا لم يُضبط العربي/الإنجليزي"
+
+#~ msgid "Column title (Arabic)"
+#~ msgstr "عنوان العمود (عربي)"
+
+#~ msgid "Column title (English)"
+#~ msgstr "عنوان العمود (إنجليزي)"
+
+#~ msgid "Footer column"
+#~ msgstr "عمود التذييل"
+
+#~ msgid "Footer columns"
+#~ msgstr "أعمدة التذييل"
+
+#~ msgid "Label (legacy)"
+#~ msgstr "التسمية (قديم)"
+
+#~ msgid "URL"
+#~ msgstr "الرابط"
+
+#~ msgid "Footer link"
+#~ msgstr "رابط التذييل"
+
+#~ msgid "Footer links"
+#~ msgstr "روابط التذييل"
+
+#~ msgid "Library"
+#~ msgstr "المكتبة"
+
+#~ msgid "Activities"
+#~ msgstr "الأنشطة"
+
+#~ msgid "C/54 Northwest Freeway, Suite 558, Houston, USA 485"
+#~ msgstr "C/54 نورث وست فريواي، جناح 558، هيوستن، الولايات المتحدة 485"
 
 #~ msgid "Notes (Arabic)"
 #~ msgstr "ملاحظات (عربي)"

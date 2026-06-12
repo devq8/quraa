@@ -1,53 +1,59 @@
+from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from tinymce.widgets import TinyMCE
+
 from .models import (
     SiteSettings,
-    LandingSection,
     HeroSlide,
-    WelcomeSection,
     Service,
-    StatCounter,
-    FeaturedPost,
-    Client,
-    TeamMember,
-    FooterColumn,
-    FooterLink,
+    Post,
 )
+
+# Description fields that should use the rich-text editor in the admin.
+RICH_TEXT_FIELDS = (
+    "about_description_ar", "about_description_en",
+    "services_description_ar", "services_description_en",
+    "blog_description_ar", "blog_description_en",
+    "contact_description_ar", "contact_description_en",
+)
+
+
+class SiteSettingsForm(forms.ModelForm):
+    class Meta:
+        model = SiteSettings
+        fields = "__all__"
+        widgets = {
+            name: TinyMCE(mce_attrs={"directionality": "rtl" if name.endswith("_ar") else "ltr"})
+            for name in RICH_TEXT_FIELDS
+        }
 
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
+    form = SiteSettingsForm
     list_display = ("site_name_ar", "site_name_en")
 
     def has_add_permission(self, request):
         return not SiteSettings.objects.exists()
     fieldsets = (
         (None, {"fields": ("site_name_ar", "site_name_en", "logo", "logo_dark", "favicon")}),
-        (_("Footer main block"), {"fields": ("footer_title_ar", "footer_title_en", "footer_description_ar", "footer_description_en", "footer_button_text_ar", "footer_button_text_en", "footer_button_link")}),
+        (_("About us section"), {"fields": ("about_heading_ar", "about_heading_en", "about_subheading_ar", "about_subheading_en", "about_description_ar", "about_description_en", "about_image", "about_url")}),
+        (_("Services section header"), {"fields": ("services_heading_ar", "services_heading_en", "services_subheading_ar", "services_subheading_en", "services_description_ar", "services_description_en")}),
+        (_("Donate section"), {"fields": ("donate_heading_ar", "donate_heading_en", "donate_subheading_ar", "donate_subheading_en", "donate_button_text_ar", "donate_button_text_en", "donate_button_link")}),
+        (_("Blog section header"), {"fields": ("blog_heading_ar", "blog_heading_en", "blog_subheading_ar", "blog_subheading_en", "blog_description_ar", "blog_description_en")}),
+        (_("Contact section"), {"fields": ("contact_heading_ar", "contact_heading_en", "contact_subheading_ar", "contact_subheading_en", "contact_description_ar", "contact_description_en", "contact_email", "contact_phone", "contact_address_ar", "contact_address_en")}),
+        (_("Social media links"), {"fields": ("facebook_url", "twitter_url", "instagram_url")}),
         (_("Copyright"), {"fields": ("copyright_ar", "copyright_en")}),
     )
 
 
-@admin.register(LandingSection)
-class LandingSectionAdmin(admin.ModelAdmin):
-    list_display = ("slug", "heading_ar", "heading_en")
-    list_editable = ("heading_ar", "heading_en")
-
-
 @admin.register(HeroSlide)
 class HeroSlideAdmin(admin.ModelAdmin):
-    list_display = ("title_ar", "title_en", "order", "is_active")
-    list_editable = ("order", "is_active")
-    list_filter = ("is_active",)
-    ordering = ("order",)
-
-
-@admin.register(WelcomeSection)
-class WelcomeSectionAdmin(admin.ModelAdmin):
-    list_display = ("heading_ar", "heading_en")
+    list_display = ("title_ar", "title_en")
 
     def has_add_permission(self, request):
-        return not WelcomeSection.objects.exists()
+        return not HeroSlide.objects.exists()
 
 
 @admin.register(Service)
@@ -57,54 +63,22 @@ class ServiceAdmin(admin.ModelAdmin):
     ordering = ("order",)
 
 
-@admin.register(StatCounter)
-class StatCounterAdmin(admin.ModelAdmin):
-    list_display = ("label_ar", "label_en", "value_to", "icon", "order")
-    list_editable = ("value_to", "order")
-    ordering = ("order",)
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = "__all__"
+        widgets = {
+            "body_ar": TinyMCE(mce_attrs={"directionality": "rtl"}),
+            "body_en": TinyMCE(mce_attrs={"directionality": "ltr"}),
+        }
 
 
-@admin.register(FeaturedPost)
-class FeaturedPostAdmin(admin.ModelAdmin):
-    list_display = ("title_ar", "title_en", "category_ar", "category_en", "published_at", "order")
-    list_editable = ("order",)
-    list_filter = ("category_ar",)
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    form = PostForm
+    list_display = ("title_ar", "title_en", "category_ar", "category_en", "show_as_featured", "published_at", "order")
+    list_editable = ("show_as_featured", "order")
+    list_filter = ("category_ar", "show_as_featured")
     ordering = ("order",)
     date_hierarchy = "published_at"
-
-
-@admin.register(Client)
-class ClientAdmin(admin.ModelAdmin):
-    list_display = ("name", "order")
-    list_editable = ("order",)
-    ordering = ("order",)
-
-
-@admin.register(TeamMember)
-class TeamMemberAdmin(admin.ModelAdmin):
-    list_display = ("name", "role", "order")
-    list_editable = ("order",)
-    ordering = ("order",)
-    search_fields = ("name", "role")
-
-
-class FooterLinkInline(admin.TabularInline):
-    model = FooterLink
-    extra = 1
-    ordering = ("order",)
-
-
-@admin.register(FooterColumn)
-class FooterColumnAdmin(admin.ModelAdmin):
-    list_display = ("title_ar", "title_en", "title", "order")
-    list_editable = ("order",)
-    inlines = [FooterLinkInline]
-    ordering = ("order",)
-
-
-@admin.register(FooterLink)
-class FooterLinkAdmin(admin.ModelAdmin):
-    list_display = ("label_ar", "label_en", "column", "url", "order")
-    list_editable = ("order",)
-    list_filter = ("column",)
-    ordering = ("order",)
