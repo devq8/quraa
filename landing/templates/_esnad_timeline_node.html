@@ -1,16 +1,64 @@
 {% load i18n %}
-{# Single node in an Esnad chain. Expects: node (Biography), step, is_first (bool), is_holder (bool), is_terminal (bool). #}
-{% if is_holder %}{% trans "Esnad holder" as role %}{% elif is_terminal %}{% trans "Terminal narrator" as role %}{% else %}{% trans "Narrator" as role %}{% endif %}
-<div class="flex items-center gap-4 {% if not is_first %}mt-5{% endif %}">
-  <div class="shrink-0 inline-flex items-center justify-center size-11 rounded-full {% if is_holder %}bg-orange-600 text-white shadow-md shadow-orange-600/40{% else %}bg-white dark:bg-slate-900 text-orange-600 border-2 border-orange-600{% endif %} text-base font-semibold">
-    {% if is_holder %}<i class="uil uil-user"></i>{% else %}{{ step }}{% endif %}
-  </div>
-  <div class="flex-1 min-w-0">
-    {% if is_holder %}
-    <h5 class="text-lg dark:text-white mb-0 font-medium">{% if LANGUAGE_CODE == 'ar' %}{{ node.alias_ar|default:node.full_name_ar|default:node.alias_en|default:node.full_name_en }}{% else %}{{ node.alias_en|default:node.full_name_en|default:node.alias_ar|default:node.full_name_ar }}{% endif %}</h5>
+{# Renders one node of an esnad chain using the exact Work Process timeline markup. #}
+{# Expects: node, step, is_first, is_holder, is_terminal, left #}
+
+<div class="timeline-item {% if not is_first %}mt-5 pt-4{% endif %}">
+  <div class="grid sm:grid-cols-2 items-center">
+
+    {% if left %}
+    {# ---- Badge on the start side, name on the end side ---- #}
+    <div class="flow-root">
+      <div class="duration date-label-left ltr:float-right rtl:float-left md:me-7 relative">
+        <div class="size-12 rounded-full bg-transparent border-2 border-dashed border-orange-600 text-orange-600 flex items-center justify-center">
+          {% if is_holder %}
+          <i class="uil uil-user text-lg"></i>
+          {% else %}
+          <span class="text-base font-semibold">{{ step }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div><!--end col-->
+    <div class="flow-root mt-4 md:mt-0">
+      <div class="event event-description-right ltr:float-left rtl:float-right ltr:text-left rtl:text-right md:ms-7">
+        <h5 class="text-lg dark:text-white mb-0 font-medium">
+          {% if is_holder %}
+            {% if LANGUAGE_CODE == 'ar' %}{{ node.alias_ar|default:node.alias_en|default:node.full_name_ar|default:node.full_name_en }}{% else %}{{ node.alias_en|default:node.alias_ar|default:node.full_name_en|default:node.full_name_ar }}{% endif %}
+          {% else %}
+            <a href="{% url 'landing:biography_detail' node.pk %}" class="hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+              {% if LANGUAGE_CODE == 'ar' %}{{ node.alias_ar|default:node.alias_en|default:node.full_name_ar|default:node.full_name_en }}{% else %}{{ node.alias_en|default:node.alias_ar|default:node.full_name_en|default:node.full_name_ar }}{% endif %}
+            </a>
+          {% endif %}
+        </h5>
+      </div>
+    </div><!--end col-->
+
     {% else %}
-    <a href="{% url 'landing:biography_detail' node.pk %}" class="block text-lg dark:text-white mb-0 font-medium hover:text-orange-600 dark:hover:text-orange-600 transition duration-500">{% if LANGUAGE_CODE == 'ar' %}{{ node.alias_ar|default:node.full_name_ar|default:node.alias_en|default:node.full_name_en }}{% else %}{{ node.alias_en|default:node.full_name_en|default:node.alias_ar|default:node.full_name_ar }}{% endif %}</a>
+    {# ---- Name on the start side, badge on the end side ---- #}
+    <div class="flow-root md:order-1 order-2">
+      <div class="event event-description-left ltr:float-right rtl:float-left ltr:text-right rtl:text-left md:me-7">
+        <h5 class="text-lg dark:text-white mb-0 font-medium">
+          {% if is_holder %}
+            {% if LANGUAGE_CODE == 'ar' %}{{ node.alias_ar|default:node.alias_en|default:node.full_name_ar|default:node.full_name_en }}{% else %}{{ node.alias_en|default:node.alias_ar|default:node.full_name_en|default:node.full_name_ar }}{% endif %}
+          {% else %}
+            <a href="{% url 'landing:biography_detail' node.pk %}" class="hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+              {% if LANGUAGE_CODE == 'ar' %}{{ node.alias_ar|default:node.alias_en|default:node.full_name_ar|default:node.full_name_en }}{% else %}{{ node.alias_en|default:node.alias_ar|default:node.full_name_en|default:node.full_name_ar }}{% endif %}
+            </a>
+          {% endif %}
+        </h5>
+      </div>
+    </div><!--end col-->
+    <div class="flow-root md:order-2 order-1">
+      <div class="duration duration-right ltr:float-left rtl:float-right md:ms-7 relative">
+        <div class="size-12 rounded-full bg-transparent border-2 border-dashed border-orange-600 text-orange-600 flex items-center justify-center">
+          {% if is_holder %}
+          <i class="uil uil-user text-lg"></i>
+          {% else %}
+          <span class="text-base font-semibold">{{ step }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div><!--end col-->
     {% endif %}
-    <p class="timeline-subtitle mt-1 mb-0 text-slate-400 text-sm">{{ role }}</p>
-  </div>
-</div>
+
+  </div><!--end grid-->
+</div><!--end timeline item-->
