@@ -14,7 +14,7 @@ from .models import (
     Attribute, Biography,
     Esnad, EsnadLink,
     EsnadTemplate, EsnadTemplateLink,
-    Location, Note, Source, TeacherStudentRelationship,
+    Location, Reading, Source, TeacherStudentRelationship,
 )
 
 
@@ -101,19 +101,17 @@ class EsnadInline(nested_admin.NestedStackedInline):
 class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     list_display = (
         "id", "full_name_ar", "full_name_en", "alias_ar", "published",
-        "birth_hijri_year", "birth_greg_year", 
-        "death_hijri_year", "death_greg_year", 
-        "birthplace", "hometown", "death_location",
+        "birth_hijri_year", "birth_greg_year",
+        "death_hijri_year", "death_greg_year",
+        "birthplace", "get_hometowns", "death_location",
         # "comments_ar", "comments_en",
     )
     list_filter = ("birthplace", "hometown", "death_location", "attributes", "published")
     search_fields = ("full_name_ar", "full_name_en", "alias_ar", "alias_en")
-    readonly_fields = (
-        "birth_hijri_approximate",
-        "birth_greg_approximate",
-        "death_hijri_approximate",
-        "death_greg_approximate",
-    )
+
+    @admin.display(description=_("Hometown"))
+    def get_hometowns(self, obj):
+        return ", ".join(str(loc) for loc in obj.hometown.all())
     inlines = [TeacherInline, StudentInline, EsnadInline, SourceInline]
     change_form_template = "admin/core/biography/change_form.html"
     change_list_template = "admin/core/biography/change_list.html"
@@ -348,21 +346,18 @@ class AttributeAdmin(admin.ModelAdmin):
         return _lang_ordering(("short_name_ar",), ("short_name_en", "short_name_ar"))
 
 
-@admin.register(Note)
-class NoteAdmin(admin.ModelAdmin):
-    list_display = ("id", "short_name_ar", "short_name_en", "long_name_ar")
-    search_fields = ("short_name_ar", "short_name_en", "long_name_ar", "long_name_en")
+@admin.register(Reading)
+class ReadingAdmin(admin.ModelAdmin):
+    list_display = ("id", "description_ar", "description_en")
+    search_fields = ("description_ar", "description_en")
     fieldsets = (
         (None, {
             "fields": (
-                ("short_name_ar", "short_name_en"),
-                ("long_name_ar", "long_name_en"),
+                "description_ar",
+                "description_en",
             ),
         }),
     )
-
-    def get_ordering(self, request):
-        return _lang_ordering(("short_name_ar",), ("short_name_en", "short_name_ar"))
 
 
 class EsnadLinkInline(SortableInlineAdminMixin, admin.TabularInline):
