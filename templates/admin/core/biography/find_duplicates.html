@@ -1,0 +1,203 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; {% trans 'Find Duplicates' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <div style="margin-bottom:1.5em;display:flex;align-items:center;gap:1em;flex-wrap:wrap;">
+    <p class="help" style="margin:0;">
+      {% trans "Duplicate candidates are detected by comparing normalized Arabic names across all four name fields. Click 'Merge →' to review and merge any pair." %}
+    </p>
+    {% if not fuzzy %}
+    <a href="?fuzzy=1" class="button" style="white-space:nowrap;">{% trans "Include fuzzy matches" %}</a>
+    {% else %}
+    <a href="?" class="button" style="white-space:nowrap;">{% trans "Exact matches only" %}</a>
+    {% endif %}
+  </div>
+
+  {% if not candidates %}
+  <div class="module" style="padding:1.5em 2em;">
+    <p style="font-size:1.1em;color:#417600;">
+      ✓ {% trans "No duplicate biographies were found." %}
+    </p>
+  </div>
+  {% else %}
+
+  {% if exact_candidates %}
+  <div class="module">
+    <h2>{% blocktrans count counter=exact_candidates|length %}{{ counter }} exact duplicate{% plural %}{{ counter }} exact duplicates{% endblocktrans %}</h2>
+    <p class="help" style="padding:.2em 1em .6em;">
+      {% trans "These biographies have identical normalized Arabic names — they are almost certainly duplicates." %}
+    </p>
+    <table style="width:100%;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{% trans "Full Name (Arabic)" %}</th>
+          <th>{% trans "Alias (Arabic)" %}</th>
+          <th>{% trans "Death Year" %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in exact_candidates %}
+        <tr style="border-top:2px solid #e0e0e0;background:#fffbe6;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_a.pk %}">{{ c.bio_a.pk }}</a></td>
+          <td><strong>{{ c.bio_a.full_name_ar }}</strong></td>
+          <td>{{ c.bio_a.alias_ar }}</td>
+          <td>{{ c.bio_a.death_hijri_year|default:"—" }}</td>
+          <td rowspan="2" style="vertical-align:middle;padding:.5em 1em;">
+            <a href="{% url 'admin:core_biography_merge_confirm' %}?ids={{ c.bio_a.pk }},{{ c.bio_b.pk }}"
+               class="button">{% trans "Merge →" %}</a>
+          </td>
+        </tr>
+        <tr style="background:#fff8e1;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_b.pk %}">{{ c.bio_b.pk }}</a></td>
+          <td>{{ c.bio_b.full_name_ar }}</td>
+          <td>{{ c.bio_b.alias_ar }}</td>
+          <td>{{ c.bio_b.death_hijri_year|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if cross_candidates %}
+  <div class="module">
+    <h2>{% blocktrans count counter=cross_candidates|length %}{{ counter }} cross-field match{% plural %}{{ counter }} cross-field matches{% endblocktrans %}</h2>
+    <p class="help" style="padding:.2em 1em .6em;">
+      {% trans "One biography's name matches another's alias or English name exactly." %}
+    </p>
+    <table style="width:100%;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{% trans "Full Name (Arabic)" %}</th>
+          <th>{% trans "Alias (Arabic)" %}</th>
+          <th>{% trans "Matched fields" %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in cross_candidates %}
+        <tr style="border-top:2px solid #e0e0e0;background:#f0f8ff;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_a.pk %}">{{ c.bio_a.pk }}</a></td>
+          <td><strong>{{ c.bio_a.full_name_ar }}</strong></td>
+          <td>{{ c.bio_a.alias_ar }}</td>
+          <td rowspan="2" style="vertical-align:middle;font-size:.85em;color:#666;">
+            {{ c.match_fields.0 }} ↔ {{ c.match_fields.1 }}
+          </td>
+          <td rowspan="2" style="vertical-align:middle;padding:.5em 1em;">
+            <a href="{% url 'admin:core_biography_merge_confirm' %}?ids={{ c.bio_a.pk }},{{ c.bio_b.pk }}"
+               class="button">{% trans "Merge →" %}</a>
+          </td>
+        </tr>
+        <tr style="background:#e8f4fd;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_b.pk %}">{{ c.bio_b.pk }}</a></td>
+          <td>{{ c.bio_b.full_name_ar }}</td>
+          <td>{{ c.bio_b.alias_ar }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if partial_candidates %}
+  <div class="module">
+    <h2>{% blocktrans count counter=partial_candidates|length %}{{ counter }} partial match{% plural %}{{ counter }} partial matches{% endblocktrans %}</h2>
+    <p class="help" style="padding:.2em 1em .6em;">
+      {% trans "One biography's name appears to be a shorter version of the other (e.g. first+last name vs. full chain of names). Review carefully — not all of these are duplicates." %}
+    </p>
+    <table style="width:100%;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{% trans "Full Name (Arabic)" %}</th>
+          <th>{% trans "Alias (Arabic)" %}</th>
+          <th>{% trans "Similarity" %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in partial_candidates %}
+        <tr style="border-top:2px solid #e0e0e0;background:#f5f5f5;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_a.pk %}">{{ c.bio_a.pk }}</a></td>
+          <td><strong>{{ c.bio_a.full_name_ar }}</strong></td>
+          <td>{{ c.bio_a.alias_ar }}</td>
+          <td rowspan="2" style="vertical-align:middle;text-align:center;">{{ c.similarity_pct }}%</td>
+          <td rowspan="2" style="vertical-align:middle;padding:.5em 1em;">
+            <a href="{% url 'admin:core_biography_merge_confirm' %}?ids={{ c.bio_a.pk }},{{ c.bio_b.pk }}"
+               class="button">{% trans "Merge →" %}</a>
+          </td>
+        </tr>
+        <tr style="background:#ececec;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_b.pk %}">{{ c.bio_b.pk }}</a></td>
+          <td>{{ c.bio_b.full_name_ar }}</td>
+          <td>{{ c.bio_b.alias_ar }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if fuzzy_candidates %}
+  <div class="module">
+    <h2>{% blocktrans count counter=fuzzy_candidates|length %}{{ counter }} fuzzy match{% plural %}{{ counter }} fuzzy matches{% endblocktrans %}</h2>
+    <p class="help" style="padding:.2em 1em .6em;">
+      {% trans "These biographies share high name similarity but are not identical or substrings. Review carefully." %}
+    </p>
+    <table style="width:100%;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{% trans "Full Name (Arabic)" %}</th>
+          <th>{% trans "Alias (Arabic)" %}</th>
+          <th>{% trans "Similarity" %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in fuzzy_candidates %}
+        <tr style="border-top:2px solid #e0e0e0;background:#fafafa;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_a.pk %}">{{ c.bio_a.pk }}</a></td>
+          <td><strong>{{ c.bio_a.full_name_ar }}</strong></td>
+          <td>{{ c.bio_a.alias_ar }}</td>
+          <td rowspan="2" style="vertical-align:middle;text-align:center;">{{ c.similarity_pct }}%</td>
+          <td rowspan="2" style="vertical-align:middle;padding:.5em 1em;">
+            <a href="{% url 'admin:core_biography_merge_confirm' %}?ids={{ c.bio_a.pk }},{{ c.bio_b.pk }}"
+               class="button">{% trans "Merge →" %}</a>
+          </td>
+        </tr>
+        <tr style="background:#f2f2f2;">
+          <td><a href="{% url 'admin:core_biography_change' c.bio_b.pk %}">{{ c.bio_b.pk }}</a></td>
+          <td>{{ c.bio_b.full_name_ar }}</td>
+          <td>{{ c.bio_b.alias_ar }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% endif %}{# /candidates #}
+
+  <div style="margin-top:1em;">
+    <a href="{% url 'admin:core_biography_changelist' %}" class="button">
+      ← {% trans "Back to biographies" %}
+    </a>
+  </div>
+
+</div>
+{% endblock %}

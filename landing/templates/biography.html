@@ -153,10 +153,12 @@
               {% if LANGUAGE_CODE == 'ar' %}{{ biography.full_name_ar|default:biography.full_name_en|default:"—" }}{% else %}{{ biography.full_name_en|default:biography.full_name_ar|default:"—" }}{% endif %}
             </dd>
 
-            {% if biography.hometown %}
+            {% with hometowns=biography.hometown.all %}
+            {% if hometowns %}
             <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Hometown" %}</dt>
-            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">{{ biography.hometown }}</dd>
+            <dd class="md:col-span-8 col-span-7 mt-2 text-slate-400">{% for loc in hometowns %}{{ loc }}{% if not forloop.last %}، {% endif %}{% endfor %}</dd>
             {% endif %}
+            {% endwith %}
 
             {% if attributes %}
             <dt class="md:col-span-4 col-span-5 mt-2 font-medium dark:text-white">{% trans "Attributes" %}</dt>
@@ -305,7 +307,7 @@
                   {% if LANGUAGE_CODE == 'ar' %}{{ rel.teacher.alias_ar|default:rel.teacher.full_name_ar|default:rel.teacher.alias_en|default:rel.teacher.full_name_en }}{% else %}{{ rel.teacher.alias_en|default:rel.teacher.full_name_en|default:rel.teacher.alias_ar|default:rel.teacher.full_name_ar }}{% endif %}
                 </a>
                 {% for note in rel.notes.all %}
-                <span class="block text-slate-400 text-sm mt-1">{% if LANGUAGE_CODE == 'ar' %}{{ note.short_name_ar|default:note.short_name_en }}{% else %}{{ note.short_name_en|default:note.short_name_ar }}{% endif %}</span>
+                <span class="block text-slate-400 text-sm mt-1">{% if LANGUAGE_CODE == 'ar' %}{{ note.description_ar|default:note.description_en }}{% else %}{{ note.description_en|default:note.description_ar }}{% endif %}</span>
                 {% endfor %}
               </li>
               {% endfor %}
@@ -324,7 +326,7 @@
                   {% if LANGUAGE_CODE == 'ar' %}{{ rel.student.alias_ar|default:rel.student.full_name_ar|default:rel.student.alias_en|default:rel.student.full_name_en }}{% else %}{{ rel.student.alias_en|default:rel.student.full_name_en|default:rel.student.alias_ar|default:rel.student.full_name_ar }}{% endif %}
                 </a>
                 {% for note in rel.notes.all %}
-                <span class="block text-slate-400 text-sm mt-1">{% if LANGUAGE_CODE == 'ar' %}{{ note.short_name_ar|default:note.short_name_en }}{% else %}{{ note.short_name_en|default:note.short_name_ar }}{% endif %}</span>
+                <span class="block text-slate-400 text-sm mt-1">{% if LANGUAGE_CODE == 'ar' %}{{ note.description_ar|default:note.description_en }}{% else %}{{ note.description_en|default:note.description_ar }}{% endif %}</span>
                 {% endfor %}
               </li>
               {% endfor %}

@@ -1,0 +1,195 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; {% trans 'Merge Biographies' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <p class="help">
+    {% trans "Select which biography to keep as the primary record. For fields where both records have different data, choose which value to keep. All relationships (teachers, students, sources, esnads) will be merged into the primary. The duplicate record will be permanently deleted." %}
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="confirm">
+    <input type="hidden" name="ids" value="{{ ids }}">
+    <input type="hidden" name="duplicate_id" id="id_duplicate_id" value="{{ bio_b.pk }}">
+
+    {# --- Primary selection --- #}
+    <div class="module" style="padding:1em 1.5em;margin-bottom:1em;">
+      <h2>{% trans "Which record is the primary (keeper)?" %}</h2>
+      <div style="display:flex;gap:2em;flex-wrap:wrap;margin-top:.5em;">
+        <label style="cursor:pointer;">
+          <input type="radio" name="primary_id" value="{{ bio_a.pk }}"
+                 data-dup="{{ bio_b.pk }}" checked id="primary_a">
+          <strong>#{{ bio_a.pk }}</strong> — {{ bio_a.full_name_ar }}
+        </label>
+        <label style="cursor:pointer;">
+          <input type="radio" name="primary_id" value="{{ bio_b.pk }}"
+                 data-dup="{{ bio_a.pk }}" id="primary_b">
+          <strong>#{{ bio_b.pk }}</strong> — {{ bio_b.full_name_ar }}
+        </label>
+      </div>
+    </div>
+
+    {# --- Field-by-field comparison table --- #}
+    <div class="module">
+      <h2>{% trans "Field comparison" %}</h2>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#f8f8f8;">
+            <th style="padding:.5em .8em;text-align:start;border-bottom:2px solid #ddd;width:18%;">{% trans "Field" %}</th>
+            <th style="padding:.5em .8em;text-align:start;border-bottom:2px solid #ddd;width:35%;">
+              {% trans "Biography A" %} <span class="bio-a-id" style="color:#666;">(#{{ bio_a.pk }})</span>
+            </th>
+            <th style="padding:.5em .8em;text-align:start;border-bottom:2px solid #ddd;width:35%;">
+              {% trans "Biography B" %} <span class="bio-b-id" style="color:#666;">(#{{ bio_b.pk }})</span>
+            </th>
+            <th style="padding:.5em .8em;text-align:start;border-bottom:2px solid #ddd;width:12%;">{% trans "Keep" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in resolutions %}
+          {% if res.status == "same" %}
+          <tr style="background:#fafafa;color:#888;">
+            <td style="padding:.4em .8em;">{{ res.label }}</td>
+            <td style="padding:.4em .8em;" colspan="2">{{ res.display_a }}</td>
+            <td style="padding:.4em .8em;font-size:.85em;">{% trans "same" %}</td>
+          </tr>
+
+          {% elif res.status == "only_a" %}
+          <tr style="background:#f0fff0;">
+            <td style="padding:.4em .8em;">{{ res.label }}</td>
+            <td style="padding:.4em .8em;"><strong>{{ res.display_a }}</strong></td>
+            <td style="padding:.4em .8em;color:#aaa;">{% trans "(empty)" %}</td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#417600;">
+              <span class="auto-label">{% trans "auto: A" %}</span>
+            </td>
+          </tr>
+
+          {% elif res.status == "only_b" %}
+          <tr style="background:#f0fff0;">
+            <td style="padding:.4em .8em;">{{ res.label }}</td>
+            <td style="padding:.4em .8em;color:#aaa;">{% trans "(empty)" %}</td>
+            <td style="padding:.4em .8em;"><strong>{{ res.display_b }}</strong></td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#417600;">
+              <span class="auto-label">{% trans "auto: B" %}</span>
+            </td>
+          </tr>
+
+          {% elif res.status == "conflict" %}
+          <tr style="background:#fff3cd;">
+            <td style="padding:.4em .8em;font-weight:bold;">{{ res.label }}</td>
+            <td style="padding:.4em .8em;">{{ res.display_a }}</td>
+            <td style="padding:.4em .8em;">{{ res.display_b }}</td>
+            <td style="padding:.4em .8em;">
+              <label style="white-space:nowrap;">
+                <input type="radio" name="choice_{{ res.field_name }}" value="a"
+                       class="conflict-choice" data-field="{{ res.field_name }}" checked>
+                A
+              </label>
+              &nbsp;
+              <label style="white-space:nowrap;">
+                <input type="radio" name="choice_{{ res.field_name }}" value="b"
+                       class="conflict-choice" data-field="{{ res.field_name }}">
+                B
+              </label>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+
+          {# --- M2M: always union --- #}
+          <tr style="background:#e8f4fd;border-top:2px solid #c0d8ee;">
+            <td style="padding:.4em .8em;">{% trans "Attributes" %}</td>
+            <td style="padding:.4em .8em;">{{ attributes_a }}</td>
+            <td style="padding:.4em .8em;">{{ attributes_b }}</td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#1a5276;">{% trans "union" %}</td>
+          </tr>
+          <tr style="background:#e8f4fd;">
+            <td style="padding:.4em .8em;">{% trans "Hometown" %}</td>
+            <td style="padding:.4em .8em;">{{ hometown_a }}</td>
+            <td style="padding:.4em .8em;">{{ hometown_b }}</td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#1a5276;">{% trans "union" %}</td>
+          </tr>
+
+          {# --- Relationships: all transferred --- #}
+          <tr style="background:#f5eef8;border-top:2px solid #d7bde2;">
+            <td style="padding:.4em .8em;">{% trans "Teachers" %}</td>
+            <td style="padding:.4em .8em;">{{ teachers_a }}</td>
+            <td style="padding:.4em .8em;">{{ teachers_b }}</td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#6c3483;">{% trans "merge" %}</td>
+          </tr>
+          <tr style="background:#f5eef8;">
+            <td style="padding:.4em .8em;">{% trans "Students" %}</td>
+            <td style="padding:.4em .8em;">{{ students_a }}</td>
+            <td style="padding:.4em .8em;">{{ students_b }}</td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#6c3483;">{% trans "merge" %}</td>
+          </tr>
+          <tr style="background:#f5eef8;">
+            <td style="padding:.4em .8em;">{% trans "Sources" %}</td>
+            <td style="padding:.4em .8em;">{{ sources_a }}</td>
+            <td style="padding:.4em .8em;">{{ sources_b }}</td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#6c3483;">{% trans "merge" %}</td>
+          </tr>
+          <tr style="background:#f5eef8;">
+            <td style="padding:.4em .8em;">{% trans "Esnads" %}</td>
+            <td style="padding:.4em .8em;">{{ esnads_a }}</td>
+            <td style="padding:.4em .8em;">{{ esnads_b }}</td>
+            <td style="padding:.4em .8em;font-size:.85em;color:#6c3483;">{% trans "merge" %}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="submit-row" style="display:flex;gap:1em;align-items:center;">
+      <input type="submit" class="default" value="{% trans 'Confirm merge' %}"
+             id="confirm-btn">
+      <a href="{% url 'admin:core_biography_changelist' %}" class="button cancel-link">
+        {% trans 'Cancel' %}
+      </a>
+      <span id="conflict-warning" style="color:#c0392b;display:none;">
+        ⚠ {% trans "Please resolve all conflict fields (highlighted in yellow) before confirming." %}
+      </span>
+    </div>
+  </form>
+</div>
+
+<script>
+(function () {
+  var primaryRadios = document.querySelectorAll('input[name="primary_id"]');
+  var dupInput = document.getElementById('id_duplicate_id');
+
+  primaryRadios.forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      dupInput.value = this.dataset.dup;
+    });
+  });
+
+  var confirmBtn = document.getElementById('confirm-btn');
+  var warning = document.getElementById('conflict-warning');
+
+  confirmBtn.addEventListener('click', function (e) {
+    var conflictGroups = {};
+    document.querySelectorAll('.conflict-choice').forEach(function (input) {
+      conflictGroups[input.dataset.field] = conflictGroups[input.dataset.field] || false;
+      if (input.checked) conflictGroups[input.dataset.field] = true;
+    });
+    var allResolved = Object.values(conflictGroups).every(Boolean);
+    if (!allResolved) {
+      e.preventDefault();
+      warning.style.display = 'inline';
+    } else {
+      warning.style.display = 'none';
+    }
+  });
+})();
+</script>
+{% endblock %}

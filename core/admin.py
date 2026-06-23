@@ -65,6 +65,22 @@ class StudentInline(nested_admin.NestedTabularInline):
     verbose_name_plural = _("Students")
 
 
+class HometownInlineForm(forms.ModelForm):
+    class Meta:
+        model = Biography.hometown.through
+        fields = ("location",)
+        labels = {"location": _("Location")}
+
+
+class HometownInline(nested_admin.NestedTabularInline):
+    model = Biography.hometown.through
+    form = HometownInlineForm
+    extra = 0
+    autocomplete_fields = ("location",)
+    verbose_name = _("Hometown")
+    verbose_name_plural = _("Hometowns")
+
+
 class EsnadLinkNestedInline(nested_admin.SortableHiddenMixin, nested_admin.NestedTabularInline):
     model = EsnadLink
     extra = 0
@@ -104,7 +120,6 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         "birth_hijri_year", "birth_greg_year",
         "death_hijri_year", "death_greg_year",
         "birthplace", "get_hometowns", "death_location",
-        # "comments_ar", "comments_en",
     )
     list_filter = ("birthplace", "hometown", "death_location", "attributes", "published")
     search_fields = ("full_name_ar", "full_name_en", "alias_ar", "alias_en")
@@ -112,7 +127,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     @admin.display(description=_("Hometown"))
     def get_hometowns(self, obj):
         return ", ".join(str(loc) for loc in obj.hometown.all())
-    inlines = [TeacherInline, StudentInline, EsnadInline, SourceInline]
+    inlines = [TeacherInline, StudentInline, HometownInline, EsnadInline, SourceInline]
     change_form_template = "admin/core/biography/change_form.html"
     change_list_template = "admin/core/biography/change_list.html"
 
@@ -132,6 +147,16 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 "import-csv/template-xlsx/",
                 self.admin_site.admin_view(self.import_xlsx_template_view),
                 name="core_biography_import_xlsx_template",
+            ),
+            path(
+                "find-duplicates/",
+                self.admin_site.admin_view(self.find_duplicates_view),
+                name="core_biography_find_duplicates",
+            ),
+            path(
+                "merge-confirm/",
+                self.admin_site.admin_view(self.merge_confirm_view),
+                name="core_biography_merge_confirm",
             ),
         ]
         return custom + super().get_urls()
@@ -216,6 +241,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                     "conflict_plans": [p for p in plans if p.status == "conflict"],
                     "identical_plans": [p for p in plans if p.status == "identical"],
                     "ambiguous_plans": [p for p in plans if p.status == "ambiguous"],
+                    "potential_duplicate_plans": [p for p in plans if p.status == "potential_duplicate"],
                     "error_plans": [p for p in plans if p.status == "error"],
                     "location_specs": location_specs,
                 })
@@ -227,11 +253,147 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         # Step 1: show the upload form.
         return TemplateResponse(request, "admin/core/biography/csv_import.html", context)
 
+    # --- Find duplicates / merge ----------------------------------------
+
+    @admin.action(description=_("Merge selected biographies (select exactly 2)"))
+    def merge_biographies_action(self, request, queryset):
+        if queryset.count() != 2:
+            self.message_user(
+                request,
+                _("Please select exactly 2 biographies to merge."),
+                level=messages.ERROR,
+            )
+            return
+        ids = list(queryset.values_list("pk", flat=True))
+        url = reverse("admin:core_biography_merge_confirm")
+        return HttpResponseRedirect(f"{url}?ids={ids[0]},{ids[1]}")
+
+    actions = ["merge_biographies_action"]
+
+    def find_duplicates_view(self, request):
+        if not self.has_change_permission(request):
+            messages.error(request, _("You do not have permission to view duplicates."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        from .merge_utils import build_duplicate_candidates
+
+        fuzzy = request.GET.get("fuzzy") == "1"
+        candidates = build_duplicate_candidates(fuzzy=fuzzy)
+
+        for c in candidates:
+            c.similarity_pct = int(c.similarity * 100)
+
+        context = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "title": _("Find Duplicate Biographies"),
+            "candidates": candidates,
+            "exact_candidates": [c for c in candidates if c.match_type == "exact"],
+            "cross_candidates": [c for c in candidates if c.match_type == "cross_field"],
+            "partial_candidates": [c for c in candidates if c.match_type == "partial"],
+            "fuzzy_candidates": [c for c in candidates if c.match_type == "fuzzy"],
+            "fuzzy": fuzzy,
+        }
+        return TemplateResponse(
+            request, "admin/core/biography/find_duplicates.html", context
+        )
+
+    def merge_confirm_view(self, request):
+        if not self.has_change_permission(request):
+            messages.error(request, _("You do not have permission to merge biographies."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        raw = request.GET.get("ids") or request.POST.get("ids", "")
+        try:
+            id_a, id_b = [int(x.strip()) for x in raw.split(",")]
+        except (ValueError, TypeError):
+            messages.error(request, _("Invalid biography selection."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        try:
+            bio_a = Biography.objects.get(pk=id_a)
+            bio_b = Biography.objects.get(pk=id_b)
+        except Biography.DoesNotExist:
+            messages.error(request, _("One or both biographies could not be found."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        if request.method == "POST" and request.POST.get("step") == "confirm":
+            try:
+                primary_id = int(request.POST.get("primary_id", 0))
+                duplicate_id = int(request.POST.get("duplicate_id", 0))
+            except (ValueError, TypeError):
+                messages.error(request, _("Invalid merge selection."))
+                return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+            try:
+                primary = Biography.objects.get(pk=primary_id)
+                duplicate = Biography.objects.get(pk=duplicate_id)
+            except Biography.DoesNotExist:
+                messages.error(request, _("One or both biographies could not be found."))
+                return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+            field_choices = {}
+            for key, value in request.POST.items():
+                if key.startswith("choice_") and value in ("a", "b"):
+                    field_name = key[len("choice_"):]
+                    field_choices[field_name] = value
+
+            from .merge_utils import merge_biographies as do_merge
+            log = do_merge(primary, duplicate, field_choices, dry_run=False)
+
+            for level, msg in log:
+                if level == "warning":
+                    messages.warning(request, msg)
+                elif level == "error":
+                    messages.error(request, msg)
+
+            messages.success(
+                request,
+                _("Biography #%(dup)d merged into #%(pri)d successfully.")
+                % {"dup": duplicate_id, "pri": primary_id},
+            )
+            return HttpResponseRedirect(
+                reverse("admin:core_biography_change", args=[primary_id])
+            )
+
+        # GET — show the confirmation form
+        from .merge_utils import compute_field_resolutions
+
+        resolutions = compute_field_resolutions(bio_a, bio_b)
+
+        def _count_display(count):
+            return str(count) if count else "—"
+
+        context = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "title": _("Merge Biographies"),
+            "bio_a": bio_a,
+            "bio_b": bio_b,
+            "ids": raw,
+            "resolutions": resolutions,
+            "attributes_a": ", ".join(str(a) for a in bio_a.attributes.all()) or "—",
+            "attributes_b": ", ".join(str(a) for a in bio_b.attributes.all()) or "—",
+            "hometown_a": ", ".join(str(h) for h in bio_a.hometown.all()) or "—",
+            "hometown_b": ", ".join(str(h) for h in bio_b.hometown.all()) or "—",
+            "teachers_a": _count_display(bio_a.teacher_relationships.count()),
+            "teachers_b": _count_display(bio_b.teacher_relationships.count()),
+            "students_a": _count_display(bio_a.student_relationships.count()),
+            "students_b": _count_display(bio_b.student_relationships.count()),
+            "sources_a": _count_display(bio_a.sources.count()),
+            "sources_b": _count_display(bio_b.sources.count()),
+            "esnads_a": _count_display(bio_a.esnads.count()),
+            "esnads_b": _count_display(bio_b.esnads.count()),
+        }
+        return TemplateResponse(
+            request, "admin/core/biography/merge_confirm.html", context
+        )
+
     def get_ordering(self, request):
         return _lang_ordering(("full_name_ar",), ("full_name_en", "full_name_ar"))
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name in ("birthplace", "hometown", "death_location"):
+        if db_field.name in ("birthplace", "death_location"):
             ordering = _lang_ordering(
                 ("country_ar", "city_ar"),
                 ("country_en", "city_en", "country_ar", "city_ar"),
@@ -290,7 +452,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         }),
         (_("Birth"), {
             "fields": (
-                "birthplace", "hometown",
+                "birthplace",
                 ("birth_hijri_year", "birth_hijri_month", "birth_hijri_day"),
                 ("birth_greg_year",  "birth_greg_month",  "birth_greg_day"),
                 ("birth_hijri_approximate", "birth_greg_approximate"),

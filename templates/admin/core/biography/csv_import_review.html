@@ -96,6 +96,32 @@
     </div>
     {% endif %}
 
+    {# --- Potential duplicates: similar biography already exists --- #}
+    {% if potential_duplicate_plans %}
+    <div class="module">
+      <h2>{% blocktrans count counter=potential_duplicate_plans|length %}{{ counter }} row may be a duplicate{% plural %}{{ counter }} rows may be duplicates{% endblocktrans %}</h2>
+      <div style="padding:.5em 1em;">
+        <p class="help">{% trans "These names are similar to existing biographies. Review carefully and decide whether to import as new, or skip to avoid duplicates." %}</p>
+        {% for plan in potential_duplicate_plans %}
+        <div style="border:1px solid #f0ad4e;margin-bottom:.8em;padding:.6em 1em;background:#fffbf0;">
+          <h3 style="margin:.2em 0;">{% blocktrans with row=plan.index name=plan.name %}Row {{ row }}: {{ name }}{% endblocktrans %}</h3>
+          {% for w in plan.warnings %}<p class="help" style="color:#856404;">⚠ {{ w }}</p>{% endfor %}
+          <p style="margin:.5em 0 0;">
+            <label style="margin-inline-end:1.2em;">
+              <input type="radio" name="resolve_{{ plan.index }}" value="skip" checked>
+              {% trans "Skip (do not import)" %}
+            </label>
+            <label>
+              <input type="radio" name="resolve_{{ plan.index }}" value="import">
+              {% trans "Import as new biography anyway" %}
+            </label>
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     {# --- New records --- #}
     {% if new_plans %}
     <div class="module">
