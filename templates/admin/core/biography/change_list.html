@@ -3,6 +3,11 @@
 
 {% block object-tools-items %}
 <li>
+  <a href="{% url 'admin:core_biography_find_duplicates' %}" class="addlink">
+    {% trans "Find Duplicates" %}
+  </a>
+</li>
+<li>
   <a href="{% url 'admin:core_biography_import_csv' %}" class="addlink">
     {% trans "Import CSV" %}
   </a>

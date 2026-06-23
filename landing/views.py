@@ -165,8 +165,9 @@ def _bio_dates(bio):
 def biography_detail(request, pk):
     """Public biography detail page; unpublished entries are visible only to staff."""
     qs = Biography.objects.select_related(
-        "birthplace", "hometown", "death_location",
+        "birthplace", "death_location",
     ).prefetch_related(
+        "hometown",
         "attributes",
         "sources",
         "esnads__links__narrator",
@@ -212,7 +213,7 @@ def biographies(request):
 
     qs = Biography.objects.filter(published=True)
     if hometown_id:
-        qs = qs.filter(hometown_id=hometown_id)
+        qs = qs.filter(hometown__id=hometown_id)
     if birthplace_id:
         qs = qs.filter(birthplace_id=birthplace_id)
     if death_location_id:
@@ -221,8 +222,7 @@ def biographies(request):
         qs = qs.filter(attributes__id=attribute_id)
 
     results = list(
-        qs.select_related("hometown")
-        .prefetch_related("esnads__links")
+        qs.prefetch_related("hometown", "esnads__links")
         .distinct()
         .order_by("full_name_ar")
     )
@@ -359,7 +359,7 @@ def search_results(request):
 
     def apply_filters(qs):
         if hometown_id:
-            qs = qs.filter(hometown_id=hometown_id)
+            qs = qs.filter(hometown__id=hometown_id)
         if birthplace_id:
             qs = qs.filter(birthplace_id=birthplace_id)
         if death_location_id:
@@ -381,8 +381,7 @@ def search_results(request):
 
         logger.debug("search_results SQL=%s", qs.query)
         results = list(
-            qs.select_related("hometown")
-            .prefetch_related("esnads__links")
+            qs.prefetch_related("hometown", "esnads__links")
             .order_by("full_name_ar")
         )
 
@@ -395,8 +394,7 @@ def search_results(request):
                 apply_filters(
                     Biography.objects.filter(published=True).exclude(pk__in=exact_ids)
                 )
-                .select_related("hometown")
-                .prefetch_related("esnads__links")
+                .prefetch_related("hometown", "esnads__links")
                 .distinct()
             )
             scored = []

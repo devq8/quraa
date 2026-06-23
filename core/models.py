@@ -22,8 +22,8 @@ class Biography(models.Model):
     birth_hijri_approximate = models.BooleanField(_("Birth Hijri Approximate"), default=False)
     birth_greg_approximate = models.BooleanField(_("Birth Gregorian Approximate"), default=False)
 
-    hometown = models.ForeignKey(
-        "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="hometown", verbose_name=_("Hometown"),
+    hometown = models.ManyToManyField(
+        "Location", blank=True, related_name="hometown", verbose_name=_("Hometown"),
     )
     death_location = models.ForeignKey(
         "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="death_location", verbose_name=_("Death Location"),
@@ -97,8 +97,8 @@ class Biography(models.Model):
         return instance
 
     def _snapshot_dates(self):
-        """Capture date field state at load time so save() can tell which side
-        the user actually edited and avoid clobbering the approximate flags."""
+        """Capture date field state at load time so save() can detect which
+        calendar side the user actually edited."""
         self._orig_dates = {}
         for prefix in ("birth", "death"):
             self._orig_dates[prefix] = {
@@ -112,8 +112,6 @@ class Biography(models.Model):
                     getattr(self, f"{prefix}_greg_month"),
                     getattr(self, f"{prefix}_greg_day"),
                 ),
-                "hijri_approx": getattr(self, f"{prefix}_hijri_approximate"),
-                "greg_approx": getattr(self, f"{prefix}_greg_approximate"),
             }
 
     def clean(self):
@@ -134,13 +132,9 @@ class Biography(models.Model):
     def _fill_date(self, prefix):
         """Convert whichever calendar was provided into the other one.
 
-        Approximate flag policy (per calendar side):
-        - On first input, a side is approximate iff the user did not supply a
-          full year+month+day on that side; the derived side is approximate.
-        - On subsequent saves, the flag for a side flips only when the user
-          actually edits that side's fields — otherwise it stays as stored.
-          This prevents a previously-derived (auto-filled) side from being
-          re-classified as "exact" when the row is saved with no date changes.
+        Conversion direction is driven solely by date completeness (all three
+        of year+month+day present).  The approximate flags are admin-controlled
+        and are never touched here.
         """
         from hijridate import Gregorian as HijriGregorian, Hijri
         from core.hijri_utils import (
@@ -162,23 +156,9 @@ class Biography(models.Model):
         if orig is not None:
             hijri_changed = (hY, hM, hD) != orig["hijri"]
             greg_changed = (gY, gM, gD) != orig["greg"]
-            prior_hijri_approx = orig["hijri_approx"]
-            prior_greg_approx = orig["greg_approx"]
         else:
-            # No snapshot: treat as a fresh row where current values are the
-            # user's authoritative input.
             hijri_changed = True
             greg_changed = True
-            prior_hijri_approx = True
-            prior_greg_approx = True
-
-        # If the user touched a side, its flag follows the new completeness;
-        # if untouched, keep whatever was previously stored.
-        hijri_approx = (not hijri_full) if hijri_changed else prior_hijri_approx
-        greg_approx = (not greg_full) if greg_changed else prior_greg_approx
-
-        setattr(self, f"{prefix}_hijri_approximate", hijri_approx)
-        setattr(self, f"{prefix}_greg_approximate", greg_approx)
 
         def fill_greg_from_hijri():
             month = hM or 6  # midyear when month unknown
@@ -207,21 +187,18 @@ class Biography(models.Model):
             setattr(self, f"{prefix}_hijri_month", h_month)
             setattr(self, f"{prefix}_hijri_day", h_day)
 
-        hijri_exact = not hijri_approx
-        greg_exact = not greg_approx
-
         # Derive the partner side. Re-derive when the source side was edited
         # and the partner wasn't (refreshes stale auto-filled data); otherwise
         # only fill an empty partner. If the user supplied data on the partner
         # — even a partial year — respect their input.
-        if hijri_exact and not greg_exact and hY:
+        if hijri_full and not greg_full and hY:
             if not gY or (hijri_changed and not greg_changed):
                 fill_greg_from_hijri()
-        elif greg_exact and not hijri_exact and gY:
+        elif greg_full and not hijri_full and gY:
             if not hY or (greg_changed and not hijri_changed):
                 fill_hijri_from_greg()
-        elif not hijri_exact and not greg_exact:
-            # Both approximate. Fill an empty side from the side that has a year.
+        elif not hijri_full and not greg_full:
+            # Both incomplete. Fill an empty side from the side that has a year.
             if hY and not gY:
                 fill_greg_from_hijri()
             elif gY and not hY:
@@ -291,11 +268,9 @@ class Attribute(models.Model):
 
 
 # ملاحظات معرَّفة مسبقًا لعلاقات المشيخة كـ"إجازة عامة"، "سماع"، "قراءة"... إلخ
-class Note(models.Model):
-    short_name_ar = models.CharField(_("Short Name (Arabic)"), max_length=255)
-    short_name_en = models.CharField(_("Short Name (English)"), max_length=255, blank=True)
-    long_name_ar = models.CharField(_("Long Name (Arabic)"), max_length=255, blank=True)
-    long_name_en = models.CharField(_("Long Name (English)"), max_length=255, blank=True)
+class Reading(models.Model):
+    description_ar = models.CharField(_("Description (Arabic)"), max_length=255)
+    description_en = models.CharField(_("Description (English)"), max_length=255, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -303,13 +278,13 @@ class Note(models.Model):
     def __str__(self):
         lang = get_language()
         if lang and lang.startswith("ar"):
-            return self.short_name_ar or self.short_name_en
-        return self.short_name_en or self.short_name_ar
+            return self.description_ar[:80] or self.description_en[:80]
+        return self.description_en[:80] or self.description_ar[:80]
 
     class Meta:
-        verbose_name = _("Note")
-        verbose_name_plural = _("Notes")
-        ordering = ["id", "short_name_ar"]
+        verbose_name = _("المقروء")
+        verbose_name_plural = _("المقروءات")
+        ordering = ["id"]
 
 
 class Source(models.Model):
@@ -514,8 +489,8 @@ class TeacherStudentRelationship(models.Model):
         verbose_name=_("Student"),
     )
     notes = models.ManyToManyField(
-        "Note", blank=True, related_name="relationships",
-        verbose_name=_("Notes"),
+        "Reading", blank=True, related_name="relationships",
+        verbose_name=_("المقروءات"),
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

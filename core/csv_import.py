@@ -511,7 +511,7 @@ class RowPlan:
     def __init__(self, index, name):
         self.index = index          # 1-based, for display
         self.name = name
-        self.status = "new"         # new|identical|conflict|ambiguous|error
+        self.status = "new"         # new|identical|conflict|ambiguous|potential_duplicate|error
         self.errors = []
         self.warnings = []
         self.scalars = {}           # field -> parsed value (provided only)
@@ -621,7 +621,29 @@ def analyze_rows(rows):
             plans.append(plan)
             continue
         if not matches:
-            plan.status = "new"
+            # Check for partial / cross-field / fuzzy near-matches so the user
+            # can review potential duplicates before committing a new record.
+            from .merge_utils import find_similar_to
+            similar = find_similar_to(name)
+            if similar:
+                plan.status = "potential_duplicate"
+                for bio, match_type, match_fields, similarity in similar[:3]:
+                    sim_pct = int(similarity * 100)
+                    plan.warnings.append(
+                        _(
+                            "Similar biography already exists: #%(id)d %(name)s"
+                            " (match: %(type)s, %(pct)d%%)"
+                        ) % {
+                            "id": bio.pk,
+                            "name": bio.full_name_ar,
+                            "type": match_type,
+                            "pct": sim_pct,
+                        }
+                    )
+                plan.similar_bios = [(bio, match_type, match_fields, similarity)
+                                     for bio, match_type, match_fields, similarity in similar[:3]]
+            else:
+                plan.status = "new"
             plans.append(plan)
             continue
 
@@ -698,23 +720,28 @@ def _apply_plan(plan, instance, user, location_map):
     """Write a plan's provided values onto ``instance`` (unsaved/loaded).
 
     ``location_map`` maps a ``(country_ar, city_ar)`` key to the resolved
-    Location chosen during review. Returns the list of attribute objects to set
-    after the initial save (m2m cannot be assigned before the row has a PK).
+    Location chosen during review. Returns (attrs, hometown_loc) where attrs
+    is the list of Attribute objects to set after save (M2M requires a PK) and
+    hometown_loc is the resolved Location for the hometown M2M field (or None).
     """
     for field, value in plan.scalars.items():
         setattr(instance, field, value)
 
+    hometown_loc = None
     for fk_name, spec in plan.locations.items():
         key = (spec["country_ar"], spec["city_ar"])
         loc = location_map.get(key) or _get_or_create_location(spec)
-        setattr(instance, fk_name, loc)
+        if fk_name == "hometown":
+            hometown_loc = loc
+        else:
+            setattr(instance, fk_name, loc)
 
     if instance.pk is None:
         instance.submitted_by = user
     instance.last_modified_by = user
 
     attrs, _missing = _match_attributes(plan.attribute_names)
-    return attrs
+    return attrs, hometown_loc
 
 
 def commit_rows(rows, resolutions, user, location_choices=None):
@@ -740,17 +767,22 @@ def commit_rows(rows, resolutions, user, location_choices=None):
                 skipped += 1
                 continue
 
-            choice = resolutions.get(plan.index, "import" if plan.status == "new" else "existing")
+            choice = resolutions.get(
+                plan.index,
+                "import" if plan.status in ("new", "potential_duplicate") else "existing",
+            )
 
-            if plan.status == "new":
+            if plan.status in ("new", "potential_duplicate"):
                 if choice != "import":
                     skipped += 1
                     continue
                 instance = Biography()
-                attrs = _apply_plan(plan, instance, user, location_map)
+                attrs, hometown_loc = _apply_plan(plan, instance, user, location_map)
                 instance.save()
                 if plan.attribute_names:
                     instance.attributes.set(attrs)
+                if hometown_loc is not None:
+                    instance.hometown.set([hometown_loc])
                 created += 1
                 continue
 
@@ -759,10 +791,12 @@ def commit_rows(rows, resolutions, user, location_choices=None):
                 skipped += 1
                 continue
             instance = Biography.objects.get(pk=plan.existing_pk)
-            attrs = _apply_plan(plan, instance, user, location_map)
+            attrs, hometown_loc = _apply_plan(plan, instance, user, location_map)
             instance.save()
             if plan.attribute_names:
                 instance.attributes.set(attrs)
+            if hometown_loc is not None:
+                instance.hometown.set([hometown_loc])
             updated += 1
 
     return {

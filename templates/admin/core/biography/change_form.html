@@ -1,6 +1,23 @@
 {% extends "admin/change_form.html" %}
 {% load i18n %}
 
+{% block extrahead %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var inline = Array.from(
+    document.querySelectorAll('[id*="biography_hometown"]')
+  ).find(function (el) { return el.id.endsWith('-group'); });
+  var fieldsets = document.querySelectorAll('fieldset.module');
+  // fieldset index 1 is the Birth section
+  var birthFieldset = fieldsets[1];
+  if (inline && birthFieldset) {
+    birthFieldset.after(inline);
+  }
+});
+</script>
+{% endblock %}
+
 {% block after_related_objects %}
 {{ block.super }}
 

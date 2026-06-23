@@ -144,12 +144,14 @@
               </p>
             </div>
             <div class="flex shrink-0 flex-col items-end gap-y-1 px-3">
-              {% if bio.hometown %}
+              {% with hometowns=bio.hometown.all %}
+              {% if hometowns %}
               <p class="text-sm/6 text-gray-900 dark:text-slate-300">
                 <i class="fa fa-map-marker-alt text-orange-600 me-1"></i>
-                {% if LANGUAGE_CODE == 'ar' %}{{ bio.hometown.city_ar|default:bio.hometown.city_en }}{% if bio.hometown.country_ar or bio.hometown.country_en %}، {{ bio.hometown.country_ar|default:bio.hometown.country_en }}{% endif %}{% else %}{{ bio.hometown.city_en|default:bio.hometown.city_ar }}{% if bio.hometown.country_en or bio.hometown.country_ar %}, {{ bio.hometown.country_en|default:bio.hometown.country_ar }}{% endif %}{% endif %}
+                {% for loc in hometowns %}{% if LANGUAGE_CODE == 'ar' %}{{ loc.city_ar|default:loc.city_en }}{% if loc.country_ar or loc.country_en %}، {{ loc.country_ar|default:loc.country_en }}{% endif %}{% else %}{{ loc.city_en|default:loc.city_ar }}{% if loc.country_en or loc.country_ar %}, {{ loc.country_en|default:loc.country_ar }}{% endif %}{% endif %}{% if not forloop.last %}؛ {% endif %}{% endfor %}
               </p>
               {% endif %}
+              {% endwith %}
               {% if bio.best_isnad_rank is not None %}
               <p class="text-xs/5 text-gray-500 dark:text-slate-400">
                 <i class="fa fa-sitemap text-orange-600 me-1"></i>
