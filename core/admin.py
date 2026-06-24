@@ -7,9 +7,10 @@ from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _, get_language
-from . import csv_import
+from . import biography_export, csv_import
 from .models import (
     Attribute, Biography,
     Esnad, EsnadLink,
@@ -149,6 +150,16 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 name="core_biography_import_xlsx_template",
             ),
             path(
+                "export-csv/",
+                self.admin_site.admin_view(self.export_csv_view),
+                name="core_biography_export_csv",
+            ),
+            path(
+                "export-xlsx/",
+                self.admin_site.admin_view(self.export_xlsx_view),
+                name="core_biography_export_xlsx",
+            ),
+            path(
                 "find-duplicates/",
                 self.admin_site.admin_view(self.find_duplicates_view),
                 name="core_biography_find_duplicates",
@@ -160,6 +171,43 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             ),
         ]
         return custom + super().get_urls()
+
+    def _export_queryset(self, request):
+        """Return the current admin changelist queryset with filters applied."""
+        changelist = self.get_changelist_instance(request)
+        return changelist.get_queryset(request)
+
+    def _export_filename(self, extension):
+        timestamp = timezone.localtime().strftime("%Y%m%d_%H%M%S")
+        return f"biographies_export_{timestamp}.{extension}"
+
+    def export_csv_view(self, request):
+        if not self.has_view_permission(request):
+            messages.error(request, _("You do not have permission to export biographies."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        response = HttpResponse(
+            biography_export.build_csv(self._export_queryset(request)),
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="{self._export_filename("csv")}"'
+        )
+        return response
+
+    def export_xlsx_view(self, request):
+        if not self.has_view_permission(request):
+            messages.error(request, _("You do not have permission to export biographies."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        response = HttpResponse(
+            biography_export.build_xlsx(self._export_queryset(request)),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="{self._export_filename("xlsx")}"'
+        )
+        return response
 
     def import_xlsx_template_view(self, request):
         response = HttpResponse(

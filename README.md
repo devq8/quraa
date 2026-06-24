@@ -99,6 +99,16 @@ python manage.py runserver
 
 Then open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser.
 
+### Biography Import and Export
+
+Administrators can manage bulk Biography data from the Django admin changelist:
+
+- **Import CSV** accepts UTF-8 CSV files and `.xlsx` workbooks that match the downloadable template.
+- **Export CSV** and **Export XLSX** download the current admin changelist queryset, including active search, filters, and ordering.
+- Exported files use the same import-compatible columns as the import template, so they can be edited and uploaded again.
+- The import-compatible format includes one hometown location and up to six attributes per Biography. Teachers, students, sources, and esnad chains are not included in this export.
+- CSV exports include a UTF-8 byte-order mark so Arabic text opens correctly in spreadsheet tools.
+
 ### Project Structure
 
 - **quraa/** — Django project settings and root URL configuration.
