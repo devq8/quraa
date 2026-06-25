@@ -12,5 +12,21 @@
     {% trans "Import CSV" %}
   </a>
 </li>
+<li>
+  <a
+    href="{% url 'admin:core_biography_export_csv' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+    class="addlink"
+  >
+    {% trans "Export CSV" %}
+  </a>
+</li>
+<li>
+  <a
+    href="{% url 'admin:core_biography_export_xlsx' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+    class="addlink"
+  >
+    {% trans "Export XLSX" %}
+  </a>
+</li>
 {{ block.super }}
 {% endblock %}

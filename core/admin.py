@@ -4,12 +4,13 @@ from django import forms
 from django.contrib import admin
 from django.contrib import messages
 from django.db import models
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _, get_language
-from . import csv_import
+from . import biography_export, csv_import
 from .models import (
     Attribute, Biography,
     Esnad, EsnadLink,
@@ -149,9 +150,24 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 name="core_biography_import_xlsx_template",
             ),
             path(
+                "export-csv/",
+                self.admin_site.admin_view(self.export_csv_view),
+                name="core_biography_export_csv",
+            ),
+            path(
+                "export-xlsx/",
+                self.admin_site.admin_view(self.export_xlsx_view),
+                name="core_biography_export_xlsx",
+            ),
+            path(
                 "find-duplicates/",
                 self.admin_site.admin_view(self.find_duplicates_view),
                 name="core_biography_find_duplicates",
+            ),
+            path(
+                "live-duplicates/",
+                self.admin_site.admin_view(self.live_duplicates_view),
+                name="core_biography_live_duplicates",
             ),
             path(
                 "merge-confirm/",
@@ -160,6 +176,43 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             ),
         ]
         return custom + super().get_urls()
+
+    def _export_queryset(self, request):
+        """Return the current admin changelist queryset with filters applied."""
+        changelist = self.get_changelist_instance(request)
+        return changelist.get_queryset(request)
+
+    def _export_filename(self, extension):
+        timestamp = timezone.localtime().strftime("%Y%m%d_%H%M%S")
+        return f"biographies_export_{timestamp}.{extension}"
+
+    def export_csv_view(self, request):
+        if not self.has_view_permission(request):
+            messages.error(request, _("You do not have permission to export biographies."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        response = HttpResponse(
+            biography_export.build_csv(self._export_queryset(request)),
+            content_type="text/csv; charset=utf-8",
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="{self._export_filename("csv")}"'
+        )
+        return response
+
+    def export_xlsx_view(self, request):
+        if not self.has_view_permission(request):
+            messages.error(request, _("You do not have permission to export biographies."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        response = HttpResponse(
+            biography_export.build_xlsx(self._export_queryset(request)),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="{self._export_filename("xlsx")}"'
+        )
+        return response
 
     def import_xlsx_template_view(self, request):
         response = HttpResponse(
@@ -297,6 +350,40 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         return TemplateResponse(
             request, "admin/core/biography/find_duplicates.html", context
         )
+
+    def live_duplicates_view(self, request):
+        if not self.has_view_permission(request):
+            return JsonResponse({"error": str(_("Permission denied."))}, status=403)
+
+        from .merge_utils import find_similar_to
+        from .search import normalize_arabic
+
+        query = request.GET.get("q", "")
+        if len(normalize_arabic(query)) < 3:
+            return JsonResponse({"results": []})
+
+        try:
+            exclude_pk = int(request.GET.get("exclude_id") or 0) or None
+        except (TypeError, ValueError):
+            exclude_pk = None
+
+        results = []
+        for bio, match_type, match_fields, similarity in find_similar_to(
+            query, exclude_pk=exclude_pk
+        )[:8]:
+            results.append({
+                "id": bio.pk,
+                "full_name_ar": bio.full_name_ar,
+                "full_name_en": bio.full_name_en,
+                "alias_ar": bio.alias_ar,
+                "alias_en": bio.alias_en,
+                "match_type": match_type,
+                "match_fields": match_fields,
+                "similarity": int(similarity * 100),
+                "url": reverse("admin:core_biography_change", args=[bio.pk]),
+            })
+
+        return JsonResponse({"results": results})
 
     def merge_confirm_view(self, request):
         if not self.has_change_permission(request):
