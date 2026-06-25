@@ -1931,6 +1931,30 @@ msgstr "تشترك هذه التراجم في تشابه عالٍ في الاس�
 msgid "Back to biographies"
 msgstr "العودة إلى التراجم"
 
+#: templates/admin/core/biography/change_form.html:35
+msgid "Possible duplicate biographies"
+msgstr "تراجم محتملة مكررة"
+
+#: templates/admin/core/biography/change_form.html:85
+msgid "Review these existing biographies before saving. Links open in a new tab."
+msgstr "راجع هذه التراجم الموجودة قبل الحفظ. تُفتح الروابط في تبويب جديد."
+
+#: templates/admin/core/biography/change_form.html:107
+msgid "Checking for duplicate biographies..."
+msgstr "جارٍ التحقق من التراجم المكررة..."
+
+#: templates/admin/core/biography/change_form.html:127
+msgid "Could not check for duplicate biographies."
+msgstr "تعذّر التحقق من التراجم المكررة."
+
+#: templates/admin/core/biography/change_form.html:79
+msgid "Match"
+msgstr "تطابق"
+
+#: core/admin.py:356
+msgid "Permission denied."
+msgstr "تم رفض الصلاحية."
+
 #: templates/admin/core/biography/merge_confirm.html:16
 msgid ""
 "Select which biography to keep as the primary record. For fields where both "
