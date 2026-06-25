@@ -10,6 +10,81 @@ from . import csv_import
 from .models import Attribute, Biography, Location
 
 
+class BiographyLiveDuplicateAdminTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.admin_user = User.objects.create_superuser(
+            email="admin-live@example.com",
+            password="password",
+            username="admin-live@example.com",
+        )
+        self.url = reverse("admin:core_biography_live_duplicates")
+        self.biography = Biography.objects.create(
+            full_name_ar="أحمد بن علي الشاطبي",
+            full_name_en="Ahmad ibn Ali al-Shatibi",
+            alias_ar="الشاطبي",
+            alias_en="Al-Shatibi",
+        )
+
+    def test_duplicate_results_include_admin_change_url(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(self.url, {"q": "احمد بن علي الشاطبي"})
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data["results"]), 1)
+        self.assertEqual(data["results"][0]["id"], self.biography.pk)
+        self.assertEqual(
+            data["results"][0]["url"],
+            reverse("admin:core_biography_change", args=[self.biography.pk]),
+        )
+
+    def test_edit_mode_excludes_current_biography(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            self.url,
+            {"q": "احمد بن علي الشاطبي", "exclude_id": self.biography.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["results"], [])
+
+    def test_alias_input_returns_matches(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(self.url, {"q": "Al-Shatibi", "field": "alias_en"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["results"][0]["id"], self.biography.pk)
+
+    def test_staff_without_view_permission_cannot_access_endpoint(self):
+        User = get_user_model()
+        staff_user = User.objects.create_user(
+            email="staff-live@example.com",
+            password="password",
+            username="staff-live@example.com",
+            is_staff=True,
+        )
+        self.client.force_login(staff_user)
+
+        response = self.client.get(self.url, {"q": "احمد بن علي الشاطبي"})
+
+        self.assertNotEqual(response.status_code, 200)
+
+    def test_empty_and_short_queries_return_no_matches(self):
+        self.client.force_login(self.admin_user)
+
+        empty_response = self.client.get(self.url, {"q": ""})
+        short_response = self.client.get(self.url, {"q": "ab"})
+
+        self.assertEqual(empty_response.status_code, 200)
+        self.assertEqual(short_response.status_code, 200)
+        self.assertEqual(empty_response.json()["results"], [])
+        self.assertEqual(short_response.json()["results"], [])
+
+
 class BiographyExportAdminTests(TestCase):
     def setUp(self):
         User = get_user_model()

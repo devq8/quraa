@@ -14,6 +14,128 @@ document.addEventListener('DOMContentLoaded', function () {
   if (inline && birthFieldset) {
     birthFieldset.after(inline);
   }
+
+  var watchedFields = ['full_name_ar', 'full_name_en', 'alias_ar', 'alias_en'];
+  var inputs = watchedFields
+    .map(function (name) { return document.getElementById('id_' + name); })
+    .filter(Boolean);
+
+  if (!inputs.length) {
+    return;
+  }
+
+  var panel = document.createElement('div');
+  panel.id = 'biography-live-duplicates';
+  panel.className = 'module';
+  panel.style.display = 'none';
+  panel.style.margin = '0 0 1em';
+  panel.style.padding = '1em';
+  panel.style.border = '1px solid #f0ad4e';
+  panel.style.background = '#fff8e5';
+  panel.innerHTML = '<h2 style="margin-top:0;">{% trans "Possible duplicate biographies" %}</h2><div class="biography-live-duplicates-content"></div>';
+
+  var firstRow = inputs[0].closest('.form-row');
+  if (firstRow) {
+    firstRow.parentNode.insertBefore(panel, firstRow.nextSibling);
+  }
+
+  var content = panel.querySelector('.biography-live-duplicates-content');
+  var endpoint = "{% url 'admin:core_biography_live_duplicates' %}";
+  var excludeId = "{% if original %}{{ original.pk }}{% endif %}";
+  var timer = null;
+  var requestSeq = 0;
+
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, function (char) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char];
+    });
+  }
+
+  function setPanel(html, visible) {
+    content.innerHTML = html;
+    panel.style.display = visible ? 'block' : 'none';
+  }
+
+  function renderResults(results) {
+    if (!results.length) {
+      setPanel('', false);
+      return;
+    }
+
+    var items = results.map(function (item) {
+      var title = item.full_name_ar || item.full_name_en || item.alias_ar || item.alias_en || ('#' + item.id);
+      var secondary = [item.full_name_en, item.alias_ar, item.alias_en].filter(Boolean).join(' · ');
+      return '<li style="margin:.4em 0;">' +
+        '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener noreferrer">' +
+        escapeHtml(title) + ' (#' + escapeHtml(item.id) + ')' +
+        '</a>' +
+        (secondary ? '<div class="help">' + escapeHtml(secondary) + '</div>' : '') +
+        '<div class="help">{% trans "Match" %}: ' + escapeHtml(item.match_type) +
+        ' · ' + escapeHtml(item.similarity) + '%</div>' +
+        '</li>';
+    }).join('');
+
+    setPanel(
+      '<p class="help">{% trans "Review these existing biographies before saving. Links open in a new tab." %}</p>' +
+      '<ul style="margin:0;padding-inline-start:1.5em;">' + items + '</ul>',
+      true
+    );
+  }
+
+  function lookup(input) {
+    var query = input.value.trim();
+    if (query.length < 3) {
+      setPanel('', false);
+      return;
+    }
+
+    var currentSeq = ++requestSeq;
+    var params = new URLSearchParams({
+      q: query,
+      field: input.name || input.id.replace(/^id_/, '')
+    });
+    if (excludeId) {
+      params.set('exclude_id', excludeId);
+    }
+
+    setPanel('<p class="help">{% trans "Checking for duplicate biographies..." %}</p>', true);
+    fetch(endpoint + '?' + params.toString(), {
+      headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('Request failed');
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        if (currentSeq !== requestSeq) {
+          return;
+        }
+        renderResults(data.results || []);
+      })
+      .catch(function () {
+        if (currentSeq !== requestSeq) {
+          return;
+        }
+        setPanel('<p class="errornote">{% trans "Could not check for duplicate biographies." %}</p>', true);
+      });
+  }
+
+  inputs.forEach(function (input) {
+    input.addEventListener('input', function () {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(function () {
+        lookup(input);
+      }, 350);
+    });
+  });
 });
 </script>
 {% endblock %}
