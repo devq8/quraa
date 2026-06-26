@@ -242,7 +242,7 @@
 
           <!-- List view (default) -->
           <div id="asanid-list-view">
-            {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
+            {% for esnad in esnads %}{% with terminal=esnad.expanded_terminal %}
             <div class="bio-esnad-item">
               <small>{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</small>
               <div>
@@ -253,14 +253,14 @@
                 {% else %}
                 <span>{% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}</span>
                 {% endif %}
-                {% for link in esnad.links.all %}
+                {% for link in esnad.full_links %}
                 <span class="mx-1">←</span>
                 <a href="{% url 'landing:biography_detail' link.narrator.pk %}" class="hover:text-orange-600 transition duration-500">
                   {% if LANGUAGE_CODE == 'ar' %}{{ link.narrator.alias_ar|default:link.narrator.full_name_ar|default:link.narrator.alias_en|default:link.narrator.full_name_en }}{% else %}{{ link.narrator.alias_en|default:link.narrator.full_name_en|default:link.narrator.alias_ar|default:link.narrator.full_name_ar }}{% endif %}
                 </a>
                 {% endfor %}
               </div>
-              {% if esnad.isnad_rank and terminal %}
+              {% if esnad.isnad_rank is not None and terminal %}
               <div class="bio-esnad-rank">
                 {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
               </div>
@@ -271,11 +271,11 @@
 
           <!-- Chain view (toggled, table view) -->
           <div id="asanid-timeline-view" class="hidden">
-            {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
+            {% for esnad in esnads %}{% with terminal=esnad.expanded_terminal %}
             <div class="{% if not forloop.first %}mt-8 pt-8 border-t border-gray-200 dark:border-gray-700{% endif %}">
               <div class="mb-6">
                 <span class="inline-block bg-orange-600 text-white rounded-full px-4 py-1 text-sm font-medium">{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</span>
-                {% if esnad.isnad_rank and terminal %}
+                {% if esnad.isnad_rank is not None and terminal %}
                 <p class="text-sm text-slate-400 mb-0 mt-2">
                   {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
                 </p>
