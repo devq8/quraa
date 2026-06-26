@@ -247,10 +247,18 @@
               <small>{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</small>
               <div>
                 {% if biography.published or user.is_staff %}
-                <a href="{% url 'landing:biography_detail' biography.pk %}" class="hover:text-orange-600 dark:hover:text-orange-600 transition duration-500">{{ esnad.chain_display }}</a>
+                <a href="{% url 'landing:biography_detail' biography.pk %}" class="hover:text-orange-600 transition duration-500">
+                  {% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}
+                </a>
                 {% else %}
-                {{ esnad.chain_display }}
+                <span>{% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}</span>
                 {% endif %}
+                {% for link in esnad.links.all %}
+                <span class="mx-1">←</span>
+                <a href="{% url 'landing:biography_detail' link.narrator.pk %}" class="hover:text-orange-600 transition duration-500">
+                  {% if LANGUAGE_CODE == 'ar' %}{{ link.narrator.alias_ar|default:link.narrator.full_name_ar|default:link.narrator.alias_en|default:link.narrator.full_name_en }}{% else %}{{ link.narrator.alias_en|default:link.narrator.full_name_en|default:link.narrator.alias_ar|default:link.narrator.full_name_ar }}{% endif %}
+                </a>
+                {% endfor %}
               </div>
               {% if esnad.isnad_rank and terminal %}
               <div class="bio-esnad-rank">
