@@ -1789,7 +1789,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
           margin-inline-end: 3rem;
   padding: 0px;
 }
-.navbar .navbar-brand img{
+.navbar .navbar-brand img,
+.logo-footer img{
   max-width: 105px;
   max-height: 24px;
   width: auto;
