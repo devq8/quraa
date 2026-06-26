@@ -1,5 +1,11 @@
 {% extends "admin/base.html" %}
-{% load i18n %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="icon" media="(prefers-color-scheme: light)" href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'assets/images/favicon.ico' %}{% endif %}" />
+<link rel="icon" media="(prefers-color-scheme: dark)" href="{% if site_settings.favicon_dark %}{{ site_settings.favicon_dark.url }}{% elif site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'assets/images/favicon.ico' %}{% endif %}" />
+{% endblock %}
 
 {% block userlinks %}
 {% get_current_language as current_language %}

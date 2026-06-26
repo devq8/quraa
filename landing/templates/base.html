@@ -22,7 +22,8 @@
   <meta name="email" content="info@quraa.org" />
   <meta name="version" content="1.0.0" />
   <!-- favicon -->
-  <link href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'assets/images/favicon.ico' %}{% endif %}" rel="shortcut icon" />
+  <link rel="icon" media="(prefers-color-scheme: light)" href="{% if site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'assets/images/favicon.ico' %}{% endif %}" />
+  <link rel="icon" media="(prefers-color-scheme: dark)" href="{% if site_settings.favicon_dark %}{{ site_settings.favicon_dark.url }}{% elif site_settings.favicon %}{{ site_settings.favicon.url }}{% else %}{% static 'assets/images/favicon.ico' %}{% endif %}" />
 
   <!-- Css -->
   <link href="{% static 'assets/libs/tobii/css/tobii.min.css' %}" rel="stylesheet" />

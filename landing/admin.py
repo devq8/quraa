@@ -40,7 +40,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
     fieldsets = (
-        (None, {"fields": ("site_name_ar", "site_name_en", "logo", "logo_dark", "favicon")}),
+        (None, {"fields": ("site_name_ar", "site_name_en", "logo", "logo_dark", "favicon", "favicon_dark")}),
         (_("About us section"), {"fields": ("about_heading_ar", "about_heading_en", "about_subheading_ar", "about_subheading_en", "about_description_ar", "about_description_en", "about_image", "about_url")}),
         (_("Services section header"), {"fields": ("services_heading_ar", "services_heading_en", "services_subheading_ar", "services_subheading_en", "services_description_ar", "services_description_en")}),
         (_("Donate section"), {"fields": ("donate_heading_ar", "donate_heading_en", "donate_subheading_ar", "donate_subheading_en", "donate_button_text_ar", "donate_button_text_en", "donate_button_link")}),
