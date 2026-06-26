@@ -37,23 +37,23 @@ msgstr "المصدر"
 msgid "Sources"
 msgstr "المصادر"
 
-#: core/admin.py:53 core/models.py:483
-msgid "Teacher"
-msgstr "الشيخ"
+#: core/admin.py:54
+msgid "Notable Teacher"
+msgstr "شيخ بارز"
 
-#: core/admin.py:54 landing/templates/biography.html:302
+#: core/admin.py:55 landing/templates/biography.html:347
 #: templates/admin/core/biography/merge_confirm.html:125
-msgid "Teachers"
-msgstr "الشيوخ"
+msgid "Notable Teachers"
+msgstr "أبرز الشيوخ"
 
-#: core/admin.py:64 core/models.py:489
-msgid "Student"
-msgstr "التلميذ"
+#: core/admin.py:65
+msgid "Notable Student"
+msgstr "تلميذ بارز"
 
-#: core/admin.py:65 landing/templates/biography.html:321
+#: core/admin.py:66 landing/templates/biography.html:366
 #: templates/admin/core/biography/merge_confirm.html:131
-msgid "Students"
-msgstr "التلاميذ"
+msgid "Notable Students"
+msgstr "أبرز التلاميذ"
 
 #: core/admin.py:72 core/models.py:239 landing/templates/home.html:417
 msgid "Location"
@@ -84,9 +84,9 @@ msgstr "الرواة"
 msgid "Esnad"
 msgstr "إسناد"
 
-#: core/admin.py:113 core/models.py:380 landing/templates/biography.html:235
-msgid "Asanid"
-msgstr "الأسانيد"
+#: core/admin.py:114 core/models.py:380 landing/templates/biography.html:235
+msgid "Transmission Chains"
+msgstr "أهم طرق الأسانيد"
 
 #: core/admin.py:174
 msgid "You do not have permission to import biographies."
@@ -280,7 +280,11 @@ msgstr "فوائد وملاحظات (عربي)"
 msgid "Comments (English)"
 msgstr "فوائد وملاحظات (إنجليزي)"
 
-#: core/csv_import.py:56 core/models.py:77
+#: core/models.py:77
+msgid "Female"
+msgstr "أنثى"
+
+#: core/csv_import.py:56 core/models.py:78
 msgid "Published"
 msgstr "منشور"
 

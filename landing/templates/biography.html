@@ -61,14 +61,14 @@
       <ul class="list-none text-white opacity-50 text-lg">
         {% if biography.birthplace or biography.birth_hijri_year or biography.birth_greg_year %}
         <li class="inline mx-2">
-          <span>{% trans "Born" %}:</span>
+          <span>{% if LANGUAGE_CODE == 'ar' %}{% if biography.is_female %}وُلدت{% else %}وُلد{% endif %}{% else %}{% trans "Born" %}{% endif %}:</span>
           {% if biography.birthplace %}{{ biography.birthplace }}{% endif %}
           {% if biography.birth_hijri_year %}({{ biography.birth_hijri_year }} {% if LANGUAGE_CODE == 'ar' %}هـ{% else %}AH{% endif %}){% elif biography.birth_greg_year %}({{ biography.birth_greg_year }} {% if LANGUAGE_CODE == 'ar' %}م{% else %}CE{% endif %}){% endif %}
         </li>
         {% endif %}
         {% if biography.death_location or biography.death_hijri_year or biography.death_greg_year %}
         <li class="inline mx-2">
-          <span>{% trans "Died" %}:</span>
+          <span>{% if LANGUAGE_CODE == 'ar' %}{% if biography.is_female %}توفيت{% else %}توفي{% endif %}{% else %}{% trans "Died" %}{% endif %}:</span>
           {% if biography.death_location %}{{ biography.death_location }}{% endif %}
           {% if biography.death_hijri_year %}({{ biography.death_hijri_year }} {% if LANGUAGE_CODE == 'ar' %}هـ{% else %}AH{% endif %}){% elif biography.death_greg_year %}({{ biography.death_greg_year }} {% if LANGUAGE_CODE == 'ar' %}م{% else %}CE{% endif %}){% endif %}
         </li>
@@ -232,7 +232,7 @@
         {% if esnads %}
         <div class="asanid-section bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
           <div class="flex items-center justify-between flex-wrap gap-3 border-b border-gray-100 dark:border-gray-700 pb-3 mb-4">
-            <h5 class="text-lg font-medium dark:text-white mb-0">{% trans "Asanid" %}</h5>
+            <h5 class="text-lg font-medium dark:text-white mb-0">{% trans "Transmission Chains" %}</h5>
             <button type="button" id="asanid-view-toggle" onclick="toggleAsanidView(this)"
               class="btn btn-sm inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white border border-orange-600 hover:border-orange-700 rounded-md transition duration-500">
               <i class="uil uil-channel text-base"></i>
@@ -344,7 +344,7 @@
           <!-- Teachers -->
           {% if teachers %}
           <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
-            <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Teachers" %}</h5>
+            <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Notable Teachers" %}</h5>
             <ul class="list-none mb-0">
               {% for rel in teachers %}
               <li class="py-2 {% if not forloop.last %}border-b border-gray-100 dark:border-gray-700{% endif %}">
@@ -363,7 +363,7 @@
           <!-- Students -->
           {% if students %}
           <div class="bg-gray-50 dark:bg-slate-800 shadow dark:shadow-gray-800 p-6 rounded-md">
-            <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Students" %}</h5>
+            <h5 class="text-lg font-medium border-b border-gray-100 dark:border-gray-700 pb-3 mb-3 dark:text-white">{% trans "Notable Students" %}</h5>
             <ul class="list-none mb-0">
               {% for rel in students %}
               <li class="py-2 {% if not forloop.last %}border-b border-gray-100 dark:border-gray-700{% endif %}">

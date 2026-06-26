@@ -51,8 +51,8 @@ class TeacherInline(nested_admin.NestedTabularInline):
     extra = 0
     fields = ("teacher", "notes")
     autocomplete_fields = ("teacher", "notes")
-    verbose_name = _("Teacher")
-    verbose_name_plural = _("Teachers")
+    verbose_name = _("Notable Teacher")
+    verbose_name_plural = _("Notable Teachers")
 
 
 class StudentInline(nested_admin.NestedTabularInline):
@@ -62,8 +62,8 @@ class StudentInline(nested_admin.NestedTabularInline):
     extra = 0
     fields = ("student", "notes")
     autocomplete_fields = ("student", "notes")
-    verbose_name = _("Student")
-    verbose_name_plural = _("Students")
+    verbose_name = _("Notable Student")
+    verbose_name_plural = _("Notable Students")
 
 
 class HometownInlineForm(forms.ModelForm):
@@ -111,7 +111,7 @@ class EsnadInline(nested_admin.NestedStackedInline):
     show_change_link = True
     inlines = [EsnadLinkNestedInline]
     verbose_name = _("Esnad")
-    verbose_name_plural = _("Asanid")
+    verbose_name_plural = _("Transmission Chains")
 
 
 @admin.register(Biography)
@@ -532,7 +532,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             "fields": (
                 ("full_name_ar", "full_name_en"),
                 ("alias_ar", "alias_en"),
-                "attributes", "published",
+                "attributes", ("is_female", "published"),
                 "comments_ar", "comments_en",
                 "user",
             ),

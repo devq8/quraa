@@ -74,6 +74,7 @@ class Biography(models.Model):
         verbose_name=_("User Account"),
     )
 
+    is_female = models.BooleanField(_("Female"), default=False)
     published = models.BooleanField(_("Published"), default=False)
     name_search = models.TextField(blank=True, default="", editable=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -377,7 +378,7 @@ class Esnad(models.Model):
 
     class Meta:
         verbose_name = _("Esnad")
-        verbose_name_plural = _("Asanid")
+        verbose_name_plural = _("Transmission Chains")
         ordering = ["biography", "id"]
     def get_expanded_links(self, visited_bio_ids=None):
         """Recursively expand this esnad by following the terminal narrator's best (shortest) esnad.
