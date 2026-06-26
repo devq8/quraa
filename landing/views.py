@@ -183,6 +183,9 @@ def biography_detail(request, pk):
     sources = list(biography.sources.all())
     esnads = list(biography.esnads.all())
 
+    for esnad in esnads:
+        esnad._reversed_links = list(reversed(list(esnad.links.all())))
+
     site_settings = SiteSettings.objects.first()
 
     context = {
