@@ -284,30 +284,41 @@
               <div class="overflow-x-auto">
                 <table class="w-full border-collapse">
                   <tbody>
+                    <!-- Narrators in reversed order (from terminal/Prophet down) -->
+                    {% if esnad.reversed_links %}
                     {% for link in esnad.reversed_links %}
-                    <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                    <tr class="{% if forloop.first %}bg-orange-50 dark:bg-orange-950/20{% endif %} border-b border-gray-200 dark:border-gray-700">
                       <td class="px-4 py-3 text-center">
-                        <div class="size-10 rounded-full bg-transparent border-2 border-dashed border-orange-600 text-orange-600 flex items-center justify-center mx-auto">
-                          <span class="text-sm font-semibold">{{ forloop.revcounter }}</span>
+                        {% if forloop.first %}
+                        <!-- First narrator (terminal/Prophet) - crown icon -->
+                        <div class="size-10 rounded-full bg-orange-600 text-white flex items-center justify-center mx-auto">
+                          <i class="uil uil-book-open text-lg"></i>
                         </div>
+                        {% else %}
+                        <!-- Middle narrators - show position number -->
+                        <div class="text-sm font-medium text-slate-600 dark:text-slate-300">{{ forloop.counter }}</div>
+                        {% endif %}
                       </td>
                       <td class="px-4 py-3">
-                        <a href="{% url 'landing:biography_detail' link.narrator.pk %}" class="text-base font-medium hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+                        <a href="{% url 'landing:biography_detail' link.narrator.pk %}" class="{% if forloop.first %}text-base font-medium{% else %}text-base{% endif %} hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
                           {% if LANGUAGE_CODE == 'ar' %}{{ link.narrator.alias_ar|default:link.narrator.full_name_ar|default:link.narrator.alias_en|default:link.narrator.full_name_en }}{% else %}{{ link.narrator.alias_en|default:link.narrator.full_name_en|default:link.narrator.alias_ar|default:link.narrator.full_name_ar }}{% endif %}
                         </a>
                       </td>
                     </tr>
                     {% endfor %}
+                    {% endif %}
+
+                    <!-- Biography being viewed (last row) -->
                     <tr class="bg-orange-50 dark:bg-orange-950/20 border-b border-gray-200 dark:border-gray-700">
                       <td class="px-4 py-3 text-center">
                         <div class="size-10 rounded-full bg-orange-600 text-white flex items-center justify-center mx-auto">
-                          <i class="uil uil-user text-lg"></i>
+                          <i class="uil uil-book-open text-lg"></i>
                         </div>
                       </td>
                       <td class="px-4 py-3">
-                        <span class="text-base font-medium dark:text-white">
+                        <a href="{% url 'landing:biography_detail' biography.pk %}" class="text-base font-medium hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
                           {% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}
-                        </span>
+                        </a>
                       </td>
                     </tr>
                   </tbody>
