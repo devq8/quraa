@@ -1789,6 +1789,13 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
           margin-inline-end: 3rem;
   padding: 0px;
 }
+.navbar .navbar-brand img{
+  max-width: 105px;
+  max-height: 24px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
 .navbar .navbar-brand .l-dark,
 .navbar .navbar-brand .logo-dark-mode{
   display: none;
