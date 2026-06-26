@@ -246,13 +246,7 @@
             <div class="bio-esnad-item">
               <small>{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</small>
               <div>
-                {% if biography.published or user.is_staff %}
-                <a href="{% url 'landing:biography_detail' biography.pk %}" class="hover:text-orange-600 transition duration-500">
-                  {% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}
-                </a>
-                {% else %}
                 <span>{% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}</span>
-                {% endif %}
                 {% for link in esnad.full_links %}
                 <span class="mx-1">←</span>
                 <a href="{% url 'landing:biography_detail' link.narrator.pk %}" class="hover:text-orange-600 transition duration-500">
@@ -316,9 +310,9 @@
                         </div>
                       </td>
                       <td class="px-4 py-3">
-                        <a href="{% url 'landing:biography_detail' biography.pk %}" class="text-base font-medium hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+                        <span class="text-base font-medium dark:text-white">
                           {% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}
-                        </a>
+                        </span>
                       </td>
                     </tr>
                   </tbody>
