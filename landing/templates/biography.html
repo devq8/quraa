@@ -245,7 +245,13 @@
             {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
             <div class="bio-esnad-item">
               <small>{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</small>
-              <div>{{ esnad.chain_display }}</div>
+              <div>
+                {% if biography.published or user.is_staff %}
+                <a href="{% url 'landing:biography_detail' biography.pk %}" class="hover:text-orange-600 dark:hover:text-orange-600 transition duration-500">{{ esnad.chain_display }}</a>
+                {% else %}
+                {{ esnad.chain_display }}
+                {% endif %}
+              </div>
               {% if esnad.isnad_rank and terminal %}
               <div class="bio-esnad-rank">
                 {% if LANGUAGE_CODE == 'ar' %}الرتبة الإسنادية: {{ esnad.isnad_rank }} واسطة إلى {{ terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar|default:terminal.narrator.alias_en|default:terminal.narrator.full_name_en }}{% else %}Isnad rank: {{ esnad.isnad_rank }} intermediaries to {{ terminal.narrator.alias_en|default:terminal.narrator.full_name_en|default:terminal.narrator.alias_ar|default:terminal.narrator.full_name_ar }}{% endif %}
@@ -255,11 +261,11 @@
             {% endwith %}{% endfor %}
           </div>
 
-          <!-- Chain view (toggled, styled like the Work Process timeline) -->
+          <!-- Chain view (toggled, table view) -->
           <div id="asanid-timeline-view" class="hidden">
             {% for esnad in esnads %}{% with terminal=esnad.terminal_link %}
-            <div class="{% if not forloop.first %}mt-10 pt-10 border-t border-dashed border-gray-200 dark:border-gray-700{% endif %}">
-              <div class="text-center mb-6">
+            <div class="{% if not forloop.first %}mt-8 pt-8 border-t border-gray-200 dark:border-gray-700{% endif %}">
+              <div class="mb-6">
                 <span class="inline-block bg-orange-600 text-white rounded-full px-4 py-1 text-sm font-medium">{% blocktrans with num=forloop.counter %}Chain #{{ num }}{% endblocktrans %}</span>
                 {% if esnad.isnad_rank and terminal %}
                 <p class="text-sm text-slate-400 mb-0 mt-2">
@@ -267,11 +273,37 @@
                 </p>
                 {% endif %}
               </div>
-              <div class="timeline relative">
-                {% include "_esnad_timeline_node.html" with node=biography step=0 is_first=True is_holder=True is_terminal=False left=True %}
-                {% for link in esnad.links.all %}
-                {% include "_esnad_timeline_node.html" with node=link.narrator step=forloop.counter is_first=False is_holder=False is_terminal=forloop.last left=forloop.counter|divisibleby:2 %}
-                {% endfor %}
+              <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                  <tbody>
+                    {% for link in esnad.links.all|dictsort:"id" reversed %}
+                    <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+                      <td class="px-4 py-3 text-center">
+                        <div class="size-10 rounded-full bg-transparent border-2 border-dashed border-orange-600 text-orange-600 flex items-center justify-center mx-auto">
+                          <span class="text-sm font-semibold">{{ forloop.revcounter }}</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-3">
+                        <a href="{% url 'landing:biography_detail' link.narrator.pk %}" class="text-base font-medium hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+                          {% if LANGUAGE_CODE == 'ar' %}{{ link.narrator.alias_ar|default:link.narrator.full_name_ar|default:link.narrator.alias_en|default:link.narrator.full_name_en }}{% else %}{{ link.narrator.alias_en|default:link.narrator.full_name_en|default:link.narrator.alias_ar|default:link.narrator.full_name_ar }}{% endif %}
+                        </a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="bg-orange-50 dark:bg-orange-950/20 border-b border-gray-200 dark:border-gray-700">
+                      <td class="px-4 py-3 text-center">
+                        <div class="size-10 rounded-full bg-orange-600 text-white flex items-center justify-center mx-auto">
+                          <i class="uil uil-user text-lg"></i>
+                        </div>
+                      </td>
+                      <td class="px-4 py-3">
+                        <span class="text-base font-medium dark:text-white">
+                          {% if LANGUAGE_CODE == 'ar' %}{{ biography.alias_ar|default:biography.full_name_ar|default:biography.alias_en|default:biography.full_name_en }}{% else %}{{ biography.alias_en|default:biography.full_name_en|default:biography.alias_ar|default:biography.full_name_ar }}{% endif %}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
             {% endwith %}{% endfor %}
