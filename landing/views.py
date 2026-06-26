@@ -171,6 +171,7 @@ def biography_detail(request, pk):
         "attributes",
         "sources",
         "esnads__links__narrator",
+        "esnads__links__narrator__esnads__links__narrator",
         "teacher_relationships__teacher",
         "teacher_relationships__notes",
         "student_relationships__student",
@@ -184,7 +185,11 @@ def biography_detail(request, pk):
     esnads = list(biography.esnads.all())
 
     for esnad in esnads:
-        esnad.reversed_links = list(reversed(list(esnad.links.all())))
+        expanded = esnad.get_expanded_links()
+        esnad.full_links = expanded
+        esnad.reversed_links = list(reversed(expanded))
+        esnad._isnad_rank_cache = len(expanded) - 1 if expanded else None
+        esnad.expanded_terminal = expanded[-1] if expanded else None
 
     site_settings = SiteSettings.objects.first()
 
@@ -225,18 +230,18 @@ def biographies(request):
         qs = qs.filter(attributes__id=attribute_id)
 
     results = list(
-        qs.prefetch_related("hometown", "esnads__links")
+        qs.prefetch_related("hometown", "esnads__links__narrator", "esnads__links__narrator__esnads__links__narrator")
         .distinct()
         .order_by("full_name_ar")
     )
 
-    # Strongest (shortest) chain per biography, mirroring the search view.
+    # Strongest (shortest) chain per biography, using expanded links.
     for bio in results:
         ranks = []
         for esnad in bio.esnads.all():
-            count = len(esnad.links.all())
-            if count:
-                ranks.append(count - 1)
+            expanded = esnad.get_expanded_links()
+            if expanded:
+                ranks.append(len(expanded) - 1)
         bio.best_isnad_rank = min(ranks) if ranks else None
 
     _sort_results(results, sort)
@@ -384,7 +389,7 @@ def search_results(request):
 
         logger.debug("search_results SQL=%s", qs.query)
         results = list(
-            qs.prefetch_related("hometown", "esnads__links")
+            qs.prefetch_related("hometown", "esnads__links__narrator", "esnads__links__narrator__esnads__links__narrator")
             .order_by("full_name_ar")
         )
 
@@ -397,7 +402,7 @@ def search_results(request):
                 apply_filters(
                     Biography.objects.filter(published=True).exclude(pk__in=exact_ids)
                 )
-                .prefetch_related("hometown", "esnads__links")
+                .prefetch_related("hometown", "esnads__links__narrator", "esnads__links__narrator__esnads__links__narrator")
                 .distinct()
             )
             scored = []
@@ -409,14 +414,14 @@ def search_results(request):
             results.extend(bio for _, bio in scored[:SIMILARITY_MAX_RESULTS])
 
     # Surface the strongest (shortest) chain each biography holds: the lowest
-    # isnad_rank across its esnads. Uses the prefetched links cache (len, not
-    # .count()) so no extra queries are issued per esnad.
+    # isnad_rank across its esnads. Uses expanded links (recursive) to count
+    # all intermediaries through the terminal narrator's chains.
     for bio in results:
         ranks = []
         for esnad in bio.esnads.all():
-            count = len(esnad.links.all())
-            if count:
-                ranks.append(count - 1)
+            expanded = esnad.get_expanded_links()
+            if expanded:
+                ranks.append(len(expanded) - 1)
         bio.best_isnad_rank = min(ranks) if ranks else None
 
     _sort_results(results, sort)

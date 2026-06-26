@@ -379,14 +379,51 @@ class Esnad(models.Model):
         verbose_name = _("Esnad")
         verbose_name_plural = _("Asanid")
         ordering = ["biography", "id"]
+    def get_expanded_links(self, visited_bio_ids=None):
+        """Recursively expand this esnad by following the terminal narrator's best (shortest) esnad.
+
+        Returns a list of EsnadLink objects representing the full chain from the holder
+        through the terminal narrator and any further narrators reachable via the terminal's esnads.
+
+        Cycle detection: stops if a visited biography is encountered again.
+        """
+        if visited_bio_ids is None:
+            visited_bio_ids = frozenset([self.biography_id])
+
+        my_links = list(self.links.select_related("narrator").order_by("order"))
+        if not my_links:
+            return []
+
+        terminal = my_links[-1].narrator
+        if terminal.pk in visited_bio_ids:
+            return my_links  # cycle guard
+
+        child_esnads = list(terminal.esnads.prefetch_related("links__narrator").all())
+        if not child_esnads:
+            return my_links  # terminal has no chain → stop
+
+        new_visited = visited_bio_ids | frozenset([terminal.pk])
+        best_extension, best_len = None, float("inf")
+        for child in child_esnads:
+            ext = child.get_expanded_links(new_visited)
+            if ext and len(ext) < best_len:  # skip empty child esnads, pick the shortest
+                best_len = len(ext)
+                best_extension = ext
+
+        return my_links + (best_extension or [])
+
     @property
     def isnad_rank(self):
-        """Number of intermediary narrators between the esnad holder and the
-        terminal narrator, excluding both endpoints. Returns None for empty chains."""
-        count = getattr(self, "_links_count", None)
-        if count is None:
-            count = self.links.count()
-        return count - 1 if count else None
+        """Rank = number of intermediary narrators in the expanded chain, excluding both endpoints.
+        Returns None for empty chains.
+
+        Uses cached value (_isnad_rank_cache) if available, otherwise computes from expanded links.
+        """
+        cached = getattr(self, "_isnad_rank_cache", None)
+        if cached is not None:
+            return cached
+        links = self.get_expanded_links()
+        return len(links) - 1 if links else None
     
     def __str__(self):
         lang = get_language()
