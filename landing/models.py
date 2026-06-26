@@ -15,6 +15,7 @@ class SiteSettings(models.Model):
     logo = models.ImageField(_("Logo"), upload_to="landing/logo", blank=True, null=True)
     logo_dark = models.ImageField(_("Logo (dark)"), upload_to="landing/logo", blank=True, null=True)
     favicon = models.ImageField(_("Favicon"), upload_to="landing/favicon", blank=True, null=True)
+    favicon_dark = models.ImageField(_("Favicon (dark)"), upload_to="landing/favicon", blank=True, null=True)
 
     # About us section
     about_heading_ar = models.CharField(_("About us heading (Arabic)"), max_length=255, blank=True)
