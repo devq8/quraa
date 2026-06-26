@@ -284,8 +284,7 @@
               <div class="overflow-x-auto">
                 <table class="w-full border-collapse">
                   <tbody>
-                    {% for link in esnad.reversed_links %}
-                    {% if forloop.first %}
+                    {% if esnad.expanded_terminal %}
                     <tr class="bg-orange-50 dark:bg-orange-950/20 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                       <td class="px-4 py-3 text-center">
                         <div class="size-10 rounded-full bg-orange-600 text-white flex items-center justify-center mx-auto">
@@ -293,12 +292,14 @@
                         </div>
                       </td>
                       <td class="px-4 py-3">
-                        <a href="{% url 'landing:biography_detail' link.narrator.pk %}" class="text-base font-medium hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
-                          {% if LANGUAGE_CODE == 'ar' %}{{ link.narrator.alias_ar|default:link.narrator.full_name_ar|default:link.narrator.alias_en|default:link.narrator.full_name_en }}{% else %}{{ link.narrator.alias_en|default:link.narrator.full_name_en|default:link.narrator.alias_ar|default:link.narrator.full_name_ar }}{% endif %}
+                        <a href="{% url 'landing:biography_detail' esnad.expanded_terminal.narrator.pk %}" class="text-base font-medium hover:text-orange-600 dark:text-white dark:hover:text-orange-600 transition duration-500">
+                          {% if LANGUAGE_CODE == 'ar' %}{{ esnad.expanded_terminal.narrator.alias_ar|default:esnad.expanded_terminal.narrator.full_name_ar|default:esnad.expanded_terminal.narrator.alias_en|default:esnad.expanded_terminal.narrator.full_name_en }}{% else %}{{ esnad.expanded_terminal.narrator.alias_en|default:esnad.expanded_terminal.narrator.full_name_en|default:esnad.expanded_terminal.narrator.alias_ar|default:esnad.expanded_terminal.narrator.full_name_ar }}{% endif %}
                         </a>
                       </td>
                     </tr>
-                    {% else %}
+                    {% endif %}
+                    {% for link in esnad.reversed_links %}
+                    {% if not forloop.first %}
                     <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                       <td class="px-4 py-3 text-center">
                         <div class="size-10 rounded-full bg-transparent border-2 border-dashed border-orange-600 text-orange-600 flex items-center justify-center mx-auto">
