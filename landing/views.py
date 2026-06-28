@@ -35,6 +35,11 @@ def landing(request):
     # Ordered lists
     services = list(Service.objects.all())
     featured_posts = list(Post.objects.filter(show_as_featured=True))
+    featured_biographies = list(
+        Biography.objects.filter(published=True, is_featured=True)
+        .select_related("death_location")
+        .prefetch_related("hometown", "attributes")[:6]
+    )
 
     context = {
         "site_settings": site_settings,
@@ -42,6 +47,7 @@ def landing(request):
         "hero": hero,
         "services": services,
         "featured_posts": featured_posts,
+        "featured_biographies": featured_biographies,
     }
     return render(request, "home.html", context)
 

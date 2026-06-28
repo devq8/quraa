@@ -141,6 +141,7 @@ document.getElementsByClassName("back-button")[0]?.addEventListener("click", (e)
 
 
 if(document.getElementsByClassName('tiny-two-item').length > 0) {
+    var isRTL = document.documentElement.dir === 'rtl';
     var slider = tns({
         container: '.tiny-two-item',
         controls: true,
@@ -151,12 +152,18 @@ if(document.getElementsByClassName('tiny-two-item').length > 0) {
         autoplayButtonOutput: false,
         autoplayTimeout: 3000,
         navPosition: "bottom",
-        controlsText: ['<i class="mdi mdi-chevron-left "></i>', '<i class="mdi mdi-chevron-right"></i>'],
+        controlsText: isRTL
+            ? ['<i class="mdi mdi-chevron-right"></i>', '<i class="mdi mdi-chevron-left"></i>']
+            : ['<i class="mdi mdi-chevron-left"></i>', '<i class="mdi mdi-chevron-right"></i>'],
         nav: false,
         speed: 400,
         gutter: 0,
+        items: 1,
         responsive: {
             768: {
+                items: 1
+            },
+            1024: {
                 items: 2
             },
         },

@@ -118,6 +118,10 @@ When administrators add or edit a Biography, the admin form checks for possible 
 - Duplicate links open in a new browser tab so the current add/edit form remains open.
 - The warning is advisory only and does not block saving.
 
+### Translation Maintenance
+
+The Arabic locale catalog lives in `locale/ar/LC_MESSAGES/django.po` and is compiled to `django.mo`. When adding public-site or admin labels, wrap static text with Django translation tags/functions, refresh messages with `python manage.py makemessages -l ar`, fill any missing Arabic translations, then run `python manage.py compilemessages`.
+
 ### Project Structure
 
 - **quraa/** — Django project settings and root URL configuration.

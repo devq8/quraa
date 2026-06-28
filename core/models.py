@@ -10,6 +10,23 @@ class Biography(models.Model):
     alias_ar = models.CharField(_("Alias (Arabic)"), max_length=255, blank=True)
     alias_en = models.CharField(_("Alias (English)"), max_length=255, blank=True)
 
+    published = models.BooleanField(_("Published"), default=False)
+    is_female = models.BooleanField(_("Female"), default=False)
+    is_featured = models.BooleanField(_("Featured"), default=False)
+    featured_summary_ar = models.TextField(
+        _("Featured Summary (Arabic)"), blank=True,
+        help_text="نبذة مختصرة تظهر في قسم أبرز التراجم في الصفحة الرئيسية",
+    )
+    featured_summary_en = models.TextField(
+        _("Featured Summary (English)"), blank=True,
+        help_text="Short summary shown in the Featured Biographies card on the home page",
+    )
+    image = models.ImageField(
+        _("Image"), upload_to="biography/images",
+        help_text=_("Optional image for Featured Biographies in the home page"),
+        blank=True, null=True
+    )
+
     birthplace = models.ForeignKey(
         "Location", on_delete=models.SET_NULL, null=True, blank=True, related_name="birthplace", verbose_name=_("Birthplace"),
     )
@@ -74,8 +91,6 @@ class Biography(models.Model):
         verbose_name=_("User Account"),
     )
 
-    is_female = models.BooleanField(_("Female"), default=False)
-    published = models.BooleanField(_("Published"), default=False)
     name_search = models.TextField(blank=True, default="", editable=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -242,6 +257,16 @@ class Location(models.Model):
         ordering = ["id", "country_ar", "city_ar"]
         constraints = [ models.UniqueConstraint(fields=["country_ar", "city_ar"], name="unique_location_ar") ]
 
+
+
+def _biography_hometown_str(self):
+    return str(self.location) if self.location_id else str(_("Hometown"))
+
+
+BiographyHometown = Biography.hometown.through
+BiographyHometown.__str__ = _biography_hometown_str
+BiographyHometown._meta.verbose_name = _("Hometown")
+BiographyHometown._meta.verbose_name_plural = _("Hometowns")
 
 
 # صفات وتصنيفات مثل ١٠ك (القراءات العشر الكبرى) ، ١٠ص (القراءات العشر الصغرى) ... إلخ
