@@ -51,8 +51,8 @@ class TeacherInline(nested_admin.NestedTabularInline):
     extra = 0
     fields = ("teacher", "notes")
     autocomplete_fields = ("teacher", "notes")
-    verbose_name = _("Teacher")
-    verbose_name_plural = _("Teachers")
+    verbose_name = _("Notable Teacher")
+    verbose_name_plural = _("Notable Teachers")
 
 
 class StudentInline(nested_admin.NestedTabularInline):
@@ -62,8 +62,8 @@ class StudentInline(nested_admin.NestedTabularInline):
     extra = 0
     fields = ("student", "notes")
     autocomplete_fields = ("student", "notes")
-    verbose_name = _("Student")
-    verbose_name_plural = _("Students")
+    verbose_name = _("Notable Student")
+    verbose_name_plural = _("Notable Students")
 
 
 class HometownInlineForm(forms.ModelForm):
@@ -111,18 +111,18 @@ class EsnadInline(nested_admin.NestedStackedInline):
     show_change_link = True
     inlines = [EsnadLinkNestedInline]
     verbose_name = _("Esnad")
-    verbose_name_plural = _("Asanid")
+    verbose_name_plural = _("Transmission Chains")
 
 
 @admin.register(Biography)
 class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     list_display = (
-        "id", "full_name_ar", "full_name_en", "alias_ar", "published",
+        "id", "full_name_ar", "full_name_en", "alias_ar", "published", "is_featured",
         "birth_hijri_year", "birth_greg_year",
         "death_hijri_year", "death_greg_year",
         "birthplace", "get_hometowns", "death_location",
     )
-    list_filter = ("birthplace", "hometown", "death_location", "attributes", "published")
+    list_filter = ("birthplace", "hometown", "death_location", "attributes", "published", "is_featured")
     search_fields = ("full_name_ar", "full_name_en", "alias_ar", "alias_en")
 
     @admin.display(description=_("Hometown"))
@@ -532,9 +532,11 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             "fields": (
                 ("full_name_ar", "full_name_en"),
                 ("alias_ar", "alias_en"),
-                "attributes", "published",
+                ("is_female", "published", "is_featured"),
+                "image",
+                ("featured_summary_ar", "featured_summary_en"),
                 "comments_ar", "comments_en",
-                "user",
+                "attributes", "user",
             ),
         }),
         (_("Birth"), {

@@ -16,6 +16,9 @@ class SiteSettings(models.Model):
     logo_dark = models.ImageField(_("Logo (dark)"), upload_to="landing/logo", blank=True, null=True)
     favicon = models.ImageField(_("Favicon"), upload_to="landing/favicon", blank=True, null=True)
     favicon_dark = models.ImageField(_("Favicon (dark)"), upload_to="landing/favicon", blank=True, null=True)
+    biography_placeholder_image = models.ImageField(
+        _("Biography placeholder image"), upload_to="landing/biography_placeholder", blank=True, null=True
+    )
 
     # About us section
     about_heading_ar = models.CharField(_("About us heading (Arabic)"), max_length=255, blank=True)
@@ -52,6 +55,14 @@ class SiteSettings(models.Model):
     blog_description_ar = models.TextField(_("Blog description (Arabic)"), max_length=2000, blank=True)
     blog_description_en = models.TextField(_("Blog description (English)"), max_length=2000, blank=True)
 
+    # Featured biographies section header
+    featured_biographies_heading_ar = models.CharField(_("Featured biographies heading (Arabic)"), max_length=255, blank=True)
+    featured_biographies_heading_en = models.CharField(_("Featured biographies heading (English)"), max_length=255, blank=True)
+    featured_biographies_subheading_ar = models.CharField(_("Featured biographies subheading (Arabic)"), max_length=255, blank=True)
+    featured_biographies_subheading_en = models.CharField(_("Featured biographies subheading (English)"), max_length=255, blank=True)
+    featured_biographies_description_ar = models.TextField(_("Featured biographies description (Arabic)"), max_length=2000, blank=True)
+    featured_biographies_description_en = models.TextField(_("Featured biographies description (English)"), max_length=2000, blank=True)
+
     # Contact section
     contact_heading_ar = models.CharField(_("Contact heading (Arabic)"), max_length=255, blank=True)
     contact_heading_en = models.CharField(_("Contact heading (English)"), max_length=255, blank=True)
@@ -86,7 +97,7 @@ class SiteSettings(models.Model):
         verbose_name_plural = _("Site settings")
 
     def __str__(self):
-        return "Site settings"
+        return str(_("Site settings"))
 
     def save(self, *args, **kwargs):
         # Keep only one instance (singleton)

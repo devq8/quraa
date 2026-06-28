@@ -14,6 +14,7 @@ from .models import (
 RICH_TEXT_FIELDS = (
     "about_description_ar", "about_description_en",
     "services_description_ar", "services_description_en",
+    "featured_biographies_description_ar", "featured_biographies_description_en",
     "blog_description_ar", "blog_description_en",
     "contact_description_ar", "contact_description_en",
 )
@@ -44,6 +45,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         (_("About us section"), {"fields": ("about_heading_ar", "about_heading_en", "about_subheading_ar", "about_subheading_en", "about_description_ar", "about_description_en", "about_image", "about_url")}),
         (_("Services section header"), {"fields": ("services_heading_ar", "services_heading_en", "services_subheading_ar", "services_subheading_en", "services_description_ar", "services_description_en")}),
         (_("Donate section"), {"fields": ("donate_heading_ar", "donate_heading_en", "donate_subheading_ar", "donate_subheading_en", "donate_button_text_ar", "donate_button_text_en", "donate_button_link")}),
+        (_("Featured biographies section"), {"fields": ("featured_biographies_heading_ar", "featured_biographies_heading_en", "featured_biographies_subheading_ar", "featured_biographies_subheading_en", "featured_biographies_description_ar", "featured_biographies_description_en", "biography_placeholder_image")}),
         (_("Blog section header"), {"fields": ("blog_heading_ar", "blog_heading_en", "blog_subheading_ar", "blog_subheading_en", "blog_description_ar", "blog_description_en")}),
         (_("Contact section"), {"fields": ("contact_heading_ar", "contact_heading_en", "contact_subheading_ar", "contact_subheading_en", "contact_description_ar", "contact_description_en", "contact_email", "contact_phone", "contact_address_ar", "contact_address_en")}),
         (_("Social media links"), {"fields": ("facebook_url", "twitter_url", "instagram_url")}),

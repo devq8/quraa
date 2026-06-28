@@ -20,6 +20,7 @@ from django.contrib.auth import logout
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
 from django.urls import path, include, reverse_lazy
+from django.views.generic import TemplateView
 
 from core import views as core_views
 
@@ -81,6 +82,7 @@ urlpatterns = [
     ),
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("landing.urls")),
+    path("preview/base-original/", TemplateView.as_view(template_name="base_original.html"), name="preview_base_original"),
 ]
 # With DEBUG=False, uploads use S3; image URLs point to the bucket (no Django route).
 if settings.DEBUG:
