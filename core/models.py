@@ -54,6 +54,15 @@ class Biography(models.Model):
     death_hijri_approximate = models.BooleanField(_("Death Hijri Approximate"), default=False)
     death_greg_approximate = models.BooleanField(_("Death Gregorian Approximate"), default=False)
 
+    birth_date_raw_ar = models.CharField(
+        _("Birth Date (raw Arabic text)"), max_length=255, blank=True, default="",
+        help_text="النص الأصلي لتاريخ الميلاد كما ورد في مصدر الاستيراد",
+    )
+    death_date_raw_ar = models.CharField(
+        _("Death Date (raw Arabic text)"), max_length=255, blank=True, default="",
+        help_text="النص الأصلي لتاريخ الوفاة كما ورد في مصدر الاستيراد",
+    )
+
     attributes = models.ManyToManyField(
         "Attribute", blank=True, related_name="biographies",
         verbose_name=_("Attributes"),
