@@ -545,6 +545,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 ("birth_hijri_year", "birth_hijri_month", "birth_hijri_day"),
                 ("birth_greg_year",  "birth_greg_month",  "birth_greg_day"),
                 ("birth_hijri_approximate", "birth_greg_approximate"),
+                "birth_date_raw_ar",
             ),
         }),
         (_("Death"), {
@@ -553,6 +554,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 ("death_hijri_year", "death_hijri_month", "death_hijri_day"),
                 ("death_greg_year",  "death_greg_month",  "death_greg_day"),
                 ("death_hijri_approximate", "death_greg_approximate"),
+                "death_date_raw_ar",
             ),
         }),
     )
