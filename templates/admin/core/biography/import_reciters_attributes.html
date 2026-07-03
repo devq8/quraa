@@ -1,0 +1,77 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_import_reciters' %}">{% trans 'Import Reciters CSV' %}</a>
+  &rsaquo; {% trans 'Resolve Attributes' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <form method="post" action="{{ wizard_url }}">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="attributes">
+
+    {% if fuzzy_attrs %}
+    <div class="module" style="padding:.7em 1.2em; margin-bottom:1.5em;">
+      <h2>{% blocktrans count counter=fuzzy_attrs|length %}{{ counter }} fuzzy match — needs decision{% plural %}{{ counter }} fuzzy matches — need decisions{% endblocktrans %}</h2>
+      <p class="help">{% trans "Each attribute below has a close but not exact match in the database. Choose whether to accept the existing attribute, create a new one, or skip." %}</p>
+
+      {% for i, item in fuzzy_attrs %}
+      <div style="border:1px solid #ddd; padding:.6em 1em; margin-bottom:.8em; background:#fff;">
+        <p style="margin:.2em 0;">
+          <strong dir="rtl">{{ item.name }}</strong>
+          &mdash; {% trans "closest match:" %} <em dir="rtl">{{ item.match_name }}</em>
+          ({{ item.score|floatformat:0 }}%)
+        </p>
+        <label style="margin-inline-end:1.2em;">
+          <input type="radio" name="fuzzy_{{ i }}_action" value="accept" checked>
+          {% blocktrans with name=item.match_name %}Accept "{{ name }}"{% endblocktrans %}
+        </label>
+        <label style="margin-inline-end:1.2em;">
+          <input type="radio" name="fuzzy_{{ i }}_action" value="create">
+          {% blocktrans with name=item.name %}Create new "{{ name }}"{% endblocktrans %}
+        </label>
+        <label>
+          <input type="radio" name="fuzzy_{{ i }}_action" value="skip">
+          {% trans "Skip" %}
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if missing_attrs %}
+    <div class="module" style="padding:.7em 1.2em; margin-bottom:1.5em;">
+      <h2>{% blocktrans count counter=missing_attrs|length %}{{ counter }} new attribute (no match in database){% plural %}{{ counter }} new attributes (no match in database){% endblocktrans %}</h2>
+      <p class="help">{% trans "These attribute names have no match. A new Attribute will be created for each. You may provide a long name, or tick 'Skip' to ignore it." %}</p>
+
+      {% for i, name in missing_attrs %}
+      <div style="border:1px solid #ddd; padding:.6em 1em; margin-bottom:.8em; background:#fff;">
+        <p style="margin:.2em 0;"><strong dir="rtl">{{ name }}</strong></p>
+        <label style="display:block; margin-bottom:.3em;">
+          {% trans "Long name (Arabic):" %}
+          <input type="text" name="missing_{{ i }}_long_name"
+                 style="width:22em; margin-inline-start:.4em;" dir="rtl"
+                 placeholder="{{ name }}">
+        </label>
+        <label>
+          <input type="checkbox" name="missing_{{ i }}_skip" value="1">
+          {% trans "Skip — do not create this attribute" %}
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="submit-row">
+      <input type="submit" class="default" value="{% trans 'Save attribute decisions →' %}">
+    </div>
+  </form>
+</div>
+{% endblock %}

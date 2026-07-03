@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_import_reciters' %}">{% trans 'Import Reciters CSV' %}</a>
+  &rsaquo; {% trans 'Resolve Locations' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <p>{% blocktrans count counter=unique_cities|length %}{{ counter }} location has no country.{% plural %}{{ counter }} locations have no country.{% endblocktrans %}
+  {% trans "Decisions here apply to all rows that share the same city name." %}</p>
+
+  {% if existing_countries %}
+  <datalist id="country-list">
+    {% for c in existing_countries %}<option value="{{ c }}">{% endfor %}
+  </datalist>
+  {% endif %}
+
+  <form method="post" action="{{ wizard_url }}">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="locations">
+
+    {% for i, city in unique_cities %}
+    <div class="module" style="padding:.7em 1.2em; margin-bottom:1em;">
+      <h3 style="margin:.2em 0 .5em; direction:rtl;">{{ city }}</h3>
+
+      <div class="form-row" style="margin-bottom:.5em;">
+        <label for="id_loc_{{ i }}_country">{% trans "Country / Region (Arabic):" %}</label>
+        <input type="text" id="id_loc_{{ i }}_country" name="loc_{{ i }}_country"
+               list="country-list" style="width:18em; margin-inline-start:.5em;"
+               placeholder="{% trans 'type or choose' %}">
+      </div>
+
+      <div>
+        <p style="margin:.4em 0 .2em;"><strong>{% blocktrans with city=city %}Is "{{ city }}" a city or a country/region?{% endblocktrans %}</strong></p>
+        <label style="margin-inline-end:1.5em;">
+          <input type="radio" name="loc_{{ i }}_type" value="city" checked>
+          {% trans "City — the name above is the city; the country field is the country" %}
+        </label>
+        <label>
+          <input type="radio" name="loc_{{ i }}_type" value="region">
+          {% blocktrans with city=city %}"{{ city }}" is itself the country/region — leave city blank{% endblocktrans %}
+        </label>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="submit-row">
+      <input type="submit" class="default" value="{% trans 'Save location decisions →' %}">
+    </div>
+  </form>
+</div>
+{% endblock %}

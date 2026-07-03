@@ -1,0 +1,82 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_import_reciters' %}">{% trans 'Import Reciters CSV' %}</a>
+  &rsaquo; {% trans 'Resolve Dates' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <p>{% blocktrans count counter=ambiguous_dates|length %}{{ counter }} date string needs your decision.{% plural %}{{ counter }} date strings need your decision.{% endblocktrans %}
+  {% trans "The original Arabic text is always saved regardless of your choice." %}</p>
+
+  <form method="post" action="{{ wizard_url }}">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="dates">
+
+    {% for d in ambiguous_dates %}
+    <div class="module" style="padding:.7em 1.2em; margin-bottom:1em;">
+      <h3 style="margin:.2em 0 .5em;">
+        {{ d.label }} &mdash; <span dir="rtl">{{ d.name }}</span>
+      </h3>
+      <p><strong>{% trans "Raw text:" %}</strong> <span dir="rtl" style="font-family:monospace;">{{ d.raw }}</span></p>
+      {% if d.year %}
+      <p><strong>{% trans "Auto-parsed:" %}</strong>
+        {% trans "Year" %} {{ d.year }}
+        ({{ d.calendar }}){% if d.approximate %}, {% trans "approximate" %}{% endif %}
+      </p>
+      {% else %}
+      <p class="help errornote" style="padding:.3em .6em;">{% trans "Could not extract a year from this text." %}</p>
+      {% endif %}
+
+      <div style="margin-top:.5em;">
+        {% if d.year %}
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="date_{{ d.idx }}_{{ d.prefix }}_action" value="keep" checked>
+          {% blocktrans with yr=d.year cal=d.calendar %}Accept as-is — year {{ yr }} ({{ cal }}){% endblocktrans %}
+          {% if d.approximate %} &mdash; {% trans "approximate" %}{% endif %}
+        </label>
+        {% endif %}
+        {% if d.alt_year %}
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="date_{{ d.idx }}_{{ d.prefix }}_action" value="alt">
+          {% blocktrans with yr=d.alt_year %}Use alternative year {{ yr }}هـ (approximate){% endblocktrans %}
+        </label>
+        {% endif %}
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="date_{{ d.idx }}_{{ d.prefix }}_action" value="manual"
+                 {% if not d.year %}checked{% endif %}>
+          {% trans "Enter manually:" %}
+        </label>
+        <div style="margin-inline-start:1.8em; margin-top:.2em;">
+          <input type="number" name="date_{{ d.idx }}_{{ d.prefix }}_year" min="1" max="2100"
+                 placeholder="{% trans 'year' %}" style="width:80px;">
+          <select name="date_{{ d.idx }}_{{ d.prefix }}_cal" style="margin-inline-start:.5em;">
+            <option value="hijri">{% trans "Hijri" %}</option>
+            <option value="gregorian">{% trans "Gregorian" %}</option>
+          </select>
+          <label style="margin-inline-start:.8em;">
+            <input type="checkbox" name="date_{{ d.idx }}_{{ d.prefix }}_approx" value="1">
+            {% trans "approximate" %}
+          </label>
+        </div>
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="date_{{ d.idx }}_{{ d.prefix }}_action" value="empty">
+          {% trans "Leave date empty (raw text preserved in raw field)" %}
+        </label>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="submit-row">
+      <input type="submit" class="default" value="{% trans 'Save date decisions →' %}">
+    </div>
+  </form>
+</div>
+{% endblock %}

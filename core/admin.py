@@ -134,6 +134,8 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
 
     # Session key holding the parsed-but-not-yet-committed CSV rows.
     _CSV_SESSION_KEY = "biography_csv_rows"
+    # Session key for the multi-step reciters import wizard.
+    _RECITERS_SESSION = "reciters_import_wizard"
 
     # --- CSV import -----------------------------------------------------
 
@@ -173,6 +175,11 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 "merge-confirm/",
                 self.admin_site.admin_view(self.merge_confirm_view),
                 name="core_biography_merge_confirm",
+            ),
+            path(
+                "import-reciters/",
+                self.admin_site.admin_view(self.import_reciters_view),
+                name="core_biography_import_reciters",
             ),
         ]
         return custom + super().get_urls()
@@ -475,6 +482,262 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         return TemplateResponse(
             request, "admin/core/biography/merge_confirm.html", context
         )
+
+    def import_reciters_view(self, request):  # noqa: C901
+        """Multi-step wizard for importing biographies from a custom Arabic CSV."""
+        from . import import_reciters_wizard as wiz
+
+        if not self.has_add_permission(request):
+            messages.error(request, _("You do not have permission to import biographies."))
+            return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
+
+        def redirect_to(s):
+            return HttpResponseRedirect(f"{request.path}?step={s}")
+
+        def save_session(data):
+            request.session[self._RECITERS_SESSION] = data
+            request.session.modified = True
+
+        session = request.session.get(self._RECITERS_SESSION) or {}
+        step = request.GET.get("step", "upload")
+
+        base_ctx = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "wizard_url": request.path,
+        }
+
+        # ── POST handlers ──────────────────────────────────────────────────────
+        if request.method == "POST":
+            post_step = request.POST.get("step", step)
+
+            if post_step == "upload":
+                upload = request.FILES.get("csv_file")
+                published_mode = request.POST.get("published_mode", "unpublished")
+                if not upload:
+                    messages.error(request, _("Please select a CSV file."))
+                    return redirect_to("upload")
+                try:
+                    rows, stats, csv_text = wiz.scan_csv_file(upload)
+                except Exception as exc:
+                    messages.error(request, f"Error reading file: {exc}")
+                    return redirect_to("upload")
+                if not rows:
+                    messages.error(request, _("No data rows found in the file."))
+                    return redirect_to("upload")
+                save_session({
+                    "csv_text": csv_text,
+                    "published_mode": published_mode,
+                    "rows": rows,
+                    "stats": stats,
+                    "date_decisions": {},
+                    "location_decisions": {},
+                    "attr_decisions": {},
+                })
+                return redirect_to("scan")
+
+            # All subsequent steps require an active session.
+            if not session or "rows" not in session:
+                messages.error(request, _("Session expired. Please upload the file again."))
+                return redirect_to("upload")
+
+            rows = session["rows"]
+            stats = session.get("stats", {})
+
+            if post_step == "scan":
+                if stats.get("ambiguous_dates", 0) > 0:
+                    return redirect_to("dates")
+                if stats.get("missing_countries", 0) > 0:
+                    return redirect_to("locations")
+                if stats.get("fuzzy_attrs", 0) + stats.get("missing_attrs", 0) > 0:
+                    return redirect_to("attributes")
+                return redirect_to("commit")
+
+            elif post_step == "dates":
+                date_decisions = {}
+                for idx, row in enumerate(rows):
+                    for prefix in ("birth", "death"):
+                        if not row.get(f"{prefix}_needs_confirm"):
+                            continue
+                        parsed = dict(row[f"{prefix}_parsed"])
+                        action = request.POST.get(f"date_{idx}_{prefix}_action", "keep")
+                        if action == "empty":
+                            parsed["calendar"] = None
+                            parsed["year"] = None
+                        elif action == "alt":
+                            import re as _re2
+                            m = _re2.search(r"وقيل\s+(\d+)هـ", parsed.get("raw", ""))
+                            if m:
+                                parsed["year"] = int(m.group(1))
+                                parsed["approximate"] = True
+                        elif action == "manual":
+                            year_str = request.POST.get(f"date_{idx}_{prefix}_year", "")
+                            cal_str = request.POST.get(f"date_{idx}_{prefix}_cal", "hijri")
+                            approx = request.POST.get(f"date_{idx}_{prefix}_approx") == "1"
+                            if year_str.isdigit():
+                                parsed["year"] = int(year_str)
+                                parsed["calendar"] = cal_str
+                                parsed["approximate"] = approx
+                            else:
+                                parsed["calendar"] = None
+                                parsed["year"] = None
+                        date_decisions[f"{idx}_{prefix}"] = parsed
+                session["date_decisions"] = date_decisions
+                save_session(session)
+                if stats.get("missing_countries", 0) > 0:
+                    return redirect_to("locations")
+                if stats.get("fuzzy_attrs", 0) + stats.get("missing_attrs", 0) > 0:
+                    return redirect_to("attributes")
+                return redirect_to("commit")
+
+            elif post_step == "locations":
+                unique_cities = wiz.get_unique_missing_cities(rows)
+                location_decisions = {}
+                for i, city in enumerate(unique_cities):
+                    country = request.POST.get(f"loc_{i}_country", "").strip()
+                    is_region = request.POST.get(f"loc_{i}_type") == "region"
+                    if is_region:
+                        location_decisions[city] = {"city_ar": "", "country_ar": city}
+                    else:
+                        location_decisions[city] = {"city_ar": city, "country_ar": country}
+                session["location_decisions"] = location_decisions
+                save_session(session)
+                if stats.get("fuzzy_attrs", 0) + stats.get("missing_attrs", 0) > 0:
+                    return redirect_to("attributes")
+                return redirect_to("commit")
+
+            elif post_step == "attributes":
+                fuzzy_attrs = wiz.get_unique_fuzzy_attrs(rows)
+                missing_attrs = wiz.get_unique_missing_attrs(rows)
+                attr_decisions = {}
+                for i, item in enumerate(fuzzy_attrs):
+                    action = request.POST.get(f"fuzzy_{i}_action", "accept")
+                    attr_decisions[item["name"]] = {
+                        "action": action,
+                        "match_pk": item["match_pk"],
+                        "long_name": item["name"],
+                    }
+                for i, name in enumerate(missing_attrs):
+                    skip = request.POST.get(f"missing_{i}_skip") == "1"
+                    if skip:
+                        attr_decisions[name] = {"action": "skip"}
+                    else:
+                        long_name = (
+                            request.POST.get(f"missing_{i}_long_name", "").strip() or name
+                        )
+                        attr_decisions[name] = {"action": "create", "long_name": long_name}
+                session["attr_decisions"] = attr_decisions
+                save_session(session)
+                return redirect_to("commit")
+
+            elif post_step == "commit":
+                teacher_fuzzy_mode = request.POST.get("teacher_fuzzy_mode", "auto")
+                try:
+                    result_stats = wiz.commit_import(
+                        rows,
+                        session.get("published_mode", "unpublished"),
+                        session.get("date_decisions", {}),
+                        session.get("location_decisions", {}),
+                        session.get("attr_decisions", {}),
+                        teacher_fuzzy_mode=teacher_fuzzy_mode,
+                    )
+                except Exception as exc:
+                    messages.error(request, f"Import failed: {exc}")
+                    return redirect_to("commit")
+                session["results"] = result_stats
+                save_session(session)
+                return redirect_to("results")
+
+        # ── GET handlers ───────────────────────────────────────────────────────
+        if step == "upload":
+            return TemplateResponse(request, "admin/core/biography/import_reciters_upload.html", {
+                **base_ctx, "title": _("Import Reciters CSV"),
+            })
+
+        if not session or "rows" not in session:
+            messages.error(request, _("Session expired. Please start the import again."))
+            return redirect_to("upload")
+
+        rows = session.get("rows", [])
+        stats = session.get("stats", {})
+
+        if step == "scan":
+            return TemplateResponse(request, "admin/core/biography/import_reciters_scan.html", {
+                **base_ctx,
+                "title": _("Import — Scan Results"),
+                "stats": stats,
+                "published_mode": session.get("published_mode"),
+            })
+
+        if step == "dates":
+            import re as _re3
+            ambiguous = []
+            for idx, row in enumerate(rows):
+                for prefix in ("birth", "death"):
+                    if not row.get(f"{prefix}_needs_confirm"):
+                        continue
+                    parsed = row[f"{prefix}_parsed"]
+                    raw_text = parsed.get("raw", "")
+                    alt_m = _re3.search(r"وقيل\s+(\d+)هـ", raw_text)
+                    ambiguous.append({
+                        "idx": idx,
+                        "prefix": prefix,
+                        "name": row["full_name_ar"],
+                        "label": _("Birth") if prefix == "birth" else _("Death"),
+                        "raw": raw_text,
+                        "year": parsed.get("year"),
+                        "calendar": parsed.get("calendar"),
+                        "approximate": parsed.get("approximate"),
+                        "alt_year": int(alt_m.group(1)) if alt_m else None,
+                    })
+            return TemplateResponse(request, "admin/core/biography/import_reciters_dates.html", {
+                **base_ctx,
+                "title": _("Import — Resolve Ambiguous Dates"),
+                "ambiguous_dates": ambiguous,
+            })
+
+        if step == "locations":
+            unique_cities = wiz.get_unique_missing_cities(rows)
+            all_locations = Location.objects.values_list("country_ar", flat=True).distinct()
+            existing_countries = sorted(c for c in all_locations if c)
+            return TemplateResponse(request, "admin/core/biography/import_reciters_locations.html", {
+                **base_ctx,
+                "title": _("Import — Resolve Missing Countries"),
+                "unique_cities": list(enumerate(unique_cities)),
+                "existing_countries": existing_countries,
+            })
+
+        if step == "attributes":
+            fuzzy_attrs = wiz.get_unique_fuzzy_attrs(rows)
+            missing_attrs = wiz.get_unique_missing_attrs(rows)
+            return TemplateResponse(request, "admin/core/biography/import_reciters_attributes.html", {
+                **base_ctx,
+                "title": _("Import — Resolve Attributes"),
+                "fuzzy_attrs": list(enumerate(fuzzy_attrs)),
+                "missing_attrs": list(enumerate(missing_attrs)),
+            })
+
+        if step == "commit":
+            return TemplateResponse(request, "admin/core/biography/import_reciters_commit.html", {
+                **base_ctx,
+                "title": _("Import — Ready to Commit"),
+                "stats": stats,
+                "published_mode": session.get("published_mode"),
+                "date_decisions_count": len(session.get("date_decisions", {})),
+                "location_decisions_count": len(session.get("location_decisions", {})),
+                "attr_decisions_count": len(session.get("attr_decisions", {})),
+            })
+
+        if step == "results":
+            results = session.get("results", {})
+            request.session.pop(self._RECITERS_SESSION, None)
+            return TemplateResponse(request, "admin/core/biography/import_reciters_results.html", {
+                **base_ctx,
+                "title": _("Import — Complete"),
+                "results": results,
+            })
+
+        return redirect_to("upload")
 
     def get_ordering(self, request):
         return _lang_ordering(("full_name_ar",), ("full_name_en", "full_name_ar"))
