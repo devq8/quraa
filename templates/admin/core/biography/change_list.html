@@ -13,6 +13,11 @@
   </a>
 </li>
 <li>
+  <a href="{% url 'admin:core_biography_import_reciters' %}" class="addlink">
+    {% trans "Import Reciters CSV" %}
+  </a>
+</li>
+<li>
   <a
     href="{% url 'admin:core_biography_export_csv' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
     class="addlink"

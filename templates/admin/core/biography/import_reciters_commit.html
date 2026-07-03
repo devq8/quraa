@@ -1,0 +1,63 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_import_reciters' %}">{% trans 'Import Reciters CSV' %}</a>
+  &rsaquo; {% trans 'Confirm Import' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <div class="module" style="padding:.8em 1.2em; margin-bottom:1.2em;">
+    <h2>{% trans "Ready to commit" %}</h2>
+    <table style="width:auto; margin:.6em 0;">
+      <tr><th style="text-align:start; padding:.2em 1em .2em 0;">{% trans "Rows to import" %}</th>      <td>{{ stats.total }}</td></tr>
+      <tr><th style="text-align:start; padding:.2em 1em .2em 0;">{% trans "Published mode" %}</th>       <td>{{ published_mode }}</td></tr>
+      <tr><th style="text-align:start; padding:.2em 1em .2em 0;">{% trans "Date decisions resolved" %}</th><td>{{ date_decisions_count }}</td></tr>
+      <tr><th style="text-align:start; padding:.2em 1em .2em 0;">{% trans "Location decisions resolved" %}</th><td>{{ location_decisions_count }}</td></tr>
+      <tr><th style="text-align:start; padding:.2em 1em .2em 0;">{% trans "Attribute decisions resolved" %}</th><td>{{ attr_decisions_count }}</td></tr>
+    </table>
+    <p>{% trans "Exact duplicate names will update the existing biography. All others create a new record." %}</p>
+  </div>
+
+  <form method="post" action="{{ wizard_url }}">
+    {% csrf_token %}
+    <input type="hidden" name="step" value="commit">
+
+    <fieldset class="module aligned" style="padding:.8em 1.2em;">
+      <h2>{% trans "Teacher / Student linking (Phase 4)" %}</h2>
+      <p class="help">{% trans "After all biographies are created, teacher and student names are matched against the database. Choose how to handle fuzzy (non-exact) matches." %}</p>
+      <div style="margin-top:.6em;">
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="teacher_fuzzy_mode" value="auto" checked>
+          {% trans "Auto-link fuzzy matches (≥85% similarity) — recommended" %}
+        </label>
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="teacher_fuzzy_mode" value="stub">
+          {% trans "Create a new stub biography for every unconfirmed fuzzy match" %}
+        </label>
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="teacher_fuzzy_mode" value="skip">
+          {% trans "Skip all names that are not an exact match" %}
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="submit-row">
+      <input type="submit" class="default"
+             value="{% trans 'Commit import — save to database' %}"
+             onclick="this.disabled=true; this.value='{% trans "Importing… please wait" %}'; this.form.submit();">
+      <a href="{% url 'admin:core_biography_import_reciters' %}" class="deletelink" style="margin-inline-start:1em;">
+        {% trans "Cancel — start over" %}
+      </a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

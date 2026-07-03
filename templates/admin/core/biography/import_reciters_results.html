@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:core_biography_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; {% trans 'Import Complete' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <div class="module" style="padding:.8em 1.2em; margin-bottom:1.2em;">
+    <h2>{% trans "Import complete" %}</h2>
+    <table style="width:auto; margin:.8em 0 .4em; border-collapse:collapse;">
+      <tr style="background:#f8f8f8;">
+        <th style="text-align:start; padding:.35em 1.5em .35em 0; border-bottom:1px solid #ddd;">{% trans "Biographies created" %}</th>
+        <td style="padding:.35em 0; border-bottom:1px solid #ddd; font-weight:bold;">{{ results.created|default:0 }}</td>
+      </tr>
+      <tr>
+        <th style="text-align:start; padding:.35em 1.5em .35em 0; border-bottom:1px solid #ddd;">{% trans "Biographies updated (exact duplicate)" %}</th>
+        <td style="padding:.35em 0; border-bottom:1px solid #ddd;">{{ results.updated|default:0 }}</td>
+      </tr>
+      <tr style="background:#f8f8f8;">
+        <th style="text-align:start; padding:.35em 1.5em .35em 0; border-bottom:1px solid #ddd;">{% trans "New locations created" %}</th>
+        <td style="padding:.35em 0; border-bottom:1px solid #ddd;">{{ results.new_locations|default:0 }}</td>
+      </tr>
+      <tr>
+        <th style="text-align:start; padding:.35em 1.5em .35em 0; border-bottom:1px solid #ddd;">{% trans "New attributes created" %}</th>
+        <td style="padding:.35em 0; border-bottom:1px solid #ddd;">{{ results.new_attrs|default:0 }}</td>
+      </tr>
+      <tr style="background:#f8f8f8;">
+        <th style="text-align:start; padding:.35em 1.5em .35em 0; border-bottom:1px solid #ddd;">{% trans "Stub biographies created (unmatched teachers/students)" %}</th>
+        <td style="padding:.35em 0; border-bottom:1px solid #ddd;">{{ results.stub_bios|default:0 }}</td>
+      </tr>
+      <tr>
+        <th style="text-align:start; padding:.35em 1.5em .35em 0;">{% trans "Teacher/student relationships linked" %}</th>
+        <td style="padding:.35em 0; font-weight:bold;">{{ results.relationships|default:0 }}</td>
+      </tr>
+    </table>
+  </div>
+
+  {% if results.stub_bios %}
+  <div class="module" style="padding:.6em 1.2em; margin-bottom:1.2em; border-left:4px solid #f0ad4e;">
+    <p>{% trans "Stub biographies were created for teacher/student names that had no match. You can find and review them by filtering the biography list for unpublished entries." %}</p>
+  </div>
+  {% endif %}
+
+  <div class="submit-row" style="padding:.8em 0;">
+    <a href="{% url 'admin:core_biography_changelist' %}" class="default button">{% trans "View all biographies →" %}</a>
+    <a href="{% url 'admin:core_biography_import_reciters' %}" style="margin-inline-start:1.2em;">{% trans "Import another file" %}</a>
+  </div>
+
+</div>
+{% endblock %}
