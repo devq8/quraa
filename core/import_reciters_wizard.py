@@ -13,7 +13,7 @@ from django.db import transaction
 
 from .arabic_date_parser import parse_arabic_date
 from .csv_import import _normalize_ar, _find_location_candidates
-from .models import Attribute, Biography, Location, TeacherStudentRelationship
+from .models import Attribute, Biography, Location, Reading, TeacherStudentRelationship
 from .search import normalize_arabic
 
 _COLUMN_KEYWORDS = {
@@ -66,6 +66,17 @@ def _split_attrs(text):
     if not text or text.strip() in ("-", "–", ""):
         return []
     return [p.strip() for p in _ATTR_SEPS.split(text) if p.strip() and p.strip() not in ("-", "–")]
+
+
+_READING_RE = re.compile(r"^(.*?)\s*\(([^)]+)\)\s*$")
+
+
+def _parse_name_and_reading(entry):
+    """Split 'Name (reading_ar)' into (name, reading_ar). Returns (entry, None) if no bracket."""
+    m = _READING_RE.match(entry)
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    return entry, None
 
 
 def _date_is_ambiguous(parsed):
@@ -408,22 +419,27 @@ def pre_scan_phase4(rows, bio_map):
     """
     Pre-scan Phase 4: find fuzzy matches and unmatched teacher/student names.
 
-    Returns {"fuzzy_matches": [...], "unmatched": [...]}.
-    Each fuzzy item: {person_name, matched_name, matched_pk, score (%), occurrences}
-    Each unmatched item: {person_name, occurrences}
+    Returns {"fuzzy_matches": [...], "unmatched": [...], "detected_readings": [...]}.
+    Each fuzzy item: {person_name, reading_ar, matched_name, matched_pk, score (%), occurrences}
+    Each unmatched item: {person_name, reading_ar, occurrences}
+    Each detected_readings item: {person_name, reading_ar} for all entries with a parenthetical
     """
     name_to_pk, norm_to_pk, norm_list = _build_bio_lookup()
 
     fuzzy_seen = {}    # person_name → item dict
     unmatched_seen = {}  # person_name → item dict
+    detected_readings = []  # {person_name, reading_ar} for ALL entries where a reading was found
 
     for row in rows:
         if row["full_name_ar"] not in bio_map:
             continue
         for raw_key in ("teachers_raw", "students_raw"):
-            for person_name in _split_names(row.get(raw_key, "")):
+            for raw_entry in _split_names(row.get(raw_key, "")):
+                person_name, reading_ar = _parse_name_and_reading(raw_entry)
                 if not person_name:
                     continue
+                if reading_ar:
+                    detected_readings.append({"person_name": person_name, "reading_ar": reading_ar})
                 # Exact match → no decision needed
                 if person_name in name_to_pk:
                     continue
@@ -445,6 +461,7 @@ def pre_scan_phase4(rows, bio_map):
                     else:
                         fuzzy_seen[person_name] = {
                             "person_name": person_name,
+                            "reading_ar": reading_ar,
                             "matched_name": best_name,
                             "matched_pk": best_pk,
                             "score": round(best_score * 100, 1),
@@ -456,12 +473,14 @@ def pre_scan_phase4(rows, bio_map):
                     else:
                         unmatched_seen[person_name] = {
                             "person_name": person_name,
+                            "reading_ar": reading_ar,
                             "occurrences": 1,
                         }
 
     return {
         "fuzzy_matches": list(fuzzy_seen.values()),
         "unmatched": list(unmatched_seen.values()),
+        "detected_readings": detected_readings,
     }
 
 
@@ -516,7 +535,10 @@ def commit_phase4(rows, bio_map, rel_decisions):
         student_pk = bio_map[row["full_name_ar"]]
 
         for role, raw_key in [("teacher", "teachers_raw"), ("student", "students_raw")]:
-            for person_name in _split_names(row.get(raw_key, "")):
+            for raw_entry in _split_names(row.get(raw_key, "")):
+                if not raw_entry:
+                    continue
+                person_name, reading_ar = _parse_name_and_reading(raw_entry)
                 if not person_name:
                     continue
 
@@ -542,10 +564,14 @@ def commit_phase4(rows, bio_map, rel_decisions):
                 teacher_pk = matched_pk if role == "teacher" else student_pk
                 actual_student_pk = student_pk if role == "teacher" else matched_pk
                 if teacher_pk != actual_student_pk:
-                    _, created = TeacherStudentRelationship.objects.get_or_create(
+                    rel, created = TeacherStudentRelationship.objects.get_or_create(
                         teacher_id=teacher_pk,
                         student_id=actual_student_pk,
                     )
+                    if reading_ar:
+                        reading_obj, _ = Reading.objects.get_or_create(description_ar=reading_ar)
+                        rel.notes.add(reading_obj)
+                        stats["readings_linked"] += 1
                     if created:
                         stats["relationships"] += 1
 

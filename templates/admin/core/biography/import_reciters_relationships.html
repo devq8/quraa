@@ -24,6 +24,18 @@
     </table>
   </div>
 
+  {% if detected_readings %}
+  <div class="module" style="padding:.7em 1.2em; margin-bottom:1.5em; border-left:4px solid #79aec8;">
+    <h2>{% blocktrans count counter=detected_readings|length %}{{ counter }} reading type detected{% plural %}{{ counter }} reading types detected{% endblocktrans %}</h2>
+    <p class="help">{% trans "The following names contained a reading type in parentheses — the name has been cleaned and the reading type will be linked to each relationship automatically." %}</p>
+    <ul style="margin:.4em 0; padding-inline-start:1.5em;">
+      {% for item in detected_readings %}
+      <li><span dir="rtl">{{ item.person_name }}</span> &rarr; <code>{{ item.reading_ar }}</code></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
   <form method="post" action="{{ wizard_url }}">
     {% csrf_token %}
     <input type="hidden" name="step" value="relationships">
@@ -37,6 +49,7 @@
       <div style="border:1px solid #ddd; padding:.6em 1em; margin-bottom:.8em; background:#fff;">
         <p style="margin:.2em 0;">
           <strong dir="rtl">{{ item.person_name }}</strong>
+          {% if item.reading_ar %}<span style="background:#e8f4f8; border:1px solid #79aec8; border-radius:3px; padding:.1em .4em; font-size:.85em; margin-inline-start:.4em;" dir="rtl">{{ item.reading_ar }}</span>{% endif %}
           &mdash; {% trans "best match:" %} <em dir="rtl">{{ item.matched_name }}</em>
           ({{ item.score }}%)
           {% if item.occurrences > 1 %}
@@ -69,6 +82,7 @@
       <div style="border:1px solid #ddd; padding:.6em 1em; margin-bottom:.8em; background:#fff;">
         <p style="margin:.2em 0;">
           <strong dir="rtl">{{ item.person_name }}</strong>
+          {% if item.reading_ar %}<span style="background:#e8f4f8; border:1px solid #79aec8; border-radius:3px; padding:.1em .4em; font-size:.85em; margin-inline-start:.4em;" dir="rtl">{{ item.reading_ar }}</span>{% endif %}
           {% if item.occurrences > 1 %}
           <span style="color:#888; font-size:.9em;">&mdash; {% blocktrans with n=item.occurrences %}referenced {{ n }} times{% endblocktrans %}</span>
           {% endif %}
