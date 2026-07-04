@@ -1,6 +1,7 @@
 import csv
 import io
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -234,3 +235,34 @@ class BiographyExportAdminTests(TestCase):
             response,
             f'{reverse("admin:core_biography_export_xlsx")}?published__exact=1&amp;q=%D8%B9%D8%A7%D8%B5%D9%85',
         )
+
+
+class BiographyImportRecitersAdminTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.admin_user = User.objects.create_superuser(
+            email="admin-import@example.com",
+            password="password",
+            username="admin-import@example.com",
+        )
+        self.client.force_login(self.admin_user)
+        self.url = reverse("admin:core_biography_import_reciters")
+
+    def test_commit_step_translates_unpublished_mode_in_arabic_admin(self):
+        session = self.client.session
+        session["reciters_import_wizard"] = {
+            "published_mode": "unpublished",
+            "rows": [{"full_name_ar": "قارئ تجريبي"}],
+            "stats": {"total": 1},
+            "date_decisions": {},
+            "location_decisions": {},
+            "attr_decisions": {},
+        }
+        session.save()
+
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ar"
+        response = self.client.get(f"{self.url}?step=commit")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "غير منشور")
+        self.assertNotContains(response, ">unpublished<")
