@@ -13,7 +13,7 @@ from django.db import transaction
 
 from .arabic_date_parser import parse_arabic_date
 from .csv_import import _normalize_ar, _find_location_candidates
-from .models import Attribute, Biography, Location, Reading, TeacherStudentRelationship
+from .models import Attribute, Biography, Location, Reading, Source, TeacherStudentRelationship
 from .search import normalize_arabic
 
 _COLUMN_KEYWORDS = {
@@ -362,11 +362,14 @@ def commit_phase3(rows, published_mode, date_decisions, location_decisions, attr
                 bio.published = _is_approved(row["status_raw"])
 
             if row["source_raw"] and row["source_raw"] not in ("-", "–"):
-                note = f"المصدر: {row['source_raw']}"
-                if note not in (bio.comments_ar or ""):
-                    bio.comments_ar = (
-                        (bio.comments_ar + "\n" + note) if bio.comments_ar else note
-                    ).strip()
+                raw_sources = _NAME_SEPS.split(row["source_raw"])
+                existing_names = set(bio.sources.values_list("name_ar", flat=True))
+                for src in raw_sources:
+                    src = src.strip()
+                    if src and src not in existing_names:
+                        Source.objects.create(biography=bio, name_ar=src)
+                        existing_names.add(src)
+                        stats["new_sources"] += 1
 
             for prefix, parsed in [("birth", birth_parsed), ("death", death_parsed)]:
                 setattr(bio, f"{prefix}_date_raw_ar", parsed["raw"])

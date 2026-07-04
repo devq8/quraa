@@ -33,6 +33,10 @@
         <td style="padding:.35em 0; border-bottom:1px solid #ddd;">{{ results.new_attrs|default:0 }}</td>
       </tr>
       <tr style="background:#f8f8f8;">
+        <th style="text-align:start; padding:.35em 1.5em .35em 0; border-bottom:1px solid #ddd;">{% trans "Sources created" %}</th>
+        <td style="padding:.35em 0; border-bottom:1px solid #ddd;">{{ results.new_sources|default:0 }}</td>
+      </tr>
+      <tr>
         <th style="text-align:start; padding:.35em 1.5em .35em 0; border-bottom:1px solid #ddd;">{% trans "Stub biographies created (unmatched teachers/students)" %}</th>
         <td style="padding:.35em 0; border-bottom:1px solid #ddd;">{{ results.stub_bios|default:0 }}</td>
       </tr>
