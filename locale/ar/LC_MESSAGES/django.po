@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-28 21:54+0300\n"
+"POT-Creation-Date: 2026-07-04 13:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,11 +28,11 @@ msgstr ""
 "ملف CSV بترميز UTF-8 أو ملف ‎.xlsx. حمّل قالب Excel للحصول على قوائم منسدلة "
 "بالمواقع والخصائص الموجودة."
 
-#: core/admin.py:43 core/models.py:334
+#: core/admin.py:43 core/models.py:343
 msgid "Source"
 msgstr "المصدر"
 
-#: core/admin.py:44 core/models.py:335 landing/templates/biography.html:385
+#: core/admin.py:44 core/models.py:344 landing/templates/biography.html:385
 #: templates/admin/core/biography/merge_confirm.html:137
 msgid "Sources"
 msgstr "المصادر"
@@ -55,57 +55,57 @@ msgstr "تلميذ بارز"
 msgid "Notable Students"
 msgstr "أبرز التلاميذ"
 
-#: core/admin.py:73 core/models.py:255 landing/templates/home.html:513
+#: core/admin.py:73 core/models.py:264 landing/templates/home.html:513
 msgid "Location"
 msgstr "الموقع الجغرافي"
 
 #: core/admin.py:81 core/admin.py:128 core/csv_import.py:62 core/models.py:43
-#: core/models.py:263 core/models.py:268 landing/templates/biographies.html:52
+#: core/models.py:272 core/models.py:277 landing/templates/biographies.html:52
 #: landing/templates/biography.html:158
 #: landing/templates/search-results.html:59
 #: templates/admin/core/biography/merge_confirm.html:117
 msgid "Hometown"
 msgstr "الموطن"
 
-#: core/admin.py:82 core/models.py:269
+#: core/admin.py:82 core/models.py:278
 msgid "Hometowns"
 msgstr "المواطن"
 
-#: core/admin.py:91 core/admin.py:621 core/admin.py:752 core/models.py:368
-#: core/models.py:501
+#: core/admin.py:91 core/admin.py:886 core/admin.py:1017 core/models.py:377
+#: core/models.py:510
 msgid "Narrator"
 msgstr "الراوي"
 
-#: core/admin.py:92 core/admin.py:622 core/admin.py:753 core/admin.py:774
-#: core/models.py:399
+#: core/admin.py:92 core/admin.py:887 core/admin.py:1018 core/admin.py:1039
+#: core/models.py:408
 msgid "Narrators"
 msgstr "الرواة"
 
-#: core/admin.py:113 core/models.py:405 core/models.py:495
+#: core/admin.py:113 core/models.py:414 core/models.py:504
 msgid "Esnad"
 msgstr "إسناد"
 
-#: core/admin.py:114 core/models.py:406 landing/templates/biography.html:235
+#: core/admin.py:114 core/models.py:415 landing/templates/biography.html:235
 msgid "Transmission Chains"
 msgstr "أهم طرق الأسانيد"
 
-#: core/admin.py:191 core/admin.py:205
+#: core/admin.py:198 core/admin.py:212
 msgid "You do not have permission to export biographies."
 msgstr "ليس لديك صلاحية لتصدير التراجم."
 
-#: core/admin.py:227
+#: core/admin.py:234 core/admin.py:491
 msgid "You do not have permission to import biographies."
 msgstr "ليس لديك صلاحية لاستيراد التراجم."
 
-#: core/admin.py:233
+#: core/admin.py:240
 msgid "Import biographies from CSV"
 msgstr "استيراد التراجم من ملف CSV"
 
-#: core/admin.py:241
+#: core/admin.py:248
 msgid "Your import session expired. Please upload the file again."
 msgstr "انتهت صلاحية جلسة الاستيراد. يرجى رفع الملف مرة أخرى."
 
-#: core/admin.py:262
+#: core/admin.py:269
 #, python-format
 msgid ""
 "Import complete: %(created)d created, %(updated)d updated, %(skipped)d "
@@ -114,90 +114,146 @@ msgstr ""
 "اكتمل الاستيراد: %(created)d مُضافة، %(updated)d محدَّثة، %(skipped)d متخطّاة، "
 "%(errors)d بها أخطاء."
 
-#: core/admin.py:280
+#: core/admin.py:287
 msgid "No data rows were found in the file."
 msgstr "لم يُعثر على أي صفوف بيانات في الملف."
 
-#: core/admin.py:311
+#: core/admin.py:318
 msgid "Merge selected biographies (select exactly 2)"
 msgstr "دمج التراجم المحددة (اختر 2 بالضبط)"
 
-#: core/admin.py:316
+#: core/admin.py:323
 msgid "Please select exactly 2 biographies to merge."
 msgstr "يرجى تحديد ترجمتين بالضبط للدمج."
 
-#: core/admin.py:328
+#: core/admin.py:335
 msgid "You do not have permission to view duplicates."
 msgstr "ليس لديك صلاحية لعرض التراجم المكررة."
 
-#: core/admin.py:342
+#: core/admin.py:349
 msgid "Find Duplicate Biographies"
 msgstr "البحث عن التراجم المكررة"
 
-#: core/admin.py:356
+#: core/admin.py:363
 msgid "Permission denied."
 msgstr "تم رفض الصلاحية."
 
-#: core/admin.py:390
+#: core/admin.py:397
 msgid "You do not have permission to merge biographies."
 msgstr "ليس لديك صلاحية لدمج التراجم."
 
-#: core/admin.py:397
+#: core/admin.py:404
 msgid "Invalid biography selection."
 msgstr "اختيار ترجمة غير صالح."
 
-#: core/admin.py:404 core/admin.py:419
+#: core/admin.py:411 core/admin.py:426
 msgid "One or both biographies could not be found."
 msgstr "لم يتم العثور على إحدى الترجمتين أو كلتيهما."
 
-#: core/admin.py:412
+#: core/admin.py:419
 msgid "Invalid merge selection."
 msgstr "اختيار دمج غير صالح."
 
-#: core/admin.py:439
+#: core/admin.py:446
 #, python-format
 msgid "Biography #%(dup)d merged into #%(pri)d successfully."
 msgstr "تم دمج الترجمة رقم #%(dup)d في الترجمة رقم #%(pri)d بنجاح."
 
-#: core/admin.py:457 templates/admin/core/biography/merge_confirm.html:9
+#: core/admin.py:464 templates/admin/core/biography/merge_confirm.html:9
 msgid "Merge Biographies"
 msgstr "دمج التراجم"
 
-#: core/admin.py:542 core/models.py:135 landing/templates/biography.html:180
+#: core/admin.py:518
+msgid "Please select a CSV file."
+msgstr "يرجى اختيار ملف CSV."
+
+#: core/admin.py:526
+#, fuzzy
+#| msgid "No data rows were found in the file."
+msgid "No data rows found in the file."
+msgstr "لم يُعثر على أي صفوف بيانات في الملف."
+
+#: core/admin.py:541
+#, fuzzy
+#| msgid "Your import session expired. Please upload the file again."
+msgid "Session expired. Please upload the file again."
+msgstr "انتهت صلاحية جلسة الاستيراد. يرجى رفع الملف مرة أخرى."
+
+#: core/admin.py:654 templates/admin/core/biography/change_list.html:17
+#: templates/admin/core/biography/import_reciters_attributes.html:9
+#: templates/admin/core/biography/import_reciters_commit.html:9
+#: templates/admin/core/biography/import_reciters_dates.html:9
+#: templates/admin/core/biography/import_reciters_locations.html:9
+#: templates/admin/core/biography/import_reciters_scan.html:9
+#: templates/admin/core/biography/import_reciters_upload.html:9
+msgid "Import Reciters CSV"
+msgstr "استيراد تراجم القراء (CSV)"
+
+#: core/admin.py:658
+msgid "Session expired. Please start the import again."
+msgstr "انتهت صلاحية الجلسة. يرجى بدء الاستيراد من جديد."
+
+#: core/admin.py:667
+msgid "Import — Scan Results"
+msgstr "الاستيراد — نتائج الفحص"
+
+#: core/admin.py:686 core/admin.py:805 core/models.py:144
+#: landing/templates/biography.html:180
 msgid "Birth"
 msgstr "الميلاد"
 
-#: core/admin.py:550 core/models.py:135 landing/templates/biography.html:207
+#: core/admin.py:686 core/admin.py:814 core/models.py:144
+#: landing/templates/biography.html:207
 msgid "Death"
 msgstr "الوفاة"
 
-#: core/admin.py:655 core/admin.py:768
+#: core/admin.py:695
+msgid "Import — Resolve Ambiguous Dates"
+msgstr "الاستيراد — حل التواريخ الغامضة"
+
+#: core/admin.py:705
+msgid "Import — Resolve Missing Countries"
+msgstr "الاستيراد — حل المواقع الناقصة"
+
+#: core/admin.py:715
+msgid "Import — Resolve Attributes"
+msgstr "الاستيراد — حل الصفات والتصنيفات"
+
+#: core/admin.py:723
+msgid "Import — Ready to Commit"
+msgstr "الاستيراد — جاهز للتأكيد"
+
+#: core/admin.py:736
+msgid "Import — Complete"
+msgstr "الاستيراد — اكتمل"
+
+#: core/admin.py:920 core/admin.py:1033
 #: templates/admin/core/biography/change_form.html:148
 msgid "Audit"
 msgstr "السجل والمراجعة"
 
-#: core/admin.py:682
+#: core/admin.py:947
 msgid "You do not have permission to modify this Esnad."
 msgstr "ليس لديك صلاحية لتعديل هذا الإسناد."
 
-#: core/admin.py:692
+#: core/admin.py:957
 msgid "Esnad not found."
 msgstr "الإسناد غير موجود."
 
-#: core/admin.py:697
+#: core/admin.py:962
 msgid "No template selected."
 msgstr "لم يُختر قالب."
 
-#: core/admin.py:712
+#: core/admin.py:977
 msgid "Template not found."
 msgstr "القالب غير موجود."
 
-#: core/admin.py:725
+#: core/admin.py:990
 #, python-format
 msgid "Template \"%(name)s\" applied."
 msgstr "تم تطبيق القالب \"%(name)s\"."
 
-#: core/admin.py:740
+#: core/admin.py:1005
 msgid "Chain"
 msgstr "سند"
 
@@ -281,11 +337,11 @@ msgstr "شهر الوفاة (ميلادي)"
 msgid "Death Day (Gregorian)"
 msgstr "يوم الوفاة (ميلادي)"
 
-#: core/csv_import.py:54 core/merge_utils.py:34 core/models.py:69
+#: core/csv_import.py:54 core/merge_utils.py:34 core/models.py:78
 msgid "Comments (Arabic)"
 msgstr "فوائد وملاحظات (عربي)"
 
-#: core/csv_import.py:55 core/merge_utils.py:35 core/models.py:70
+#: core/csv_import.py:55 core/merge_utils.py:35 core/models.py:79
 msgid "Comments (English)"
 msgstr "فوائد وملاحظات (إنجليزي)"
 
@@ -364,7 +420,7 @@ msgid ""
 msgstr ""
 "توجد ترجمة مشابهة بالفعل: رقم #%(id)d %(name)s (التطابق: %(type)s، %(pct)d%%)"
 
-#: core/csv_import.py:693 core/models.py:59 core/models.py:292
+#: core/csv_import.py:693 core/models.py:68 core/models.py:301
 #: landing/templates/biography.html:164
 #: templates/admin/core/biography/merge_confirm.html:111
 msgid "Attributes"
@@ -418,165 +474,179 @@ msgstr "تاريخ الوفاة الهجري تقريبي"
 msgid "Death Gregorian Approximate"
 msgstr "تاريخ الوفاة الميلادي تقريبي"
 
-#: core/models.py:77
+#: core/models.py:58
+#, fuzzy
+#| msgid "Site name (Arabic)"
+msgid "Birth Date (raw Arabic text)"
+msgstr "اسم الموقع (عربي)"
+
+#: core/models.py:62
+#, fuzzy
+#| msgid "Death year (earliest)"
+msgid "Death Date (raw Arabic text)"
+msgstr "سنة الوفاة (الأقدم)"
+
+#: core/models.py:86
 msgid "Submitted By"
 msgstr "أُضيف بواسطة"
 
-#: core/models.py:84
+#: core/models.py:93
 msgid "Last Modified By"
 msgstr "آخر تعديل بواسطة"
 
-#: core/models.py:91
+#: core/models.py:100
 msgid "User Account"
 msgstr "حساب المستخدم"
 
-#: core/models.py:99 core/models.py:318 core/models.py:391 users/models.py:43
+#: core/models.py:108 core/models.py:327 core/models.py:400 users/models.py:43
 msgid "Biography"
 msgstr "تراجم القراء"
 
-#: core/models.py:100 landing/templates/base.html:120
+#: core/models.py:109 landing/templates/base.html:120
 #: landing/templates/biographies.html:21
 msgid "Biographies"
 msgstr "تراجم القراء"
 
-#: core/models.py:136
+#: core/models.py:145
+#: templates/admin/core/biography/import_reciters_dates.html:61
 msgid "Hijri"
 msgstr "الهجري"
 
-#: core/models.py:136
+#: core/models.py:145
+#: templates/admin/core/biography/import_reciters_dates.html:62
 msgid "Gregorian"
 msgstr "الميلادي"
 
-#: core/models.py:141
+#: core/models.py:150
 #, python-format
 msgid "%(label)s %(cal)s day requires a month."
 msgstr "يوم %(label)s %(cal)s يستلزم تحديد الشهر."
 
-#: core/models.py:143
+#: core/models.py:152
 #, python-format
 msgid "%(label)s %(cal)s month requires a year."
 msgstr "شهر %(label)s %(cal)s يستلزم تحديد السنة."
 
-#: core/models.py:238
+#: core/models.py:247
 msgid "City (Arabic)"
 msgstr "المدينة (عربي)"
 
-#: core/models.py:239
+#: core/models.py:248
 msgid "City (English)"
 msgstr "المدينة (إنجليزي)"
 
-#: core/models.py:240
+#: core/models.py:249
 msgid "Country (Arabic)"
 msgstr "الدولة (عربي)"
 
-#: core/models.py:241
+#: core/models.py:250
 msgid "Country (English)"
 msgstr "الدولة (إنجليزي)"
 
-#: core/models.py:256
+#: core/models.py:265
 msgid "Locations"
 msgstr "المواقع الجغرافية"
 
-#: core/models.py:274
+#: core/models.py:283
 msgid "Short Name (Arabic)"
 msgstr "الاسم المختصر (عربي)"
 
-#: core/models.py:275
+#: core/models.py:284
 msgid "Short Name (English)"
 msgstr "الاسم المختصر (إنجليزي)"
 
-#: core/models.py:276
+#: core/models.py:285
 msgid "Long Name (Arabic)"
 msgstr "الاسم الكامل (عربي)"
 
-#: core/models.py:277
+#: core/models.py:286
 msgid "Long Name (English)"
 msgstr "الاسم الكامل (إنجليزي)"
 
-#: core/models.py:278 core/models.py:298 landing/models.py:144
+#: core/models.py:287 core/models.py:307 landing/models.py:144
 msgid "Description (Arabic)"
 msgstr "الوصف (عربي)"
 
-#: core/models.py:279 core/models.py:299 landing/models.py:145
+#: core/models.py:288 core/models.py:308 landing/models.py:145
 msgid "Description (English)"
 msgstr "الوصف (إنجليزي)"
 
-#: core/models.py:291 landing/templates/biographies.html:73
+#: core/models.py:300 landing/templates/biographies.html:73
 #: landing/templates/search-results.html:80
 msgid "Attribute"
 msgstr "الصفة"
 
-#: core/models.py:311
+#: core/models.py:320
 msgid "المقروء"
 msgstr "المقروء"
 
-#: core/models.py:312 core/models.py:556
+#: core/models.py:321 core/models.py:565
 msgid "المقروءات"
 msgstr "المقروءات"
 
-#: core/models.py:320 core/models.py:340
+#: core/models.py:329 core/models.py:349
 msgid "Name (Arabic)"
 msgstr "الاسم (عربي)"
 
-#: core/models.py:321 core/models.py:341
+#: core/models.py:330 core/models.py:350
 msgid "Name (English)"
 msgstr "الاسم (إنجليزي)"
 
-#: core/models.py:322 landing/models.py:146
+#: core/models.py:331 landing/models.py:146
 msgid "Link"
 msgstr "الرابط"
 
-#: core/models.py:346
+#: core/models.py:355
 msgid "Esnad Template"
 msgstr "قالب إسناد"
 
-#: core/models.py:347
+#: core/models.py:356
 msgid "Esnad Templates"
 msgstr "قوالب الأسانيد"
 
-#: core/models.py:362
+#: core/models.py:371
 msgid "Template"
 msgstr "القالب"
 
-#: core/models.py:370 core/models.py:503 landing/models.py:147
+#: core/models.py:379 core/models.py:512 landing/models.py:147
 #: landing/models.py:174
 msgid "Order"
 msgstr "الترتيب"
 
-#: core/models.py:378
+#: core/models.py:387
 msgid "Template Link"
 msgstr "حلقة القالب"
 
-#: core/models.py:379
+#: core/models.py:388
 msgid "Template Links"
 msgstr "حلقات القالب"
 
-#: core/models.py:517
+#: core/models.py:526
 msgid "Esnad Link"
 msgstr "حلقة الإسناد"
 
-#: core/models.py:518
+#: core/models.py:527
 msgid "Esnad Links"
 msgstr "حلقات الإسناد"
 
-#: core/models.py:534
+#: core/models.py:543
 msgid ""
 "The holder of this Esnad cannot appear as a narrator in their own chain."
 msgstr "لا يمكن أن يظهر صاحب هذا الإسناد كراوٍ في سلسلته الخاصة."
 
-#: core/models.py:546
+#: core/models.py:555
 msgid "Teacher"
 msgstr "الشيخ"
 
-#: core/models.py:552
+#: core/models.py:561
 msgid "Student"
 msgstr "التلميذ"
 
-#: core/models.py:565
+#: core/models.py:574
 msgid "Teacher-Student Relationship"
 msgstr "علاقة شيخ-تلميذ"
 
-#: core/models.py:566
+#: core/models.py:575
 msgid "Teacher-Student Relationships"
 msgstr "علاقات الشيوخ والتلاميذ"
 
@@ -985,6 +1055,13 @@ msgstr "قائمة التنقل"
 #: templates/admin/core/biography/csv_import.html:6
 #: templates/admin/core/biography/csv_import_review.html:6
 #: templates/admin/core/biography/find_duplicates.html:6
+#: templates/admin/core/biography/import_reciters_attributes.html:6
+#: templates/admin/core/biography/import_reciters_commit.html:6
+#: templates/admin/core/biography/import_reciters_dates.html:6
+#: templates/admin/core/biography/import_reciters_locations.html:6
+#: templates/admin/core/biography/import_reciters_results.html:6
+#: templates/admin/core/biography/import_reciters_scan.html:6
+#: templates/admin/core/biography/import_reciters_upload.html:6
 #: templates/admin/core/biography/merge_confirm.html:6
 msgid "Home"
 msgstr "الرئيسية"
@@ -1672,11 +1749,11 @@ msgstr "البحث عن المكررات"
 msgid "Import CSV"
 msgstr "استيراد CSV"
 
-#: templates/admin/core/biography/change_list.html:20
+#: templates/admin/core/biography/change_list.html:25
 msgid "Export CSV"
 msgstr "تصدير CSV"
 
-#: templates/admin/core/biography/change_list.html:28
+#: templates/admin/core/biography/change_list.html:33
 msgid "Export XLSX"
 msgstr "تصدير XLSX"
 
@@ -1706,6 +1783,7 @@ msgid "Upload and preview"
 msgstr "رفع ومعاينة"
 
 #: templates/admin/core/biography/csv_import.html:35
+#: templates/admin/core/biography/import_reciters_upload.html:21
 msgid "Expected columns"
 msgstr "الأعمدة المتوقّعة"
 
@@ -2056,6 +2134,417 @@ msgstr ""
 #: templates/admin/core/biography/find_duplicates.html:198
 msgid "Back to biographies"
 msgstr "العودة إلى التراجم"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:10
+msgid "Resolve Attributes"
+msgstr "حل الصفات والتصنيفات"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:22
+msgid "%(counter)s fuzzy match — needs decision"
+msgid_plural "%(counter)s fuzzy matches — need decisions"
+msgstr[0] "لا توجد تطابقات تقريبية تحتاج قراراً"
+msgstr[1] "تطابق تقريبي واحد يحتاج قراراً"
+msgstr[2] "تطابقان تقريبيان يحتاجان قراراً"
+msgstr[3] "%(counter)s تطابقات تقريبية تحتاج قراراً"
+msgstr[4] "%(counter)s تطابقاً تقريبياً تحتاج قراراً"
+msgstr[5] "%(counter)s تطابق تقريبي يحتاج قراراً"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:23
+msgid ""
+"Each attribute below has a close but not exact match in the database. Choose "
+"whether to accept the existing attribute, create a new one, or skip."
+msgstr "كل صفة أدناه لها تطابق قريب غير دقيق في قاعدة البيانات. اختر قبول الصفة الموجودة أو إنشاء صفة جديدة أو التخطي."
+
+#: templates/admin/core/biography/import_reciters_attributes.html:29
+msgid "closest match:"
+msgstr "أقرب تطابق:"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:34
+#, python-format
+msgid "Accept \"%(name)s\""
+msgstr "قبول «%(name)s»"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:38
+#, python-format
+msgid "Create new \"%(name)s\""
+msgstr "إنشاء «%(name)s» جديداً"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:42
+msgid "Skip"
+msgstr "تخطي"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:51
+#, python-format
+msgid "%(counter)s new attribute (no match in database)"
+msgid_plural "%(counter)s new attributes (no match in database)"
+msgstr[0] "لا توجد صفات جديدة"
+msgstr[1] "صفة جديدة واحدة (لا تطابق في قاعدة البيانات)"
+msgstr[2] "صفتان جديدتان (لا تطابق في قاعدة البيانات)"
+msgstr[3] "%(counter)s صفات جديدة (لا تطابق في قاعدة البيانات)"
+msgstr[4] "%(counter)s صفةً جديدةً (لا تطابق في قاعدة البيانات)"
+msgstr[5] "%(counter)s صفة جديدة (لا تطابق في قاعدة البيانات)"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:52
+msgid ""
+"These attribute names have no match. A new Attribute will be created for "
+"each. You may provide a long name, or tick 'Skip' to ignore it."
+msgstr "هذه الصفات لا تطابق أي صفة موجودة. ستُنشأ صفة جديدة لكل منها. يمكنك تقديم اسم تفصيلي أو تحديد «تخطي» لتجاهلها."
+
+#: templates/admin/core/biography/import_reciters_attributes.html:58
+msgid "Long name (Arabic):"
+msgstr "الاسم التفصيلي (عربي):"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:65
+msgid "Skip — do not create this attribute"
+msgstr "تخطي — لا تُنشئ هذه الصفة"
+
+#: templates/admin/core/biography/import_reciters_attributes.html:73
+msgid "Save attribute decisions →"
+msgstr "حفظ قرارات الصفات ←"
+
+#: templates/admin/core/biography/import_reciters_commit.html:10
+msgid "Confirm Import"
+msgstr "تأكيد الاستيراد"
+
+#: templates/admin/core/biography/import_reciters_commit.html:18
+msgid "Ready to commit"
+msgstr "جاهز للحفظ في قاعدة البيانات"
+
+#: templates/admin/core/biography/import_reciters_commit.html:20
+msgid "Rows to import"
+msgstr "الصفوف المستوردة"
+
+#: templates/admin/core/biography/import_reciters_commit.html:21
+msgid "Published mode"
+msgstr "وضع النشر"
+
+#: templates/admin/core/biography/import_reciters_commit.html:22
+msgid "Date decisions resolved"
+msgstr "قرارات التواريخ المحلولة"
+
+#: templates/admin/core/biography/import_reciters_commit.html:23
+msgid "Location decisions resolved"
+msgstr "قرارات المواقع المحلولة"
+
+#: templates/admin/core/biography/import_reciters_commit.html:24
+msgid "Attribute decisions resolved"
+msgstr "قرارات الصفات المحلولة"
+
+#: templates/admin/core/biography/import_reciters_commit.html:26
+msgid ""
+"Exact duplicate names will update the existing biography. All others create "
+"a new record."
+msgstr "الأسماء المكررة تماماً ستُحدِّث الترجمة الموجودة. وجميع ما عداها ستُنشئ سجلاً جديداً."
+
+#: templates/admin/core/biography/import_reciters_commit.html:34
+msgid "Teacher / Student linking (Phase 4)"
+msgstr "ربط الشيوخ والتلاميذ (المرحلة الرابعة)"
+
+#: templates/admin/core/biography/import_reciters_commit.html:35
+msgid ""
+"After all biographies are created, teacher and student names are matched "
+"against the database. Choose how to handle fuzzy (non-exact) matches."
+msgstr "بعد إنشاء جميع التراجم، تُطابَق أسماء الشيوخ والتلاميذ مع قاعدة البيانات. اختر كيفية التعامل مع التطابقات التقريبية (غير الدقيقة)."
+
+#: templates/admin/core/biography/import_reciters_commit.html:39
+#, python-format
+msgid "Auto-link fuzzy matches (≥85%% similarity) — recommended"
+msgstr "ربط التطابقات التقريبية تلقائياً (تشابه ≥85%%) — موصى به"
+
+#: templates/admin/core/biography/import_reciters_commit.html:43
+msgid "Create a new stub biography for every unconfirmed fuzzy match"
+msgstr "إنشاء ترجمة مؤقتة لكل تطابق تقريبي غير مؤكد"
+
+#: templates/admin/core/biography/import_reciters_commit.html:47
+msgid "Skip all names that are not an exact match"
+msgstr "تخطي جميع الأسماء غير المطابِقة تماماً"
+
+#: templates/admin/core/biography/import_reciters_commit.html:54
+msgid "Commit import — save to database"
+msgstr "تأكيد الاستيراد — الحفظ في قاعدة البيانات"
+
+#: templates/admin/core/biography/import_reciters_commit.html:55
+msgid "Importing… please wait"
+msgstr "جارٍ الاستيراد… يُرجى الانتظار"
+
+#: templates/admin/core/biography/import_reciters_commit.html:57
+#: templates/admin/core/biography/import_reciters_scan.html:47
+msgid "Cancel — start over"
+msgstr "إلغاء — البدء من جديد"
+
+#: templates/admin/core/biography/import_reciters_dates.html:10
+msgid "Resolve Dates"
+msgstr "حل التواريخ"
+
+#: templates/admin/core/biography/import_reciters_dates.html:16
+#, python-format
+msgid "%(counter)s date string needs your decision."
+msgid_plural "%(counter)s date strings need your decision."
+msgstr[0] "لا توجد تواريخ تحتاج قراراً"
+msgstr[1] "نص تاريخ واحد يحتاج قرارك"
+msgstr[2] "نصّا تاريخين يحتاجان قرارك"
+msgstr[3] "%(counter)s نصوص تواريخ تحتاج قرارك"
+msgstr[4] "%(counter)s نصّ تاريخ يحتاج قرارك"
+msgstr[5] "%(counter)s نص تاريخ يحتاج قرارك"
+
+#: templates/admin/core/biography/import_reciters_dates.html:17
+msgid "The original Arabic text is always saved regardless of your choice."
+msgstr "يُحفظ النص العربي الأصلي دائماً بغض النظر عن اختيارك."
+
+#: templates/admin/core/biography/import_reciters_dates.html:28
+msgid "Raw text:"
+msgstr "النص الأصلي:"
+
+#: templates/admin/core/biography/import_reciters_dates.html:30
+msgid "Auto-parsed:"
+msgstr "التحليل التلقائي:"
+
+#: templates/admin/core/biography/import_reciters_dates.html:31
+msgid "Year"
+msgstr "السنة"
+
+#: templates/admin/core/biography/import_reciters_dates.html:32
+#: templates/admin/core/biography/import_reciters_dates.html:43
+#: templates/admin/core/biography/import_reciters_dates.html:66
+msgid "approximate"
+msgstr "تقريبي"
+
+#: templates/admin/core/biography/import_reciters_dates.html:35
+msgid "Could not extract a year from this text."
+msgstr "تعذّر استخراج سنة من هذا النص."
+
+#: templates/admin/core/biography/import_reciters_dates.html:42
+#, python-format
+msgid "Accept as-is — year %(yr)s (%(cal)s)"
+msgstr "قبول كما هو — السنة %(yr)s (%(cal)s)"
+
+#: templates/admin/core/biography/import_reciters_dates.html:49
+#, python-format
+msgid "Use alternative year %(yr)sهـ (approximate)"
+msgstr "استخدام السنة البديلة %(yr)sهـ (تقريبية)"
+
+#: templates/admin/core/biography/import_reciters_dates.html:55
+msgid "Enter manually:"
+msgstr "إدخال يدوياً:"
+
+#: templates/admin/core/biography/import_reciters_dates.html:59
+msgid "year"
+msgstr "السنة"
+
+#: templates/admin/core/biography/import_reciters_dates.html:71
+msgid "Leave date empty (raw text preserved in raw field)"
+msgstr "ترك التاريخ فارغاً (النص الأصلي محفوظ في الحقل المخصص)"
+
+#: templates/admin/core/biography/import_reciters_dates.html:78
+msgid "Save date decisions →"
+msgstr "حفظ قرارات التواريخ ←"
+
+#: templates/admin/core/biography/import_reciters_locations.html:10
+msgid "Resolve Locations"
+msgstr "حل المواقع الجغرافية"
+
+#: templates/admin/core/biography/import_reciters_locations.html:16
+msgid "%(counter)s location has no country."
+msgid_plural "%(counter)s locations have no country."
+msgstr[0] "لا توجد مواقع ناقصة الدولة"
+msgstr[1] "موقع واحد ناقص الدولة"
+msgstr[2] "موقعان ناقصا الدولة"
+msgstr[3] "%(counter)s مواقع ناقصة الدولة"
+msgstr[4] "%(counter)s موقعاً ناقص الدولة"
+msgstr[5] "%(counter)s موقع ناقص الدولة"
+
+#: templates/admin/core/biography/import_reciters_locations.html:17
+msgid "Decisions here apply to all rows that share the same city name."
+msgstr "تُطبَّق القرارات هنا على جميع الصفوف التي تشترك في نفس اسم المدينة."
+
+#: templates/admin/core/biography/import_reciters_locations.html:34
+msgid "Country / Region (Arabic):"
+msgstr "الدولة / المنطقة (عربي):"
+
+#: templates/admin/core/biography/import_reciters_locations.html:37
+msgid "type or choose"
+msgstr "اكتب أو اختر"
+
+#: templates/admin/core/biography/import_reciters_locations.html:41
+#, python-format
+msgid "Is \"%(city)s\" a city or a country/region?"
+msgstr "هل «%(city)s» مدينة أم دولة/منطقة؟"
+
+#: templates/admin/core/biography/import_reciters_locations.html:44
+msgid "City — the name above is the city; the country field is the country"
+msgstr "مدينة — الاسم أعلاه هو المدينة والحقل الثاني هو الدولة"
+
+#: templates/admin/core/biography/import_reciters_locations.html:48
+#, python-format
+msgid "\"%(city)s\" is itself the country/region — leave city blank"
+msgstr "«%(city)s» هي نفسها الدولة/المنطقة — اترك حقل المدينة فارغاً"
+
+#: templates/admin/core/biography/import_reciters_locations.html:55
+msgid "Save location decisions →"
+msgstr "حفظ قرارات المواقع ←"
+
+#: templates/admin/core/biography/import_reciters_results.html:9
+msgid "Import Complete"
+msgstr "اكتمل الاستيراد"
+
+#: templates/admin/core/biography/import_reciters_results.html:17
+msgid "Import complete"
+msgstr "اكتمل الاستيراد"
+
+#: templates/admin/core/biography/import_reciters_results.html:20
+msgid "Biographies created"
+msgstr "التراجم المُنشأة"
+
+#: templates/admin/core/biography/import_reciters_results.html:24
+msgid "Biographies updated (exact duplicate)"
+msgstr "التراجم المُحدَّثة (تكرار دقيق)"
+
+#: templates/admin/core/biography/import_reciters_results.html:28
+msgid "New locations created"
+msgstr "المواقع الجديدة المُنشأة"
+
+#: templates/admin/core/biography/import_reciters_results.html:32
+msgid "New attributes created"
+msgstr "الصفات الجديدة المُنشأة"
+
+#: templates/admin/core/biography/import_reciters_results.html:36
+msgid "Stub biographies created (unmatched teachers/students)"
+msgstr "التراجم المؤقتة المُنشأة (أسماء غير مطابِقة)"
+
+#: templates/admin/core/biography/import_reciters_results.html:40
+msgid "Teacher/student relationships linked"
+msgstr "علاقات الشيوخ والتلاميذ المربوطة"
+
+#: templates/admin/core/biography/import_reciters_results.html:48
+msgid ""
+"Stub biographies were created for teacher/student names that had no match. "
+"You can find and review them by filtering the biography list for unpublished "
+"entries."
+msgstr "أُنشئت تراجم مؤقتة لأسماء الشيوخ والتلاميذ التي لم تُطابَق. يمكنك العثور عليها ومراجعتها بتصفية قائمة التراجم على غير المنشورة."
+
+#: templates/admin/core/biography/import_reciters_results.html:53
+msgid "View all biographies →"
+msgstr "عرض جميع التراجم ←"
+
+#: templates/admin/core/biography/import_reciters_results.html:54
+msgid "Import another file"
+msgstr "استيراد ملف آخر"
+
+#: templates/admin/core/biography/import_reciters_scan.html:10
+msgid "Scan Results"
+msgstr "نتائج الفحص"
+
+#: templates/admin/core/biography/import_reciters_scan.html:17
+msgid "Pre-scan complete"
+msgstr "اكتمل الفحص المبدئي"
+
+#: templates/admin/core/biography/import_reciters_scan.html:19
+msgid "Total rows"
+msgstr "إجمالي الصفوف"
+
+#: templates/admin/core/biography/import_reciters_scan.html:20
+msgid "Ambiguous date strings"
+msgstr "نصوص التواريخ الغامضة"
+
+#: templates/admin/core/biography/import_reciters_scan.html:22
+msgid "step 2"
+msgstr "الخطوة 2"
+
+#: templates/admin/core/biography/import_reciters_scan.html:24
+msgid "Locations missing country"
+msgstr "المواقع الناقصة الدولة"
+
+#: templates/admin/core/biography/import_reciters_scan.html:26
+msgid "step 3"
+msgstr "الخطوة 3"
+
+#: templates/admin/core/biography/import_reciters_scan.html:28
+msgid "Attribute fuzzy matches (need confirmation)"
+msgstr "الصفات المتشابهة (تحتاج تأكيداً)"
+
+#: templates/admin/core/biography/import_reciters_scan.html:30
+msgid "Attributes with no match (will create new)"
+msgstr "الصفات بدون تطابق (ستُنشأ جديدة)"
+
+#: templates/admin/core/biography/import_reciters_scan.html:32
+msgid "step 4"
+msgstr "الخطوة 4"
+
+#: templates/admin/core/biography/import_reciters_scan.html:36
+msgid "Published mode:"
+msgstr "وضع النشر:"
+
+#: templates/admin/core/biography/import_reciters_scan.html:38
+msgid "Nothing is saved until you reach the final Commit step."
+msgstr "لا يُحفظ أي شيء حتى تصل إلى خطوة التأكيد النهائية."
+
+#: templates/admin/core/biography/import_reciters_scan.html:45
+msgid "Proceed to resolution →"
+msgstr "المتابعة إلى الحل ←"
+
+#: templates/admin/core/biography/import_reciters_upload.html:16
+msgid ""
+"Upload a CSV file in the custom Arabic reciters format. The wizard will scan "
+"the file\n"
+"    and guide you through resolving dates, locations, and attributes before "
+"saving anything."
+msgstr "ارفع ملف CSV بتنسيق القراء العربي المخصص. سيفحص المعالج الملف ويرشدك خطوة بخطوة لحل التواريخ والمواقع والصفات قبل الحفظ."
+
+#: templates/admin/core/biography/import_reciters_upload.html:23
+msgid "alias"
+msgstr "الشهرة"
+
+#: templates/admin/core/biography/import_reciters_upload.html:24
+msgid "full name (required)"
+msgstr "الاسم الكامل (مطلوب)"
+
+#: templates/admin/core/biography/import_reciters_upload.html:27
+msgid "comma-separated names"
+msgstr "أسماء مفصولة بفاصلة"
+
+#: templates/admin/core/biography/import_reciters_upload.html:28
+msgid "comma-separated attributes"
+msgstr "صفات مفصولة بفاصلة"
+
+#: templates/admin/core/biography/import_reciters_upload.html:29
+msgid "source (appended to comments)"
+msgstr "المصدر (يُضاف إلى التعليقات)"
+
+#: templates/admin/core/biography/import_reciters_upload.html:30
+msgid "approval status (optional)"
+msgstr "حالة الاعتماد (اختياري)"
+
+#: templates/admin/core/biography/import_reciters_upload.html:39
+msgid "Upload file"
+msgstr "رفع الملف"
+
+#: templates/admin/core/biography/import_reciters_upload.html:41
+msgid "CSV file"
+msgstr "ملف CSV"
+
+#: templates/admin/core/biography/import_reciters_upload.html:43
+msgid "UTF-8 or UTF-8-BOM encoded CSV."
+msgstr "ملف CSV بترميز UTF-8 أو UTF-8-BOM."
+
+#: templates/admin/core/biography/import_reciters_upload.html:46
+msgid "Published status for imported biographies"
+msgstr "حالة النشر للتراجم المستوردة"
+
+#: templates/admin/core/biography/import_reciters_upload.html:50
+msgid "Unpublished (safer — review in admin before going live)"
+msgstr "غير منشور (أكثر أماناً — راجع في لوحة الإدارة قبل النشر)"
+
+#: templates/admin/core/biography/import_reciters_upload.html:54
+msgid "Published immediately"
+msgstr "منشور فوراً"
+
+#: templates/admin/core/biography/import_reciters_upload.html:58
+msgid "Use حالة الترجمة column (معتمد → published, others → unpublished)"
+msgstr "استخدام عمود حالة الترجمة (معتمد → منشور، غيره → غير منشور)"
+
+#: templates/admin/core/biography/import_reciters_upload.html:65
+msgid "Upload and scan"
+msgstr "رفع وفحص"
 
 #: templates/admin/core/biography/merge_confirm.html:16
 msgid ""
