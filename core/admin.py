@@ -792,11 +792,22 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
 
         if step == "results":
             results = session.get("results", {})
+            bio_pks = list(session.get("bio_map", {}).values())
             request.session.pop(self._RECITERS_SESSION, None)
+            _MAX_SHOWN = 300
+            imported_bios = list(
+                Biography.objects.filter(pk__in=bio_pks)
+                .values("pk", "full_name_ar", "alias_ar",
+                        "death_hijri_year", "death_greg_year", "published")
+                .order_by("full_name_ar")[:_MAX_SHOWN]
+            )
             return TemplateResponse(request, "admin/core/biography/import_reciters_results.html", {
                 **base_ctx,
                 "title": _("Import — Complete"),
                 "results": results,
+                "imported_bios": imported_bios,
+                "imported_bios_total": len(bio_pks),
+                "imported_bios_truncated": len(bio_pks) > _MAX_SHOWN,
             })
 
         return redirect_to("upload")
