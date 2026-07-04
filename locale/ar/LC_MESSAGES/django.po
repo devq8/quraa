@@ -180,16 +180,12 @@ msgid "Please select a CSV file."
 msgstr "يرجى اختيار ملف CSV."
 
 #: core/admin.py:536
-#, fuzzy
-#| msgid "No data rows were found in the file."
 msgid "No data rows found in the file."
 msgstr "لم يُعثر على أي صفوف بيانات في الملف."
 
 #: core/admin.py:551
-#, fuzzy
-#| msgid "Your import session expired. Please upload the file again."
 msgid "Session expired. Please upload the file again."
-msgstr "انتهت صلاحية جلسة الاستيراد. يرجى رفع الملف مرة أخرى."
+msgstr "انتهت صلاحية الجلسة. يرجى رفع الملف مرة أخرى."
 
 #: core/admin.py:698 templates/admin/core/biography/change_list.html:17
 #: templates/admin/core/biography/import_reciters_attributes.html:9
@@ -488,16 +484,12 @@ msgid "Death Gregorian Approximate"
 msgstr "تاريخ الوفاة الميلادي تقريبي"
 
 #: core/models.py:58
-#, fuzzy
-#| msgid "Site name (Arabic)"
 msgid "Birth Date (raw Arabic text)"
-msgstr "اسم الموقع (عربي)"
+msgstr "تاريخ الميلاد (النص العربي الأصلي)"
 
 #: core/models.py:62
-#, fuzzy
-#| msgid "Death year (earliest)"
 msgid "Death Date (raw Arabic text)"
-msgstr "سنة الوفاة (الأقدم)"
+msgstr "تاريخ الوفاة (النص العربي الأصلي)"
 
 #: core/models.py:86
 msgid "Submitted By"
