@@ -240,25 +240,43 @@ def get_unique_missing_attrs(rows):
     return list(seen.keys())
 
 
-def commit_import(rows, published_mode, date_decisions, location_decisions, attr_decisions, teacher_fuzzy_mode="auto"):
+def _build_bio_lookup():
+    """Load all biographies into memory for fast name matching. Returns (name_to_pk, norm_to_pk, norm_list)."""
+    all_bios = list(Biography.objects.values_list("id", "full_name_ar", "alias_ar"))
+    name_to_pk = {}
+    norm_to_pk = {}
+    norm_list = []  # [(normalized_name, pk, display_name)]
+    for pk, full_name, alias in all_bios:
+        if full_name:
+            name_to_pk[full_name] = pk
+            n = normalize_arabic(full_name)
+            if n not in norm_to_pk:
+                norm_to_pk[n] = pk
+                norm_list.append((n, pk, full_name))
+        if alias:
+            na = normalize_arabic(alias)
+            if na not in norm_to_pk:
+                norm_to_pk[na] = pk
+                norm_list.append((na, pk, alias))
+    return name_to_pk, norm_to_pk, norm_list
+
+
+def commit_phase3(rows, published_mode, date_decisions, location_decisions, attr_decisions):
     """
-    Commit all rows to the database.
+    Phase 3: create/update biographies, locations, and attributes.
 
     date_decisions    : {"0_birth": parsed_dict, "1_death": parsed_dict, ...}
     location_decisions: {"city_ar": {"city_ar": str, "country_ar": str}}
     attr_decisions    : {"attr_name": {"action": "accept"|"create"|"skip",
                                        "match_pk": int|None, "long_name": str}}
-    teacher_fuzzy_mode: "auto"  → link fuzzy matches (≥0.85) automatically
-                        "stub"  → create a stub bio for fuzzy matches
-                        "skip"  → skip unmatched names entirely
 
-    Returns a stats dict.
+    Returns (stats_dict, bio_map) where bio_map is {full_name_ar: pk}.
     """
     stats = defaultdict(int)
-    bio_map = {}  # full_name_ar → pk (used in Phase 4)
+    bio_map = {}  # full_name_ar → pk
 
     # ── Pre-create / resolve attributes ──────────────────────────────────────
-    pending_attr_pks = {}  # attr_name → int pk, or "skip"
+    pending_attr_pks = {}  # attr_name → int pk
     for attr_name, decision in attr_decisions.items():
         action = decision.get("action", "skip")
         if action == "accept":
@@ -274,7 +292,6 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
             pending_attr_pks[attr_name] = attr.pk
             if created:
                 stats["new_attrs"] += 1
-        # "skip" → omit from pending_attr_pks
 
     # ── Location resolver ─────────────────────────────────────────────────────
     all_locations = list(Location.objects.all())
@@ -298,18 +315,16 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
         loc_cache[key] = loc
         return loc
 
-    # ── Phase 3: Commit biographies ───────────────────────────────────────────
+    # ── Commit biographies ────────────────────────────────────────────────────
     from .merge_utils import find_similar_to
 
     with transaction.atomic():
         for idx, row in enumerate(rows):
             name = row["full_name_ar"]
 
-            # Apply user date decisions (override auto-parsed values)
             birth_parsed = date_decisions.get(f"{idx}_birth", row["birth_parsed"])
             death_parsed = date_decisions.get(f"{idx}_death", row["death_parsed"])
 
-            # Exact duplicate check only (fuzzy duplicates auto-create a new bio)
             existing = None
             similar = find_similar_to(name)
             if similar:
@@ -327,7 +342,6 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
             if row["alias_ar"]:
                 bio.alias_ar = row["alias_ar"]
 
-            # Published status
             if published_mode == "published":
                 bio.published = True
             elif published_mode == "unpublished":
@@ -336,7 +350,6 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
             else:
                 bio.published = _is_approved(row["status_raw"])
 
-            # Source note → append to comments_ar
             if row["source_raw"] and row["source_raw"] not in ("-", "–"):
                 note = f"المصدر: {row['source_raw']}"
                 if note not in (bio.comments_ar or ""):
@@ -344,7 +357,6 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
                         (bio.comments_ar + "\n" + note) if bio.comments_ar else note
                     ).strip()
 
-            # Dates
             for prefix, parsed in [("birth", birth_parsed), ("death", death_parsed)]:
                 setattr(bio, f"{prefix}_date_raw_ar", parsed["raw"])
                 if parsed["calendar"] is None or parsed["year"] is None:
@@ -357,14 +369,12 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
                     setattr(bio, f"{prefix}_{cal}_day", parsed["day"])
                     setattr(bio, f"{prefix}_{cal}_approximate", parsed["approximate"])
 
-            # Locations
             for loc_key, field_name in [("birth_loc", "birthplace"), ("death_loc", "death_location")]:
                 raw_loc = row.get(loc_key)
                 if not raw_loc:
                     continue
                 city_ar = raw_loc["city_ar"]
                 country_ar = raw_loc["country_ar"]
-                # Apply user location decision
                 if row.get(f"{loc_key}_needs_country") and city_ar in location_decisions:
                     decided = location_decisions[city_ar]
                     city_ar = decided.get("city_ar", city_ar)
@@ -376,7 +386,6 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
 
             bio.save()
 
-            # Attributes (M2M)
             attrs_to_add = list(row.get("attr_exact_pks", []))
             all_req_names = (
                 [item["name"] for item in row.get("attr_fuzzy", [])]
@@ -392,43 +401,116 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
             bio_map[bio.full_name_ar] = bio.pk
             stats["created" if is_new else "updated"] += 1
 
-    # ── Phase 4: Teacher / Student linking ────────────────────────────────────
-    # Load all bios into memory for fast in-memory matching (avoids N+1 queries).
-    all_bios = list(Biography.objects.values_list("id", "full_name_ar", "alias_ar"))
-    name_to_pk = {}
-    norm_to_pk = {}
-    norm_list = []  # [(normalized_name, pk)] for fuzzy iteration
-    for pk, full_name, alias in all_bios:
-        if full_name:
-            name_to_pk[full_name] = pk
-            n = normalize_arabic(full_name)
-            norm_to_pk[n] = pk
-            norm_list.append((n, pk))
-        if alias:
-            na = normalize_arabic(alias)
-            if na not in norm_to_pk:
-                norm_to_pk[na] = pk
-                norm_list.append((na, pk))
+    return dict(stats), bio_map
 
-    def find_bio_pk(person_name):
+
+def pre_scan_phase4(rows, bio_map):
+    """
+    Pre-scan Phase 4: find fuzzy matches and unmatched teacher/student names.
+
+    Returns {"fuzzy_matches": [...], "unmatched": [...]}.
+    Each fuzzy item: {person_name, matched_name, matched_pk, score (%), occurrences}
+    Each unmatched item: {person_name, occurrences}
+    """
+    name_to_pk, norm_to_pk, norm_list = _build_bio_lookup()
+
+    fuzzy_seen = {}    # person_name → item dict
+    unmatched_seen = {}  # person_name → item dict
+
+    for row in rows:
+        if row["full_name_ar"] not in bio_map:
+            continue
+        for raw_key in ("teachers_raw", "students_raw"):
+            for person_name in _split_names(row.get(raw_key, "")):
+                if not person_name:
+                    continue
+                # Exact match → no decision needed
+                if person_name in name_to_pk:
+                    continue
+                norm = normalize_arabic(person_name)
+                if norm in norm_to_pk:
+                    continue
+                # Fuzzy search
+                best_score, best_pk, best_name = 0.0, None, None
+                for bio_norm, bio_pk, bio_name in norm_list:
+                    if not bio_norm:
+                        continue
+                    score = difflib.SequenceMatcher(None, norm, bio_norm).ratio()
+                    if score > best_score:
+                        best_score, best_pk, best_name = score, bio_pk, bio_name
+
+                if best_score >= 0.85:
+                    if person_name in fuzzy_seen:
+                        fuzzy_seen[person_name]["occurrences"] += 1
+                    else:
+                        fuzzy_seen[person_name] = {
+                            "person_name": person_name,
+                            "matched_name": best_name,
+                            "matched_pk": best_pk,
+                            "score": round(best_score * 100, 1),
+                            "occurrences": 1,
+                        }
+                else:
+                    if person_name in unmatched_seen:
+                        unmatched_seen[person_name]["occurrences"] += 1
+                    else:
+                        unmatched_seen[person_name] = {
+                            "person_name": person_name,
+                            "occurrences": 1,
+                        }
+
+    return {
+        "fuzzy_matches": list(fuzzy_seen.values()),
+        "unmatched": list(unmatched_seen.values()),
+    }
+
+
+def commit_phase4(rows, bio_map, rel_decisions):
+    """
+    Phase 4: teacher/student relationship linking based on user decisions.
+
+    rel_decisions: {
+        "fuzzy": {person_name: {"action": "link"|"stub"|"skip", "matched_pk": int}},
+        "unmatched": {person_name: {"action": "stub"|"skip"}},
+    }
+
+    Returns stats dict.
+    """
+    stats = defaultdict(int)
+
+    name_to_pk, norm_to_pk, norm_list_triples = _build_bio_lookup()
+    norm_list = [(n, pk) for n, pk, _ in norm_list_triples]
+
+    fuzzy_decisions = rel_decisions.get("fuzzy", {})
+    unmatched_decisions = rel_decisions.get("unmatched", {})
+
+    def resolve_person(person_name):
+        """Returns (pk_or_None, should_create_stub)."""
         if person_name in name_to_pk:
-            return name_to_pk[person_name]
+            return name_to_pk[person_name], False
         norm = normalize_arabic(person_name)
         if norm in norm_to_pk:
-            return norm_to_pk[norm]
-        if teacher_fuzzy_mode == "auto":
-            best_score, best_pk = 0.0, None
-            for bio_norm, bio_pk in norm_list:
-                if not bio_norm:
-                    continue
-                score = difflib.SequenceMatcher(None, norm, bio_norm).ratio()
-                if score > best_score:
-                    best_score, best_pk = score, bio_pk
-            if best_score >= 0.85:
-                return best_pk
-        return None
+            return norm_to_pk[norm], False
 
-    for idx, row in enumerate(rows):
+        fd = fuzzy_decisions.get(person_name)
+        if fd:
+            action = fd.get("action", "skip")
+            if action == "link":
+                mpk = fd.get("matched_pk")
+                if mpk:
+                    return int(mpk), False
+                return None, True
+            if action == "stub":
+                return None, True
+            return None, False  # skip
+
+        ud = unmatched_decisions.get(person_name)
+        if ud:
+            if ud.get("action") == "skip":
+                return None, False
+        return None, True  # default: create stub
+
+    for row in rows:
         if row["full_name_ar"] not in bio_map:
             continue
         student_pk = bio_map[row["full_name_ar"]]
@@ -438,11 +520,9 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
                 if not person_name:
                     continue
 
-                matched_pk = find_bio_pk(person_name)
+                matched_pk, should_create_stub = resolve_person(person_name)
 
-                if matched_pk is None:
-                    if teacher_fuzzy_mode == "skip":
-                        continue
+                if matched_pk is None and should_create_stub:
                     stub, created = Biography.objects.get_or_create(
                         full_name_ar=person_name,
                         defaults={"published": False},
@@ -451,9 +531,13 @@ def commit_import(rows, published_mode, date_decisions, location_decisions, attr
                         stats["stub_bios"] += 1
                         name_to_pk[person_name] = stub.pk
                         n = normalize_arabic(person_name)
-                        norm_to_pk[n] = stub.pk
-                        norm_list.append((n, stub.pk))
+                        if n not in norm_to_pk:
+                            norm_to_pk[n] = stub.pk
+                            norm_list.append((n, stub.pk))
                     matched_pk = stub.pk
+
+                if matched_pk is None:
+                    continue
 
                 teacher_pk = matched_pk if role == "teacher" else student_pk
                 actual_student_pk = student_pk if role == "teacher" else matched_pk
