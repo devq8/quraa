@@ -744,8 +744,8 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
 
         if step == "locations":
             unique_cities = wiz.get_unique_missing_cities(rows)
-            all_locations = Location.objects.values_list("country_ar", flat=True).distinct()
-            existing_countries = sorted(c for c in all_locations if c)
+            all_locations = Location.objects.values_list("country_ar", flat=True)
+            existing_countries = sorted({c.strip() for c in all_locations if c and c.strip()})
             return TemplateResponse(request, "admin/core/biography/import_reciters_locations.html", {
                 **base_ctx,
                 "title": _("Import — Resolve Missing Countries"),
