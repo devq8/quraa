@@ -141,6 +141,7 @@ def scan_csv_text(text):
 
     rows = []
     stats = defaultdict(int)
+    attr_match_cache = {}  # name → (score, match_or_None) — shared across all rows
 
     for raw in raw_rows[1:]:
         def get(key, _raw=raw):
@@ -198,7 +199,9 @@ def scan_csv_text(text):
             if name in seen_names:
                 continue
             seen_names.add(name)
-            score, match = _fuzzy_match_attr(name, all_attrs)
+            if name not in attr_match_cache:
+                attr_match_cache[name] = _fuzzy_match_attr(name, all_attrs)
+            score, match = attr_match_cache[name]
             if score == 1.0:
                 row["attr_exact_pks"].append(match.pk)
             elif match is not None:
