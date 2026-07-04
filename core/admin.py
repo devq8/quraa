@@ -36,6 +36,16 @@ def _lang_ordering(ar_fields, en_fields):
     return ar_fields if (lang and lang.startswith("ar")) else en_fields
 
 
+def _published_mode_label(mode):
+    """Return the human-facing label for the import wizard's published mode."""
+    labels = {
+        "unpublished": _("Unpublished"),
+        "published": _("Published"),
+        "column": _("Use status column"),
+    }
+    return labels.get(mode, mode or "")
+
+
 class SourceInline(nested_admin.NestedTabularInline):
     model = Source
     extra = 0
@@ -594,11 +604,15 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 unique_cities = wiz.get_unique_missing_cities(rows)
                 location_decisions = {}
                 for i, city in enumerate(unique_cities):
-                    country = request.POST.get(f"loc_{i}_country", "").strip()
-                    is_region = request.POST.get(f"loc_{i}_type") == "region"
-                    if is_region:
+                    loc_type = request.POST.get(f"loc_{i}_type", "city")
+                    if loc_type == "region":
                         location_decisions[city] = {"city_ar": "", "country_ar": city}
-                    else:
+                    elif loc_type == "new":
+                        new_city = request.POST.get(f"loc_{i}_new_city", "").strip()
+                        new_country = request.POST.get(f"loc_{i}_new_country", "").strip()
+                        location_decisions[city] = {"city_ar": new_city, "country_ar": new_country}
+                    else:  # "city"
+                        country = request.POST.get(f"loc_{i}_country", "").strip()
                         location_decisions[city] = {"city_ar": city, "country_ar": country}
                 session["location_decisions"] = location_decisions
                 save_session(session)
@@ -631,20 +645,50 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 return redirect_to("commit")
 
             elif post_step == "commit":
-                teacher_fuzzy_mode = request.POST.get("teacher_fuzzy_mode", "auto")
                 try:
-                    result_stats = wiz.commit_import(
+                    phase3_stats, bio_map = wiz.commit_phase3(
                         rows,
                         session.get("published_mode", "unpublished"),
                         session.get("date_decisions", {}),
                         session.get("location_decisions", {}),
                         session.get("attr_decisions", {}),
-                        teacher_fuzzy_mode=teacher_fuzzy_mode,
                     )
                 except Exception as exc:
                     messages.error(request, f"Import failed: {exc}")
                     return redirect_to("commit")
-                session["results"] = result_stats
+                phase4_scan = wiz.pre_scan_phase4(rows, bio_map)
+                session["phase3_stats"] = phase3_stats
+                session["bio_map"] = bio_map
+                session["phase4_scan"] = phase4_scan
+                save_session(session)
+                return redirect_to("relationships")
+
+            elif post_step == "relationships":
+                fuzzy_matches = session.get("phase4_scan", {}).get("fuzzy_matches", [])
+                unmatched = session.get("phase4_scan", {}).get("unmatched", [])
+                rel_decisions = {"fuzzy": {}, "unmatched": {}}
+                for i, item in enumerate(fuzzy_matches):
+                    action = request.POST.get(f"fuzzy_{i}_action", "link")
+                    rel_decisions["fuzzy"][item["person_name"]] = {
+                        "action": action,
+                        "matched_pk": item["matched_pk"],
+                    }
+                for i, item in enumerate(unmatched):
+                    action = request.POST.get(f"unmatched_{i}_action", "stub")
+                    rel_decisions["unmatched"][item["person_name"]] = {"action": action}
+                try:
+                    phase4_stats = wiz.commit_phase4(
+                        rows,
+                        session.get("bio_map", {}),
+                        rel_decisions,
+                    )
+                except Exception as exc:
+                    messages.error(request, f"Relationship linking failed: {exc}")
+                    return redirect_to("relationships")
+                combined = {**session.get("phase3_stats", {})}
+                for k, v in phase4_stats.items():
+                    combined[k] = combined.get(k, 0) + v
+                session["results"] = combined
                 save_session(session)
                 return redirect_to("results")
 
@@ -662,11 +706,13 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         stats = session.get("stats", {})
 
         if step == "scan":
+            published_mode = session.get("published_mode")
             return TemplateResponse(request, "admin/core/biography/import_reciters_scan.html", {
                 **base_ctx,
                 "title": _("Import — Scan Results"),
                 "stats": stats,
-                "published_mode": session.get("published_mode"),
+                "published_mode": published_mode,
+                "published_mode_label": _published_mode_label(published_mode),
             })
 
         if step == "dates":
@@ -718,15 +764,31 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             })
 
         if step == "commit":
+            published_mode = session.get("published_mode")
             return TemplateResponse(request, "admin/core/biography/import_reciters_commit.html", {
                 **base_ctx,
                 "title": _("Import — Ready to Commit"),
                 "stats": stats,
-                "published_mode": session.get("published_mode"),
+                "published_mode": published_mode,
+                "published_mode_label": _published_mode_label(published_mode),
                 "date_decisions_count": len(session.get("date_decisions", {})),
                 "location_decisions_count": len(session.get("location_decisions", {})),
                 "attr_decisions_count": len(session.get("attr_decisions", {})),
             })
+
+        if step == "relationships":
+            phase4_scan = session.get("phase4_scan", {})
+            return TemplateResponse(
+                request,
+                "admin/core/biography/import_reciters_relationships.html",
+                {
+                    **base_ctx,
+                    "title": _("Import — Confirm Relationships"),
+                    "fuzzy_matches": list(enumerate(phase4_scan.get("fuzzy_matches", []))),
+                    "unmatched": list(enumerate(phase4_scan.get("unmatched", []))),
+                    "phase3_stats": session.get("phase3_stats", {}),
+                },
+            )
 
         if step == "results":
             results = session.get("results", {})

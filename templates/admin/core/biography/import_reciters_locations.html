@@ -30,23 +30,41 @@
     <div class="module" style="padding:.7em 1.2em; margin-bottom:1em;">
       <h3 style="margin:.2em 0 .5em; direction:rtl;">{{ city }}</h3>
 
-      <div class="form-row" style="margin-bottom:.5em;">
-        <label for="id_loc_{{ i }}_country">{% trans "Country / Region (Arabic):" %}</label>
-        <input type="text" id="id_loc_{{ i }}_country" name="loc_{{ i }}_country"
-               list="country-list" style="width:18em; margin-inline-start:.5em;"
-               placeholder="{% trans 'type or choose' %}">
-      </div>
-
       <div>
         <p style="margin:.4em 0 .2em;"><strong>{% blocktrans with city=city %}Is "{{ city }}" a city or a country/region?{% endblocktrans %}</strong></p>
-        <label style="margin-inline-end:1.5em;">
-          <input type="radio" name="loc_{{ i }}_type" value="city" checked>
-          {% trans "City — the name above is the city; the country field is the country" %}
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="loc_{{ i }}_type" value="city" checked
+                 onchange="toggleLocFields({{ i }}, this.value)">
+          {% trans "City — the name above is the city; enter its country below" %}
         </label>
-        <label>
-          <input type="radio" name="loc_{{ i }}_type" value="region">
+        <div id="loc_{{ i }}_country_row" style="margin:.3em 0 .3em 1.5em;">
+          <label for="id_loc_{{ i }}_country">{% trans "Country / Region (Arabic):" %}</label>
+          <input type="text" id="id_loc_{{ i }}_country" name="loc_{{ i }}_country"
+                 list="country-list" style="width:18em; margin-inline-start:.5em;"
+                 placeholder="{% trans 'type or choose' %}">
+        </div>
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="loc_{{ i }}_type" value="region"
+                 onchange="toggleLocFields({{ i }}, this.value)">
           {% blocktrans with city=city %}"{{ city }}" is itself the country/region — leave city blank{% endblocktrans %}
         </label>
+        <label style="display:block; margin:.3em 0;">
+          <input type="radio" name="loc_{{ i }}_type" value="new"
+                 onchange="toggleLocFields({{ i }}, this.value)">
+          {% trans "Enter a completely different city and country" %}
+        </label>
+        <div id="loc_{{ i }}_new_row" style="display:none; margin:.3em 0 .3em 1.5em;">
+          <label>{% trans "City (Arabic):" %}
+            <input type="text" name="loc_{{ i }}_new_city"
+                   style="width:14em; margin-inline-start:.4em;" dir="rtl"
+                   placeholder="{{ city }}">
+          </label>
+          <label style="margin-inline-start:1em;">{% trans "Country (Arabic):" %}
+            <input type="text" name="loc_{{ i }}_new_country"
+                   style="width:14em; margin-inline-start:.4em;" dir="rtl"
+                   list="country-list">
+          </label>
+        </div>
       </div>
     </div>
     {% endfor %}
@@ -56,4 +74,12 @@
     </div>
   </form>
 </div>
+<script>
+function toggleLocFields(i, val) {
+  var countryRow = document.getElementById('loc_' + i + '_country_row');
+  var newRow = document.getElementById('loc_' + i + '_new_row');
+  if (countryRow) countryRow.style.display = val === 'city' ? '' : 'none';
+  if (newRow) newRow.style.display = val === 'new' ? '' : 'none';
+}
+</script>
 {% endblock %}
