@@ -361,16 +361,6 @@ def commit_phase3(rows, published_mode, date_decisions, location_decisions, attr
             else:
                 bio.published = _is_approved(row["status_raw"])
 
-            if row["source_raw"] and row["source_raw"] not in ("-", "–"):
-                raw_sources = _NAME_SEPS.split(row["source_raw"])
-                existing_names = set(bio.sources.values_list("name_ar", flat=True))
-                for src in raw_sources:
-                    src = src.strip()
-                    if src and src not in existing_names:
-                        Source.objects.create(biography=bio, name_ar=src)
-                        existing_names.add(src)
-                        stats["new_sources"] += 1
-
             for prefix, parsed in [("birth", birth_parsed), ("death", death_parsed)]:
                 setattr(bio, f"{prefix}_date_raw_ar", parsed["raw"])
                 if parsed["calendar"] is None or parsed["year"] is None:
@@ -399,6 +389,16 @@ def commit_phase3(rows, published_mode, date_decisions, location_decisions, attr
                         setattr(bio, field_name, loc_obj)
 
             bio.save()
+
+            if row["source_raw"] and row["source_raw"] not in ("-", "–"):
+                raw_sources = _NAME_SEPS.split(row["source_raw"])
+                existing_names = set(bio.sources.values_list("name_ar", flat=True))
+                for src in raw_sources:
+                    src = src.strip()
+                    if src and src not in existing_names:
+                        Source.objects.create(biography=bio, name_ar=src)
+                        existing_names.add(src)
+                        stats["new_sources"] += 1
 
             attrs_to_add = list(row.get("attr_exact_pks", []))
             all_req_names = (

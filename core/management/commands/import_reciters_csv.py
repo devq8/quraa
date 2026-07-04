@@ -574,17 +574,6 @@ class Command(BaseCommand):
                 else:
                     bio.published = _is_approved(row["status_raw"])
 
-                # Source → Source objects.
-                if row["source_raw"] and row["source_raw"] not in ("-", "–"):
-                    raw_sources = _NAME_SEPS.split(row["source_raw"])
-                    existing_names = set(bio.sources.values_list("name_ar", flat=True))
-                    for src in raw_sources:
-                        src = src.strip()
-                        if src and src not in existing_names:
-                            Source.objects.create(biography=bio, name_ar=src)
-                            existing_names.add(src)
-                            stats["new_sources"] += 1
-
                 # Dates.
                 for prefix in ("birth", "death"):
                     parsed = row[f"{prefix}_parsed"]
@@ -616,6 +605,17 @@ class Command(BaseCommand):
                         setattr(bio, field_name, loc_obj)
 
                 bio.save()
+
+                # Source → Source objects.
+                if row["source_raw"] and row["source_raw"] not in ("-", "–"):
+                    raw_sources = _NAME_SEPS.split(row["source_raw"])
+                    existing_names = set(bio.sources.values_list("name_ar", flat=True))
+                    for src in raw_sources:
+                        src = src.strip()
+                        if src and src not in existing_names:
+                            Source.objects.create(biography=bio, name_ar=src)
+                            existing_names.add(src)
+                            stats["new_sources"] += 1
 
                 # Attributes (M2M).
                 attrs_to_add = list(row["attr_resolved"])
