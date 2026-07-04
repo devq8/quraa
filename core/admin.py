@@ -528,7 +528,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                     messages.error(request, _("Please select a CSV file."))
                     return redirect_to("upload")
                 try:
-                    rows, stats, csv_text = wiz.scan_csv_file(upload)
+                    rows, stats, _csv_text = wiz.scan_csv_file(upload)
                 except Exception as exc:
                     messages.error(request, f"Error reading file: {exc}")
                     return redirect_to("upload")
@@ -536,7 +536,6 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                     messages.error(request, _("No data rows found in the file."))
                     return redirect_to("upload")
                 save_session({
-                    "csv_text": csv_text,
                     "published_mode": published_mode,
                     "rows": rows,
                     "stats": stats,
