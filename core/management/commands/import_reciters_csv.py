@@ -20,7 +20,7 @@ from django.db import transaction
 from core.arabic_date_parser import parse_arabic_date
 from core.csv_import import _normalize_ar, _find_location_candidates
 from core.merge_utils import find_similar_to
-from core.models import Attribute, Biography, Location, TeacherStudentRelationship
+from core.models import Attribute, Biography, Location, Reading, TeacherStudentRelationship
 from core.search import normalize_arabic
 
 # ── CSV column header keywords (normalized) ─────────────────────────────────
@@ -80,6 +80,17 @@ def _split_names(text):
         return []
     parts = [p.strip() for p in _NAME_SEPS.split(text)]
     return [p for p in parts if p and p not in ("-", "–")]
+
+
+_READING_RE = re.compile(r"^(.*?)\s*\(([^)]+)\)\s*$")
+
+
+def _parse_name_and_reading(entry):
+    """Split 'Name (reading_ar)' into (name, reading_ar). Returns (entry, None) if no bracket."""
+    m = _READING_RE.match(entry)
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    return entry, None
 
 
 def _split_attrs(text):
@@ -646,8 +657,10 @@ class Command(BaseCommand):
                     ("teacher", "teachers_raw", None),
                     ("student", "students_raw", None),
                 ]:
-                    names = _split_names(row[f"{role}_raw"])
-                    for person_name in names:
+                    for raw_entry in _split_names(row[f"{role}_raw"]):
+                        if not raw_entry:
+                            continue
+                        person_name, reading_ar = _parse_name_and_reading(raw_entry)
                         if not person_name:
                             continue
 
@@ -663,8 +676,9 @@ class Command(BaseCommand):
                                 if accept_all_teachers:
                                     matched_bio = Biography.objects.filter(pk=top_stub.pk).first()
                                 else:
+                                    reading_note = f" ({reading_ar})" if reading_ar else ""
                                     print(
-                                        f"\n  {role.title()} of \"{student_bio}\": \"{person_name}\""
+                                        f"\n  {role.title()} of \"{student_bio}\": \"{person_name}\"{reading_note}"
                                     )
                                     print(
                                         f"  Best match: \"{top_stub.full_name_ar}\" — {similarity:.0%} ({match_type})"
@@ -704,10 +718,14 @@ class Command(BaseCommand):
                         teacher_bio = matched_bio if role == "teacher" else student_bio
                         actual_student = student_bio if role == "teacher" else matched_bio
                         if teacher_bio.pk != actual_student.pk:
-                            _, created = TeacherStudentRelationship.objects.get_or_create(
+                            rel, created = TeacherStudentRelationship.objects.get_or_create(
                                 teacher=teacher_bio,
                                 student=actual_student,
                             )
+                            if reading_ar:
+                                reading_obj, _ = Reading.objects.get_or_create(description_ar=reading_ar)
+                                rel.notes.add(reading_obj)
+                                stats["readings_linked"] += 1
                             if created:
                                 stats["relationships"] += 1
 
@@ -719,3 +737,5 @@ class Command(BaseCommand):
         self.stdout.write(f"  {stats['new_attrs']} new attributes created")
         self.stdout.write(f"  {stats['stub_bios']} stub biographies created (teachers/students)")
         self.stdout.write(f"  {stats['relationships']} teacher/student relationships linked")
+        if stats.get("readings_linked"):
+            self.stdout.write(f"  {stats['readings_linked']} reading types linked to relationships")

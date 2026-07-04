@@ -786,6 +786,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                     "title": _("Import — Confirm Relationships"),
                     "fuzzy_matches": list(enumerate(phase4_scan.get("fuzzy_matches", []))),
                     "unmatched": list(enumerate(phase4_scan.get("unmatched", []))),
+                    "detected_readings": phase4_scan.get("detected_readings", []),
                     "phase3_stats": session.get("phase3_stats", {}),
                 },
             )
