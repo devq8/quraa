@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 14:01+0300\n"
+"POT-Creation-Date: 2026-07-04 15:33+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,6 +33,7 @@ msgid "Unpublished"
 msgstr "غير منشور"
 
 #: core/admin.py:43 core/csv_import.py:56 core/models.py:13
+#: templates/admin/core/biography/import_reciters_results.html:73
 msgid "Published"
 msgstr "منشور"
 
@@ -83,12 +84,12 @@ msgstr "الموطن"
 msgid "Hometowns"
 msgstr "المواطن"
 
-#: core/admin.py:101 core/admin.py:948 core/admin.py:1079 core/models.py:377
+#: core/admin.py:101 core/admin.py:959 core/admin.py:1090 core/models.py:377
 #: core/models.py:510
 msgid "Narrator"
 msgstr "الراوي"
 
-#: core/admin.py:102 core/admin.py:949 core/admin.py:1080 core/admin.py:1101
+#: core/admin.py:102 core/admin.py:960 core/admin.py:1091 core/admin.py:1112
 #: core/models.py:408
 msgid "Narrators"
 msgstr "الرواة"
@@ -206,12 +207,12 @@ msgstr "انتهت صلاحية الجلسة. يرجى بدء الاستيراد
 msgid "Import — Scan Results"
 msgstr "الاستيراد — نتائج الفحص"
 
-#: core/admin.py:732 core/admin.py:867 core/models.py:144
+#: core/admin.py:732 core/admin.py:878 core/models.py:144
 #: landing/templates/biography.html:180
 msgid "Birth"
 msgstr "الميلاد"
 
-#: core/admin.py:732 core/admin.py:876 core/models.py:144
+#: core/admin.py:732 core/admin.py:887 core/models.py:144
 #: landing/templates/biography.html:207
 msgid "Death"
 msgstr "الوفاة"
@@ -236,37 +237,37 @@ msgstr "الاستيراد — جاهز للتأكيد"
 msgid "Import — Confirm Relationships"
 msgstr "الاستيراد — تأكيد العلاقات"
 
-#: core/admin.py:798
+#: core/admin.py:806
 msgid "Import — Complete"
 msgstr "الاستيراد — اكتمل"
 
-#: core/admin.py:982 core/admin.py:1095
+#: core/admin.py:993 core/admin.py:1106
 #: templates/admin/core/biography/change_form.html:148
 msgid "Audit"
 msgstr "السجل والمراجعة"
 
-#: core/admin.py:1009
+#: core/admin.py:1020
 msgid "You do not have permission to modify this Esnad."
 msgstr "ليس لديك صلاحية لتعديل هذا الإسناد."
 
-#: core/admin.py:1019
+#: core/admin.py:1030
 msgid "Esnad not found."
 msgstr "الإسناد غير موجود."
 
-#: core/admin.py:1024
+#: core/admin.py:1035
 msgid "No template selected."
 msgstr "لم يُختر قالب."
 
-#: core/admin.py:1039
+#: core/admin.py:1050
 msgid "Template not found."
 msgstr "القالب غير موجود."
 
-#: core/admin.py:1052
+#: core/admin.py:1063
 #, python-format
 msgid "Template \"%(name)s\" applied."
 msgstr "تم تطبيق القالب \"%(name)s\"."
 
-#: core/admin.py:1067
+#: core/admin.py:1078
 msgid "Chain"
 msgstr "سند"
 
@@ -2255,8 +2256,7 @@ msgstr ""
 msgid ""
 "After saving biographies, you will review teacher/student relationships on "
 "the next page."
-msgstr ""
-"بعد حفظ التراجم ستنتقل إلى صفحة تأكيد علاقات الشيوخ والتلاميذ."
+msgstr "بعد حفظ التراجم ستنتقل إلى صفحة تأكيد علاقات الشيوخ والتلاميذ."
 
 #: templates/admin/core/biography/import_reciters_commit.html:36
 msgid "Commit import — save to database"
@@ -2431,8 +2431,8 @@ msgid ""
 "These teacher/student names have a close but not exact match in the "
 "database. Confirm each link, create a new stub biography, or skip."
 msgstr ""
-"هذه الأسماء لها تطابق قريب غير دقيق في قاعدة البيانات. أكّد الربط أو "
-"أنشئ ترجمة مؤقتة جديدة أو تخطَّها."
+"هذه الأسماء لها تطابق قريب غير دقيق في قاعدة البيانات. أكّد الربط أو أنشئ "
+"ترجمة مؤقتة جديدة أو تخطَّها."
 
 #: templates/admin/core/biography/import_reciters_relationships.html:40
 msgid "best match:"
@@ -2536,6 +2536,28 @@ msgstr "عرض جميع التراجم ←"
 #: templates/admin/core/biography/import_reciters_results.html:54
 msgid "Import another file"
 msgstr "استيراد ملف آخر"
+
+#: templates/admin/core/biography/import_reciters_results.html:60
+#, python-format
+msgid "Imported biographies (%(total)s)"
+msgstr "التراجم المستوردة (%(total)s)"
+
+#: templates/admin/core/biography/import_reciters_results.html:63
+#, python-format
+msgid "showing first %(n)s"
+msgstr "يُعرض أول %(n)s"
+
+#: templates/admin/core/biography/import_reciters_results.html:71
+msgid "Name"
+msgstr "الاسم"
+
+#: templates/admin/core/biography/import_reciters_results.html:72
+msgid "Death year"
+msgstr "سنة الوفاة"
+
+#: templates/admin/core/biography/import_reciters_results.html:92
+msgid "Edit"
+msgstr "تعديل"
 
 #: templates/admin/core/biography/import_reciters_scan.html:10
 msgid "Scan Results"

@@ -54,5 +54,49 @@
     <a href="{% url 'admin:core_biography_import_reciters' %}" style="margin-inline-start:1.2em;">{% trans "Import another file" %}</a>
   </div>
 
+  {% if imported_bios %}
+  <div class="module" style="margin-top:1.5em;">
+    <h2 style="padding:.6em 1.2em .4em;">
+      {% blocktrans with total=imported_bios_total %}Imported biographies ({{ total }}){% endblocktrans %}
+      {% if imported_bios_truncated %}
+      <span class="help" style="font-weight:normal; font-size:.85em;">
+        &mdash; {% blocktrans with n=300 %}showing first {{ n }}{% endblocktrans %}
+      </span>
+      {% endif %}
+    </h2>
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f0f0f0;">
+          <th style="text-align:start; padding:.35em 1em; border-bottom:2px solid #ddd;">#</th>
+          <th style="text-align:start; padding:.35em 1em; border-bottom:2px solid #ddd;" dir="rtl">{% trans "Name" %}</th>
+          <th style="text-align:start; padding:.35em 1em; border-bottom:2px solid #ddd;">{% trans "Death year" %}</th>
+          <th style="text-align:start; padding:.35em 1em; border-bottom:2px solid #ddd;">{% trans "Published" %}</th>
+          <th style="padding:.35em 1em; border-bottom:2px solid #ddd;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bio in imported_bios %}
+        <tr style="{% cycle 'background:#fafafa;' '' %}">
+          <td style="padding:.3em 1em; border-bottom:1px solid #eee; color:#888; font-size:.9em;">{{ forloop.counter }}</td>
+          <td style="padding:.3em 1em; border-bottom:1px solid #eee;" dir="rtl">
+            <strong>{{ bio.full_name_ar }}</strong>
+            {% if bio.alias_ar %}<span style="color:#666; font-size:.9em;"> ({{ bio.alias_ar }})</span>{% endif %}
+          </td>
+          <td style="padding:.3em 1em; border-bottom:1px solid #eee;">
+            {% if bio.death_hijri_year %}{{ bio.death_hijri_year }}هـ{% elif bio.death_greg_year %}{{ bio.death_greg_year }}م{% else %}&mdash;{% endif %}
+          </td>
+          <td style="padding:.3em 1em; border-bottom:1px solid #eee;">
+            {% if bio.published %}<span style="color:#2e7d32;">✓</span>{% else %}<span style="color:#888;">—</span>{% endif %}
+          </td>
+          <td style="padding:.3em 1em; border-bottom:1px solid #eee; text-align:end;">
+            <a href="{% url 'admin:core_biography_change' bio.pk %}" style="font-size:.85em;">{% trans "Edit" %}</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
