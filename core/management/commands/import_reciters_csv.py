@@ -20,7 +20,7 @@ from django.db import transaction
 from core.arabic_date_parser import parse_arabic_date
 from core.csv_import import _normalize_ar, _find_location_candidates
 from core.merge_utils import find_similar_to
-from core.models import Attribute, Biography, Location, Reading, TeacherStudentRelationship
+from core.models import Attribute, Biography, Location, Reading, Source, TeacherStudentRelationship
 from core.search import normalize_arabic
 
 # ── CSV column header keywords (normalized) ─────────────────────────────────
@@ -574,11 +574,16 @@ class Command(BaseCommand):
                 else:
                     bio.published = _is_approved(row["status_raw"])
 
-                # Source → comments_ar.
+                # Source → Source objects.
                 if row["source_raw"] and row["source_raw"] not in ("-", "–"):
-                    source_note = f"المصدر: {row['source_raw']}"
-                    if source_note not in (bio.comments_ar or ""):
-                        bio.comments_ar = (bio.comments_ar + "\n" + source_note).strip() if bio.comments_ar else source_note
+                    raw_sources = _NAME_SEPS.split(row["source_raw"])
+                    existing_names = set(bio.sources.values_list("name_ar", flat=True))
+                    for src in raw_sources:
+                        src = src.strip()
+                        if src and src not in existing_names:
+                            Source.objects.create(biography=bio, name_ar=src)
+                            existing_names.add(src)
+                            stats["new_sources"] += 1
 
                 # Dates.
                 for prefix in ("birth", "death"):
@@ -735,6 +740,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  {stats['updated']} updated")
         self.stdout.write(f"  {stats['new_locations']} new locations created")
         self.stdout.write(f"  {stats['new_attrs']} new attributes created")
+        self.stdout.write(f"  {stats['new_sources']} sources created")
         self.stdout.write(f"  {stats['stub_bios']} stub biographies created (teachers/students)")
         self.stdout.write(f"  {stats['relationships']} teacher/student relationships linked")
         if stats.get("readings_linked"):
