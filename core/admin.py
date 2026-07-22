@@ -12,7 +12,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _, get_language
 from . import biography_export, csv_import
 from .models import (
-    Attribute, Biography,
+    Attribute, Biography, City, Country,
     Esnad, EsnadLink,
     EsnadTemplate, EsnadTemplateLink,
     Location, Reading, Source, TeacherStudentRelationship,
@@ -896,14 +896,36 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     )
 
 
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    list_display = ("id", "name_ar", "name_en")
+    search_fields = ("name_ar", "name_en")
+
+    def get_ordering(self, request):
+        return _lang_ordering(("name_ar",), ("name_en", "name_ar"))
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ("id", "name_ar", "name_en", "country")
+    list_filter = ("country",)
+    search_fields = ("name_ar", "name_en", "country__name_ar", "country__name_en")
+    autocomplete_fields = ("country",)
+
+    def get_ordering(self, request):
+        return _lang_ordering(("name_ar",), ("name_en", "name_ar"))
+
+
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ("id", "city_ar", "city_en", "country_ar", "country_en")
     list_filter = ("country_ar",)
     search_fields = ("city_ar", "city_en", "country_ar", "country_en")
+    autocomplete_fields = ("city", "country")
     fieldsets = (
         (None, {
             "fields": (
+                ("city", "country"),
                 ("city_ar", "city_en"),
                 ("country_ar", "country_en"),
             ),

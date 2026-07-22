@@ -17,43 +17,70 @@ from .models import Attribute, Biography, Location, Reading, Source, TeacherStud
 from .search import normalize_arabic
 
 _COLUMN_KEYWORDS = {
-    "alias":       ["شهره", "شهرة"],
-    "full_name":   ["اسم الكامل", "الاسم الكامل"],
-    "birth_date":  ["تاريخ الميلاد", "ميلاد"],
-    "birthplace":  ["مكان الميلاد"],
-    "death_date":  ["تاريخ الوفاة", "وفاة"],
-    "death_place": ["مكان الوفاة"],
-    "teachers":    ["شيوخ", "شيوخه"],
-    "students":    ["تلاميذ", "تلاميذه"],
-    "attributes":  ["صفات", "تصنيفات"],
-    "source":      ["مصدر"],
-    "status":      ["حاله الترجمه", "حالة الترجمة", "معتمد"],
+    "alias":         ["شهره", "شهرة"],
+    "full_name":     ["اسم الكامل", "الاسم الكامل"],
+    "birth_date":    ["تاريخ الميلاد", "ميلاد"],
+    "birth_city":    ["مدينة الميلاد", "مدينه الميلاد"],
+    "birth_country": ["دولة الميلاد", "دوله الميلاد", "بلد الميلاد"],
+    "death_date":    ["تاريخ الوفاة", "وفاة"],
+    "death_city":    ["مدينة الوفاة", "مدينه الوفاة"],
+    "death_country": ["دولة الوفاة", "دوله الوفاة", "بلد الوفاة"],
+    "teachers":      ["شيوخ", "شيوخه"],
+    "students":      ["تلاميذ", "تلاميذه"],
+    "attributes":    ["صفات", "تصنيفات"],
+    "source":        ["مصدر"],
+    "status":        ["حاله الترجمه", "حالة الترجمة", "معتمد"],
 }
 
 _ATTR_SEPS = re.compile(r"[،,;؛/]")
 _NAME_SEPS = re.compile(r"[،,;؛\n]")
-_LOC_RE = re.compile(r"^([^(]+)\s*\(([^)]+)\)\s*$")
+_DASHES = ("-", "–", "")
+
+
+def _clean_cell(text):
+    text = (text or "").strip()
+    return "" if text in _DASHES else text
+
+
+# Keys are resolved in this order so the specific city/country columns claim
+# their header before the greedy bare "ميلاد"/"وفاة" date keywords can match it
+# (both "مدينة الميلاد" and "دولة الميلاد" contain "ميلاد").
+_DETECTION_ORDER = [
+    "alias", "full_name",
+    "birth_city", "birth_country", "death_city", "death_country",
+    "birth_date", "death_date",
+    "teachers", "students", "attributes", "source", "status",
+]
 
 
 def _detect_columns(headers):
     mapping = {}
+    used = set()
     norm_headers = [_normalize_ar(h) for h in headers]
-    for key, keywords in _COLUMN_KEYWORDS.items():
+    for key in _DETECTION_ORDER:
+        keywords = _COLUMN_KEYWORDS[key]
         for i, nh in enumerate(norm_headers):
+            if i in used:
+                continue
             if any(_normalize_ar(kw) in nh for kw in keywords):
                 mapping[key] = i
+                used.add(i)
                 break
     return mapping
 
 
-def _parse_loc(text):
-    if not text or text.strip() in ("-", "–", ""):
+def _loc_from_cols(city, country):
+    """Build a location spec from separate city and country cells.
+
+    Returns None when both are empty. Either side may be empty: a country with
+    no city, or a city with no (yet) country. A region (e.g. الحجاز، الشام)
+    simply arrives in the country column and is treated like any country.
+    """
+    city = _clean_cell(city)
+    country = _clean_cell(country)
+    if not city and not country:
         return None
-    text = text.strip()
-    m = _LOC_RE.match(text)
-    if m:
-        return {"city_ar": m.group(1).strip(), "country_ar": m.group(2).strip()}
-    return {"city_ar": text, "country_ar": ""}
+    return {"city_ar": city, "country_ar": country}
 
 
 def _split_names(text):
@@ -158,9 +185,11 @@ def scan_csv_text(text):
             "alias_ar":       get("alias"),
             "full_name_ar":   full_name,
             "birth_date_raw": get("birth_date"),
-            "birthplace_raw": get("birthplace"),
+            "birth_city_raw":    get("birth_city"),
+            "birth_country_raw": get("birth_country"),
             "death_date_raw": get("death_date"),
-            "death_place_raw":get("death_place"),
+            "death_city_raw":    get("death_city"),
+            "death_country_raw": get("death_country"),
             "teachers_raw":   get("teachers"),
             "students_raw":   get("students"),
             "attributes_raw": get("attributes"),
@@ -178,12 +207,14 @@ def scan_csv_text(text):
         if row["death_needs_confirm"]:
             stats["ambiguous_dates"] += 1
 
-        birth_loc = _parse_loc(row["birthplace_raw"])
-        death_loc = _parse_loc(row["death_place_raw"])
+        birth_loc = _loc_from_cols(row["birth_city_raw"], row["birth_country_raw"])
+        death_loc = _loc_from_cols(row["death_city_raw"], row["death_country_raw"])
         row["birth_loc"] = birth_loc
         row["death_loc"] = death_loc
-        row["birth_loc_needs_country"] = bool(birth_loc and not birth_loc["country_ar"])
-        row["death_loc_needs_country"] = bool(death_loc and not death_loc["country_ar"])
+        # Only a city with no country needs resolving now that country is its own
+        # column (unlikely, but the wizard still asks the user just in case).
+        row["birth_loc_needs_country"] = bool(birth_loc and birth_loc["city_ar"] and not birth_loc["country_ar"])
+        row["death_loc_needs_country"] = bool(death_loc and death_loc["city_ar"] and not death_loc["country_ar"])
 
         if row["birth_loc_needs_country"]:
             stats["missing_countries"] += 1

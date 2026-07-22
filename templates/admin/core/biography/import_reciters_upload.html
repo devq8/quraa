@@ -22,8 +22,11 @@
     <ul style="margin:.4em 0 0 1.2em;">
       <li>الشهرة &mdash; {% trans "alias" %}</li>
       <li>الاسم الكامل &mdash; {% trans "full name (required)" %}</li>
-      <li>تاريخ الميلاد / مكان الميلاد</li>
-      <li>تاريخ الوفاة / مكان الوفاة</li>
+      <li>تاريخ الميلاد / مدينة الميلاد / دولة الميلاد</li>
+      <li>تاريخ الوفاة / مدينة الوفاة / دولة الوفاة</li>
+      <li style="list-style:none; color:#666; font-size:.9em;">
+        {% blocktrans %}City and country are separate columns. A country with no city, or a region such as الحجاز / الشام in the country column, are both accepted.{% endblocktrans %}
+      </li>
       <li>أبرز شيوخه / أبرز تلاميذه &mdash; {% trans "comma-separated names" %}</li>
       <li>صفات وتصنيفات &mdash; {% trans "comma-separated attributes" %}</li>
       <li>المصدر &mdash; {% trans "source (appended to comments)" %}</li>
