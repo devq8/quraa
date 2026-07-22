@@ -57,6 +57,26 @@ class NormalizedLocationTests(TestCase):
         self.assertEqual(loc.city_en, "Basra")
 
 
+class RecitersTemplateTests(TestCase):
+    """The downloadable Excel example round-trips back through the wizard."""
+
+    def test_template_builds_and_scans_back(self):
+        import io
+
+        from . import import_reciters_wizard as wiz
+
+        data = wiz.build_template_xlsx()
+        self.assertTrue(data)
+
+        rows, stats, _ = wiz.scan_csv_file(io.BytesIO(data), "reciters_import_example.xlsx")
+        self.assertEqual(len(rows), 2)
+        # Row 1: full city + country.
+        self.assertEqual(rows[0]["birth_loc"], {"city_ar": "الكوفة", "country_ar": "العراق"})
+        # Row 2: region-only birthplace, country-only death location.
+        self.assertEqual(rows[1]["birth_loc"], {"city_ar": "", "country_ar": "الحجاز"})
+        self.assertEqual(rows[1]["death_loc"], {"city_ar": "", "country_ar": "مصر"})
+
+
 class BiographyLiveDuplicateAdminTests(TestCase):
     def setUp(self):
         User = get_user_model()

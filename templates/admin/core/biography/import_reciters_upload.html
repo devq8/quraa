@@ -13,8 +13,17 @@
 {% block content %}
 <div id="content-main">
   <p>
-    {% blocktrans %}Upload a CSV file in the custom Arabic reciters format. The wizard will scan the file
+    {% blocktrans %}Upload a CSV or Excel (.xlsx) file in the custom Arabic reciters format. The wizard will scan the file
     and guide you through resolving dates, locations, and attributes before saving anything.{% endblocktrans %}
+  </p>
+
+  <p style="margin:.4em 0 1.2em;">
+    <a class="button" href="{% url 'admin:core_biography_import_reciters_template' %}">
+      ⬇ {% trans "Download Excel example" %}
+    </a>
+    <span class="help" style="margin-inline-start:.6em;">
+      {% trans "A ready-to-fill .xlsx with the expected columns and sample rows. You can upload it back here once filled." %}
+    </span>
   </p>
 
   <div class="module" style="padding:.8em 1.2em; margin-bottom:1.2em;">
@@ -41,9 +50,9 @@
     <fieldset class="module aligned">
       <h2>{% trans "Upload file" %}</h2>
       <div class="form-row">
-        <label for="id_csv_file">{% trans "CSV file" %}:</label>
-        <input type="file" name="csv_file" id="id_csv_file" accept=".csv,.txt" required>
-        <p class="help">{% trans "UTF-8 or UTF-8-BOM encoded CSV." %}</p>
+        <label for="id_csv_file">{% trans "CSV or Excel file" %}:</label>
+        <input type="file" name="csv_file" id="id_csv_file" accept=".csv,.txt,.xlsx" required>
+        <p class="help">{% trans "UTF-8 / UTF-8-BOM encoded CSV, or an .xlsx file." %}</p>
       </div>
       <div class="form-row">
         <label>{% trans "Published status for imported biographies" %}:</label>

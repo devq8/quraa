@@ -191,6 +191,11 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 self.admin_site.admin_view(self.import_reciters_view),
                 name="core_biography_import_reciters",
             ),
+            path(
+                "import-reciters/template-xlsx/",
+                self.admin_site.admin_view(self.import_reciters_template_view),
+                name="core_biography_import_reciters_template",
+            ),
         ]
         return custom + super().get_urls()
 
@@ -237,6 +242,16 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
         response["Content-Disposition"] = "attachment; filename=biography_import_template.xlsx"
+        return response
+
+    def import_reciters_template_view(self, request):
+        from . import import_reciters_wizard as wiz
+
+        response = HttpResponse(
+            wiz.build_template_xlsx(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = "attachment; filename=reciters_import_example.xlsx"
         return response
 
     def import_csv_view(self, request):
@@ -528,7 +543,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                     messages.error(request, _("Please select a CSV file."))
                     return redirect_to("upload")
                 try:
-                    rows, stats, _csv_text = wiz.scan_csv_file(upload)
+                    rows, stats, _csv_text = wiz.scan_csv_file(upload, upload.name)
                 except Exception as exc:
                     messages.error(request, f"Error reading file: {exc}")
                     return redirect_to("upload")
