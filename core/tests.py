@@ -107,6 +107,43 @@ class MigrateLocationDataCommandTests(TestCase):
         self.assertIsNone(Location.objects.get(city_ar="الكوفة").country_id)
 
 
+class PopulateCountriesCommandTests(TestCase):
+    """populate_countries creates a Country per distinct Location country, trims
+    and de-duplicates whitespace variants, and is idempotent."""
+
+    def test_creates_distinct_countries_and_is_idempotent(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        Location.objects.bulk_create([
+            Location(city_ar="الكوفة", country_ar="العراق", country_en="Iraq"),
+            Location(city_ar="البصرة", country_ar="العراق"),      # same country
+            Location(city_ar="القاهرة", country_ar=" مصر "),       # whitespace variant
+            Location(city_ar="مكة", country_ar="مصر"),             # collapses with above
+            Location(city_ar="مدينة", country_ar=""),              # no country → skipped
+        ])
+
+        call_command("populate_countries", stdout=StringIO())
+
+        self.assertEqual(Country.objects.count(), 2)
+        self.assertTrue(Country.objects.filter(name_ar="العراق").exists())
+        self.assertTrue(Country.objects.filter(name_ar="مصر").exists())
+        self.assertEqual(Country.objects.get(name_ar="العراق").name_en, "Iraq")
+
+        call_command("populate_countries", stdout=StringIO())  # re-run
+        self.assertEqual(Country.objects.count(), 2)
+
+    def test_dry_run_writes_nothing(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        Location.objects.bulk_create([Location(city_ar="الكوفة", country_ar="العراق")])
+        call_command("populate_countries", "--dry-run", stdout=StringIO())
+        self.assertEqual(Country.objects.count(), 0)
+
+
 class RecitersTemplateTests(TestCase):
     """The downloadable Excel example round-trips back through the wizard."""
 
