@@ -57,6 +57,56 @@ class NormalizedLocationTests(TestCase):
         self.assertEqual(loc.city_en, "Basra")
 
 
+class MigrateLocationDataCommandTests(TestCase):
+    """The migrate_location_data command backfills the normalized tables from the
+    legacy text columns, is idempotent, and never touches the text columns."""
+
+    def _legacy_rows(self):
+        # bulk_create bypasses Location.save(), leaving the FKs null — this is the
+        # pre-migration state of production rows.
+        Location.objects.bulk_create([
+            Location(city_ar="الكوفة", city_en="Kufa", country_ar="العراق", country_en="Iraq"),
+            Location(city_ar="مكة", country_ar="الحجاز"),   # region in the country column
+            Location(city_ar="", country_ar="مصر"),          # country with no city
+        ])
+
+    def test_command_links_and_is_idempotent(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        self._legacy_rows()
+        self.assertEqual(Country.objects.count(), 0)  # nothing normalized yet
+
+        call_command("migrate_location_data", stdout=StringIO())
+
+        self.assertEqual(Country.objects.filter(name_ar="العراق").count(), 1)
+        self.assertEqual(Country.objects.filter(name_ar="الحجاز").count(), 1)
+        kufa = Location.objects.get(city_ar="الكوفة")
+        self.assertEqual(kufa.country.name_ar, "العراق")
+        self.assertEqual(kufa.city.name_ar, "الكوفة")
+        self.assertEqual(kufa.city.country.name_ar, "العراق")
+        # text columns are left exactly as they were
+        self.assertEqual(kufa.country_ar, "العراق")
+        self.assertEqual(kufa.city_ar, "الكوفة")
+
+        countries, cities = Country.objects.count(), City.objects.count()
+        call_command("migrate_location_data", stdout=StringIO())  # re-run
+        self.assertEqual(Country.objects.count(), countries)
+        self.assertEqual(City.objects.count(), cities)
+
+    def test_dry_run_writes_nothing(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        self._legacy_rows()
+        call_command("migrate_location_data", "--dry-run", stdout=StringIO())
+        self.assertEqual(Country.objects.count(), 0)
+        self.assertEqual(City.objects.count(), 0)
+        self.assertIsNone(Location.objects.get(city_ar="الكوفة").country_id)
+
+
 class RecitersTemplateTests(TestCase):
     """The downloadable Excel example round-trips back through the wizard."""
 
