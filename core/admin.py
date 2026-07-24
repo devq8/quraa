@@ -12,7 +12,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _, get_language
 from . import biography_export, csv_import
 from .models import (
-    Attribute, Biography,
+    Attribute, Biography, City, Country,
     Esnad, EsnadLink,
     EsnadTemplate, EsnadTemplateLink,
     Location, Reading, Source, TeacherStudentRelationship,
@@ -191,6 +191,11 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                 self.admin_site.admin_view(self.import_reciters_view),
                 name="core_biography_import_reciters",
             ),
+            path(
+                "import-reciters/template-xlsx/",
+                self.admin_site.admin_view(self.import_reciters_template_view),
+                name="core_biography_import_reciters_template",
+            ),
         ]
         return custom + super().get_urls()
 
@@ -237,6 +242,16 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
         response["Content-Disposition"] = "attachment; filename=biography_import_template.xlsx"
+        return response
+
+    def import_reciters_template_view(self, request):
+        from . import import_reciters_wizard as wiz
+
+        response = HttpResponse(
+            wiz.build_template_xlsx(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = "attachment; filename=reciters_import_example.xlsx"
         return response
 
     def import_csv_view(self, request):
@@ -528,7 +543,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
                     messages.error(request, _("Please select a CSV file."))
                     return redirect_to("upload")
                 try:
-                    rows, stats, _csv_text = wiz.scan_csv_file(upload)
+                    rows, stats, _csv_text = wiz.scan_csv_file(upload, upload.name)
                 except Exception as exc:
                     messages.error(request, f"Error reading file: {exc}")
                     return redirect_to("upload")
@@ -896,14 +911,36 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     )
 
 
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    list_display = ("id", "name_ar", "name_en")
+    search_fields = ("name_ar", "name_en")
+
+    def get_ordering(self, request):
+        return _lang_ordering(("name_ar",), ("name_en", "name_ar"))
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ("id", "name_ar", "name_en", "country")
+    list_filter = ("country",)
+    search_fields = ("name_ar", "name_en", "country__name_ar", "country__name_en")
+    autocomplete_fields = ("country",)
+
+    def get_ordering(self, request):
+        return _lang_ordering(("name_ar",), ("name_en", "name_ar"))
+
+
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ("id", "city_ar", "city_en", "country_ar", "country_en")
     list_filter = ("country_ar",)
     search_fields = ("city_ar", "city_en", "country_ar", "country_en")
+    autocomplete_fields = ("city", "country")
     fieldsets = (
         (None, {
             "fields": (
+                ("city", "country"),
                 ("city_ar", "city_en"),
                 ("country_ar", "country_en"),
             ),

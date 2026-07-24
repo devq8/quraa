@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-04 21:02+0300\n"
+"POT-Creation-Date: 2026-07-22 17:29+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,7 @@ msgstr ""
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: core/admin.py:25
+#: templates/admin/core/biography/import_reciters_upload.html:53
 msgid "CSV or Excel file"
 msgstr "ملف CSV أو Excel"
 
@@ -41,11 +42,11 @@ msgstr "منشور"
 msgid "Use status column"
 msgstr "استخدام عمود الحالة"
 
-#: core/admin.py:53 core/models.py:343
+#: core/admin.py:53 core/models.py:469
 msgid "Source"
 msgstr "المصدر"
 
-#: core/admin.py:54 core/models.py:344 landing/templates/biography.html:385
+#: core/admin.py:54 core/models.py:470 landing/templates/biography.html:385
 #: templates/admin/core/biography/merge_confirm.html:137
 msgid "Sources"
 msgstr "المصادر"
@@ -68,57 +69,57 @@ msgstr "تلميذ بارز"
 msgid "Notable Students"
 msgstr "أبرز التلاميذ"
 
-#: core/admin.py:83 core/models.py:264 landing/templates/home.html:513
+#: core/admin.py:83 core/models.py:390 landing/templates/home.html:513
 msgid "Location"
 msgstr "الموقع الجغرافي"
 
 #: core/admin.py:91 core/admin.py:138 core/csv_import.py:62 core/models.py:43
-#: core/models.py:272 core/models.py:277 landing/templates/biographies.html:52
+#: core/models.py:398 core/models.py:403 landing/templates/biographies.html:52
 #: landing/templates/biography.html:158
 #: landing/templates/search-results.html:59
 #: templates/admin/core/biography/merge_confirm.html:117
 msgid "Hometown"
 msgstr "الموطن"
 
-#: core/admin.py:92 core/models.py:278
+#: core/admin.py:92 core/models.py:404
 msgid "Hometowns"
 msgstr "المواطن"
 
-#: core/admin.py:101 core/admin.py:960 core/admin.py:1091 core/models.py:377
-#: core/models.py:510
+#: core/admin.py:101 core/admin.py:996 core/admin.py:1127 core/models.py:503
+#: core/models.py:636
 msgid "Narrator"
 msgstr "الراوي"
 
-#: core/admin.py:102 core/admin.py:961 core/admin.py:1092 core/admin.py:1113
-#: core/models.py:408
+#: core/admin.py:102 core/admin.py:997 core/admin.py:1128 core/admin.py:1149
+#: core/models.py:534
 msgid "Narrators"
 msgstr "الرواة"
 
-#: core/admin.py:123 core/models.py:414 core/models.py:504
+#: core/admin.py:123 core/models.py:540 core/models.py:630
 msgid "Esnad"
 msgstr "إسناد"
 
-#: core/admin.py:124 core/models.py:415 landing/templates/biography.html:235
+#: core/admin.py:124 core/models.py:541 landing/templates/biography.html:235
 msgid "Transmission Chains"
 msgstr "أهم طرق الأسانيد"
 
-#: core/admin.py:208 core/admin.py:222
+#: core/admin.py:213 core/admin.py:227
 msgid "You do not have permission to export biographies."
 msgstr "ليس لديك صلاحية لتصدير التراجم."
 
-#: core/admin.py:244 core/admin.py:501
+#: core/admin.py:259 core/admin.py:516
 msgid "You do not have permission to import biographies."
 msgstr "ليس لديك صلاحية لاستيراد التراجم."
 
-#: core/admin.py:250
+#: core/admin.py:265
 msgid "Import biographies from CSV"
 msgstr "استيراد التراجم من ملف CSV"
 
-#: core/admin.py:258
+#: core/admin.py:273
 msgid "Your import session expired. Please upload the file again."
 msgstr "انتهت صلاحية جلسة الاستيراد. يرجى رفع الملف مرة أخرى."
 
-#: core/admin.py:279
+#: core/admin.py:294
 #, python-format
 msgid ""
 "Import complete: %(created)d created, %(updated)d updated, %(skipped)d "
@@ -127,68 +128,68 @@ msgstr ""
 "اكتمل الاستيراد: %(created)d مُضافة، %(updated)d محدَّثة، %(skipped)d متخطّاة، "
 "%(errors)d بها أخطاء."
 
-#: core/admin.py:297
+#: core/admin.py:312
 msgid "No data rows were found in the file."
 msgstr "لم يُعثر على أي صفوف بيانات في الملف."
 
-#: core/admin.py:328
+#: core/admin.py:343
 msgid "Merge selected biographies (select exactly 2)"
 msgstr "دمج التراجم المحددة (اختر 2 بالضبط)"
 
-#: core/admin.py:333
+#: core/admin.py:348
 msgid "Please select exactly 2 biographies to merge."
 msgstr "يرجى تحديد ترجمتين بالضبط للدمج."
 
-#: core/admin.py:345
+#: core/admin.py:360
 msgid "You do not have permission to view duplicates."
 msgstr "ليس لديك صلاحية لعرض التراجم المكررة."
 
-#: core/admin.py:359
+#: core/admin.py:374
 msgid "Find Duplicate Biographies"
 msgstr "البحث عن التراجم المكررة"
 
-#: core/admin.py:373
+#: core/admin.py:388
 msgid "Permission denied."
 msgstr "تم رفض الصلاحية."
 
-#: core/admin.py:407
+#: core/admin.py:422
 msgid "You do not have permission to merge biographies."
 msgstr "ليس لديك صلاحية لدمج التراجم."
 
-#: core/admin.py:414
+#: core/admin.py:429
 msgid "Invalid biography selection."
 msgstr "اختيار ترجمة غير صالح."
 
-#: core/admin.py:421 core/admin.py:436
+#: core/admin.py:436 core/admin.py:451
 msgid "One or both biographies could not be found."
 msgstr "لم يتم العثور على إحدى الترجمتين أو كلتيهما."
 
-#: core/admin.py:429
+#: core/admin.py:444
 msgid "Invalid merge selection."
 msgstr "اختيار دمج غير صالح."
 
-#: core/admin.py:456
+#: core/admin.py:471
 #, python-format
 msgid "Biography #%(dup)d merged into #%(pri)d successfully."
 msgstr "تم دمج الترجمة رقم #%(dup)d في الترجمة رقم #%(pri)d بنجاح."
 
-#: core/admin.py:474 templates/admin/core/biography/merge_confirm.html:9
+#: core/admin.py:489 templates/admin/core/biography/merge_confirm.html:9
 msgid "Merge Biographies"
 msgstr "دمج التراجم"
 
-#: core/admin.py:528
+#: core/admin.py:543
 msgid "Please select a CSV file."
 msgstr "يرجى اختيار ملف CSV."
 
-#: core/admin.py:536
+#: core/admin.py:551
 msgid "No data rows found in the file."
 msgstr "لم يُعثر على أي صفوف بيانات في الملف."
 
-#: core/admin.py:551
+#: core/admin.py:565
 msgid "Session expired. Please upload the file again."
 msgstr "انتهت صلاحية الجلسة. يرجى رفع الملف مرة أخرى."
 
-#: core/admin.py:698 templates/admin/core/biography/change_list.html:17
+#: core/admin.py:712 templates/admin/core/biography/change_list.html:17
 #: templates/admin/core/biography/import_reciters_attributes.html:9
 #: templates/admin/core/biography/import_reciters_commit.html:9
 #: templates/admin/core/biography/import_reciters_dates.html:9
@@ -199,75 +200,75 @@ msgstr "انتهت صلاحية الجلسة. يرجى رفع الملف مرة 
 msgid "Import Reciters CSV"
 msgstr "استيراد تراجم القراء (CSV)"
 
-#: core/admin.py:702
+#: core/admin.py:716
 msgid "Session expired. Please start the import again."
 msgstr "انتهت صلاحية الجلسة. يرجى بدء الاستيراد من جديد."
 
-#: core/admin.py:712
+#: core/admin.py:726
 msgid "Import — Scan Results"
 msgstr "الاستيراد — نتائج الفحص"
 
-#: core/admin.py:732 core/admin.py:879 core/models.py:144
+#: core/admin.py:746 core/admin.py:893 core/models.py:144
 #: landing/templates/biography.html:180
 msgid "Birth"
 msgstr "الميلاد"
 
-#: core/admin.py:732 core/admin.py:888 core/models.py:144
+#: core/admin.py:746 core/admin.py:902 core/models.py:144
 #: landing/templates/biography.html:207
 msgid "Death"
 msgstr "الوفاة"
 
-#: core/admin.py:741
+#: core/admin.py:755
 msgid "Import — Resolve Ambiguous Dates"
 msgstr "الاستيراد — حل التواريخ الغامضة"
 
-#: core/admin.py:751
+#: core/admin.py:765
 msgid "Import — Resolve Missing Countries"
 msgstr "الاستيراد — حل المواقع الناقصة"
 
-#: core/admin.py:761
+#: core/admin.py:775
 msgid "Import — Resolve Attributes"
 msgstr "الاستيراد — حل الصفات والتصنيفات"
 
-#: core/admin.py:770
+#: core/admin.py:784
 msgid "Import — Ready to Commit"
 msgstr "الاستيراد — جاهز للتأكيد"
 
-#: core/admin.py:786
+#: core/admin.py:800
 msgid "Import — Confirm Relationships"
 msgstr "الاستيراد — تأكيد العلاقات"
 
-#: core/admin.py:807
+#: core/admin.py:821
 msgid "Import — Complete"
 msgstr "الاستيراد — اكتمل"
 
-#: core/admin.py:994 core/admin.py:1107
+#: core/admin.py:1030 core/admin.py:1143
 #: templates/admin/core/biography/change_form.html:148
 msgid "Audit"
 msgstr "السجل والمراجعة"
 
-#: core/admin.py:1021
+#: core/admin.py:1057
 msgid "You do not have permission to modify this Esnad."
 msgstr "ليس لديك صلاحية لتعديل هذا الإسناد."
 
-#: core/admin.py:1031
+#: core/admin.py:1067
 msgid "Esnad not found."
 msgstr "الإسناد غير موجود."
 
-#: core/admin.py:1036
+#: core/admin.py:1072
 msgid "No template selected."
 msgstr "لم يُختر قالب."
 
-#: core/admin.py:1051
+#: core/admin.py:1087
 msgid "Template not found."
 msgstr "القالب غير موجود."
 
-#: core/admin.py:1064
+#: core/admin.py:1100
 #, python-format
 msgid "Template \"%(name)s\" applied."
 msgstr "تم تطبيق القالب \"%(name)s\"."
 
-#: core/admin.py:1079
+#: core/admin.py:1115
 msgid "Chain"
 msgstr "سند"
 
@@ -430,7 +431,7 @@ msgid ""
 msgstr ""
 "توجد ترجمة مشابهة بالفعل: رقم #%(id)d %(name)s (التطابق: %(type)s، %(pct)d%%)"
 
-#: core/csv_import.py:693 core/models.py:68 core/models.py:301
+#: core/csv_import.py:693 core/models.py:68 core/models.py:427
 #: landing/templates/biography.html:164
 #: templates/admin/core/biography/merge_confirm.html:111
 msgid "Attributes"
@@ -504,7 +505,7 @@ msgstr "آخر تعديل بواسطة"
 msgid "User Account"
 msgstr "حساب المستخدم"
 
-#: core/models.py:108 core/models.py:327 core/models.py:400 users/models.py:43
+#: core/models.py:108 core/models.py:453 core/models.py:526 users/models.py:43
 msgid "Biography"
 msgstr "تراجم القراء"
 
@@ -533,126 +534,142 @@ msgstr "يوم %(label)s %(cal)s يستلزم تحديد الشهر."
 msgid "%(label)s %(cal)s month requires a year."
 msgstr "شهر %(label)s %(cal)s يستلزم تحديد السنة."
 
-#: core/models.py:247
+#: core/models.py:250 core/models.py:272 core/models.py:455 core/models.py:475
+msgid "Name (Arabic)"
+msgstr "الاسم (عربي)"
+
+#: core/models.py:251 core/models.py:273 core/models.py:456 core/models.py:476
+msgid "Name (English)"
+msgstr "الاسم (إنجليزي)"
+
+#: core/models.py:263 core/models.py:276 core/models.py:366
+msgid "Country"
+msgstr "الدولة"
+
+#: core/models.py:264
+msgid "Countries"
+msgstr "الدول"
+
+#: core/models.py:290 core/models.py:362
+msgid "City"
+msgstr "المدينة"
+
+#: core/models.py:291
+msgid "Cities"
+msgstr "المدن"
+
+#: core/models.py:369
 msgid "City (Arabic)"
 msgstr "المدينة (عربي)"
 
-#: core/models.py:248
+#: core/models.py:370
 msgid "City (English)"
 msgstr "المدينة (إنجليزي)"
 
-#: core/models.py:249
+#: core/models.py:371
 msgid "Country (Arabic)"
 msgstr "الدولة (عربي)"
 
-#: core/models.py:250
+#: core/models.py:372
 msgid "Country (English)"
 msgstr "الدولة (إنجليزي)"
 
-#: core/models.py:265
+#: core/models.py:391
 msgid "Locations"
 msgstr "المواقع الجغرافية"
 
-#: core/models.py:283
+#: core/models.py:409
 msgid "Short Name (Arabic)"
 msgstr "الاسم المختصر (عربي)"
 
-#: core/models.py:284
+#: core/models.py:410
 msgid "Short Name (English)"
 msgstr "الاسم المختصر (إنجليزي)"
 
-#: core/models.py:285
+#: core/models.py:411
 msgid "Long Name (Arabic)"
 msgstr "الاسم الكامل (عربي)"
 
-#: core/models.py:286
+#: core/models.py:412
 msgid "Long Name (English)"
 msgstr "الاسم الكامل (إنجليزي)"
 
-#: core/models.py:287 core/models.py:307 landing/models.py:144
+#: core/models.py:413 core/models.py:433 landing/models.py:144
 msgid "Description (Arabic)"
 msgstr "الوصف (عربي)"
 
-#: core/models.py:288 core/models.py:308 landing/models.py:145
+#: core/models.py:414 core/models.py:434 landing/models.py:145
 msgid "Description (English)"
 msgstr "الوصف (إنجليزي)"
 
-#: core/models.py:300 landing/templates/biographies.html:73
+#: core/models.py:426 landing/templates/biographies.html:73
 #: landing/templates/search-results.html:80
 msgid "Attribute"
 msgstr "الصفة"
 
-#: core/models.py:320
+#: core/models.py:446
 msgid "المقروء"
 msgstr "المقروء"
 
-#: core/models.py:321 core/models.py:565
+#: core/models.py:447 core/models.py:691
 msgid "المقروءات"
 msgstr "المقروءات"
 
-#: core/models.py:329 core/models.py:349
-msgid "Name (Arabic)"
-msgstr "الاسم (عربي)"
-
-#: core/models.py:330 core/models.py:350
-msgid "Name (English)"
-msgstr "الاسم (إنجليزي)"
-
-#: core/models.py:331 landing/models.py:146
+#: core/models.py:457 landing/models.py:146
 msgid "Link"
 msgstr "الرابط"
 
-#: core/models.py:355
+#: core/models.py:481
 msgid "Esnad Template"
 msgstr "قالب إسناد"
 
-#: core/models.py:356
+#: core/models.py:482
 msgid "Esnad Templates"
 msgstr "قوالب الأسانيد"
 
-#: core/models.py:371
+#: core/models.py:497
 msgid "Template"
 msgstr "القالب"
 
-#: core/models.py:379 core/models.py:512 landing/models.py:147
+#: core/models.py:505 core/models.py:638 landing/models.py:147
 #: landing/models.py:174
 msgid "Order"
 msgstr "الترتيب"
 
-#: core/models.py:387
+#: core/models.py:513
 msgid "Template Link"
 msgstr "حلقة القالب"
 
-#: core/models.py:388
+#: core/models.py:514
 msgid "Template Links"
 msgstr "حلقات القالب"
 
-#: core/models.py:526
+#: core/models.py:652
 msgid "Esnad Link"
 msgstr "حلقة الإسناد"
 
-#: core/models.py:527
+#: core/models.py:653
 msgid "Esnad Links"
 msgstr "حلقات الإسناد"
 
-#: core/models.py:543
+#: core/models.py:669
 msgid ""
 "The holder of this Esnad cannot appear as a narrator in their own chain."
 msgstr "لا يمكن أن يظهر صاحب هذا الإسناد كراوٍ في سلسلته الخاصة."
 
-#: core/models.py:555
+#: core/models.py:681
 msgid "Teacher"
 msgstr "الشيخ"
 
-#: core/models.py:561
+#: core/models.py:687
 msgid "Student"
 msgstr "التلميذ"
 
-#: core/models.py:574
+#: core/models.py:700
 msgid "Teacher-Student Relationship"
 msgstr "علاقة شيخ-تلميذ"
 
-#: core/models.py:575
+#: core/models.py:701
 msgid "Teacher-Student Relationships"
 msgstr "علاقات الشيوخ والتلاميذ"
 
@@ -1791,7 +1808,7 @@ msgid "Upload and preview"
 msgstr "رفع ومعاينة"
 
 #: templates/admin/core/biography/csv_import.html:35
-#: templates/admin/core/biography/import_reciters_upload.html:21
+#: templates/admin/core/biography/import_reciters_upload.html:30
 msgid "Expected columns"
 msgstr "الأعمدة المتوقّعة"
 
@@ -2432,8 +2449,8 @@ msgid ""
 "been cleaned and the reading type will be linked to each relationship "
 "automatically."
 msgstr ""
-"الأسماء التالية تحتوي على نوع قراءة بين قوسين — تمّ تنظيف الاسم وسيُربط "
-"نوع القراءة بكل علاقة تلقائياً."
+"الأسماء التالية تحتوي على نوع قراءة بين قوسين — تمّ تنظيف الاسم وسيُربط نوع "
+"القراءة بكل علاقة تلقائياً."
 
 #: templates/admin/core/biography/import_reciters_relationships.html:45
 #, python-format
@@ -2637,67 +2654,83 @@ msgstr "المتابعة إلى الحل ←"
 
 #: templates/admin/core/biography/import_reciters_upload.html:16
 msgid ""
-"Upload a CSV file in the custom Arabic reciters format. The wizard will scan "
-"the file\n"
+"Upload a CSV or Excel (.xlsx) file in the custom Arabic reciters format. The "
+"wizard will scan the file\n"
 "    and guide you through resolving dates, locations, and attributes before "
 "saving anything."
 msgstr ""
-"ارفع ملف CSV بتنسيق القراء العربي المخصص. سيفحص المعالج الملف ويرشدك خطوة "
-"بخطوة لحل التواريخ والمواقع والصفات قبل الحفظ."
+"ارفع ملف CSV أو Excel (.xlsx) بتنسيق القراء العربي المخصص. سيفحص المعالج الملف "
+"ويرشدك خطوة بخطوة لحل التواريخ والمواقع والصفات قبل الحفظ."
 
-#: templates/admin/core/biography/import_reciters_upload.html:23
+#: templates/admin/core/biography/import_reciters_upload.html:22
+msgid "Download Excel example"
+msgstr "تنزيل مثال Excel"
+
+#: templates/admin/core/biography/import_reciters_upload.html:25
+msgid ""
+"A ready-to-fill .xlsx with the expected columns and sample rows. You can "
+"upload it back here once filled."
+msgstr ""
+"ملف .xlsx جاهز للتعبئة يحتوي على الأعمدة المتوقعة وصفوف نموذجية. يمكنك رفعه "
+"هنا مرة أخرى بعد تعبئته."
+
+#: templates/admin/core/biography/import_reciters_upload.html:32
 msgid "alias"
 msgstr "الشهرة"
 
-#: templates/admin/core/biography/import_reciters_upload.html:24
+#: templates/admin/core/biography/import_reciters_upload.html:33
 msgid "full name (required)"
 msgstr "الاسم الكامل (مطلوب)"
 
-#: templates/admin/core/biography/import_reciters_upload.html:27
+#: templates/admin/core/biography/import_reciters_upload.html:37
+msgid ""
+"City and country are separate columns. A country with no city, or a region "
+"such as الحجاز / الشام in the country column, are both accepted."
+msgstr ""
+"المدينة والدولة عمودان منفصلان. يُقبل وجود دولة بدون مدينة، أو منطقة مثل "
+"الحجاز / الشام في عمود الدولة."
+
+#: templates/admin/core/biography/import_reciters_upload.html:39
 msgid "comma-separated names"
 msgstr "أسماء مفصولة بفاصلة"
 
-#: templates/admin/core/biography/import_reciters_upload.html:28
+#: templates/admin/core/biography/import_reciters_upload.html:40
 msgid "comma-separated attributes"
 msgstr "صفات مفصولة بفاصلة"
 
-#: templates/admin/core/biography/import_reciters_upload.html:29
+#: templates/admin/core/biography/import_reciters_upload.html:41
 msgid "source (appended to comments)"
 msgstr "المصدر (يُضاف إلى التعليقات)"
 
-#: templates/admin/core/biography/import_reciters_upload.html:30
+#: templates/admin/core/biography/import_reciters_upload.html:42
 msgid "approval status (optional)"
 msgstr "حالة الاعتماد (اختياري)"
 
-#: templates/admin/core/biography/import_reciters_upload.html:39
+#: templates/admin/core/biography/import_reciters_upload.html:51
 msgid "Upload file"
 msgstr "رفع الملف"
 
-#: templates/admin/core/biography/import_reciters_upload.html:41
-msgid "CSV file"
-msgstr "ملف CSV"
+#: templates/admin/core/biography/import_reciters_upload.html:55
+msgid "UTF-8 / UTF-8-BOM encoded CSV, or an .xlsx file."
+msgstr "ملف CSV بترميز UTF-8 أو UTF-8-BOM، أو ملف .xlsx."
 
-#: templates/admin/core/biography/import_reciters_upload.html:43
-msgid "UTF-8 or UTF-8-BOM encoded CSV."
-msgstr "ملف CSV بترميز UTF-8 أو UTF-8-BOM."
-
-#: templates/admin/core/biography/import_reciters_upload.html:46
+#: templates/admin/core/biography/import_reciters_upload.html:58
 msgid "Published status for imported biographies"
 msgstr "حالة النشر للتراجم المستوردة"
 
-#: templates/admin/core/biography/import_reciters_upload.html:50
+#: templates/admin/core/biography/import_reciters_upload.html:62
 msgid "Unpublished (safer — review in admin before going live)"
 msgstr "غير منشور (أكثر أماناً — راجع في لوحة الإدارة قبل النشر)"
 
-#: templates/admin/core/biography/import_reciters_upload.html:54
+#: templates/admin/core/biography/import_reciters_upload.html:66
 msgid "Published immediately"
 msgstr "منشور فوراً"
 
-#: templates/admin/core/biography/import_reciters_upload.html:58
+#: templates/admin/core/biography/import_reciters_upload.html:70
 msgid "Use حالة الترجمة column (معتمد → published, others → unpublished)"
 msgstr "استخدام عمود حالة الترجمة (معتمد → منشور، غيره → غير منشور)"
 
-#: templates/admin/core/biography/import_reciters_upload.html:65
+#: templates/admin/core/biography/import_reciters_upload.html:77
 msgid "Upload and scan"
 msgstr "رفع وفحص"
 
@@ -2818,6 +2851,9 @@ msgstr "مستخدم"
 #: users/models.py:59
 msgid "users"
 msgstr "المستخدمون"
+
+#~ msgid "CSV file"
+#~ msgstr "ملف CSV"
 
 #~ msgid "Teacher / Student linking (Phase 4)"
 #~ msgstr "ربط الشيوخ والتلاميذ (المرحلة الرابعة)"

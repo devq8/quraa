@@ -8,7 +8,161 @@ from django.urls import reverse
 from openpyxl import load_workbook
 
 from . import csv_import
-from .models import Attribute, Biography, Location
+from .models import Attribute, Biography, City, Country, Location
+
+
+class NormalizedLocationTests(TestCase):
+    """The ``Location`` wrapper keeps its FKs and text columns in sync in both
+    directions, and a region is stored as an ordinary ``Country``."""
+
+    def test_legacy_text_creation_backfills_fks(self):
+        loc = Location.objects.create(
+            city_ar="الكوفة", city_en="Kufa",
+            country_ar="العراق", country_en="Iraq",
+        )
+        self.assertIsNotNone(loc.country_id)
+        self.assertIsNotNone(loc.city_id)
+        self.assertEqual(loc.country.name_ar, "العراق")
+        self.assertEqual(loc.city.name_ar, "الكوفة")
+        self.assertEqual(loc.city.country_id, loc.country_id)
+
+    def test_region_is_stored_as_country(self):
+        makkah = Location.objects.create(
+            city_ar="مكة", city_en="Makkah",
+            country_ar="الحجاز", country_en="Hijaz",
+        )
+        madinah = Location.objects.create(
+            city_ar="المدينة", city_en="Madinah",
+            country_ar="الحجاز", country_en="Hijaz",
+        )
+        # Both cities point at the single الحجاز Country row.
+        self.assertEqual(Country.objects.filter(name_ar="الحجاز").count(), 1)
+        self.assertEqual(makkah.city.country, madinah.city.country)
+        self.assertEqual(makkah.city.country.name_ar, "الحجاز")
+
+    def test_country_only_location_has_blank_city(self):
+        egypt = Country.objects.create(name_ar="مصر", name_en="Egypt")
+        loc = Location.objects.create(country=egypt)
+        self.assertEqual(loc.city_ar, "")
+        self.assertIsNone(loc.city_id)
+        self.assertEqual(loc.country_ar, "مصر")
+
+    def test_fk_creation_mirrors_text_columns(self):
+        iraq = Country.objects.create(name_ar="العراق", name_en="Iraq")
+        basra = City.objects.create(name_ar="البصرة", name_en="Basra", country=iraq)
+        loc = Location.objects.create(city=basra)
+        # country inferred from the city, text columns mirrored from the FKs.
+        self.assertEqual(loc.country_id, iraq.id)
+        self.assertEqual(loc.city_ar, "البصرة")
+        self.assertEqual(loc.country_ar, "العراق")
+        self.assertEqual(loc.city_en, "Basra")
+
+
+class MigrateLocationDataCommandTests(TestCase):
+    """The migrate_location_data command backfills the normalized tables from the
+    legacy text columns, is idempotent, and never touches the text columns."""
+
+    def _legacy_rows(self):
+        # bulk_create bypasses Location.save(), leaving the FKs null — this is the
+        # pre-migration state of production rows.
+        Location.objects.bulk_create([
+            Location(city_ar="الكوفة", city_en="Kufa", country_ar="العراق", country_en="Iraq"),
+            Location(city_ar="مكة", country_ar="الحجاز"),   # region in the country column
+            Location(city_ar="", country_ar="مصر"),          # country with no city
+        ])
+
+    def test_command_links_and_is_idempotent(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        self._legacy_rows()
+        self.assertEqual(Country.objects.count(), 0)  # nothing normalized yet
+
+        call_command("migrate_location_data", stdout=StringIO())
+
+        self.assertEqual(Country.objects.filter(name_ar="العراق").count(), 1)
+        self.assertEqual(Country.objects.filter(name_ar="الحجاز").count(), 1)
+        kufa = Location.objects.get(city_ar="الكوفة")
+        self.assertEqual(kufa.country.name_ar, "العراق")
+        self.assertEqual(kufa.city.name_ar, "الكوفة")
+        self.assertEqual(kufa.city.country.name_ar, "العراق")
+        # text columns are left exactly as they were
+        self.assertEqual(kufa.country_ar, "العراق")
+        self.assertEqual(kufa.city_ar, "الكوفة")
+
+        countries, cities = Country.objects.count(), City.objects.count()
+        call_command("migrate_location_data", stdout=StringIO())  # re-run
+        self.assertEqual(Country.objects.count(), countries)
+        self.assertEqual(City.objects.count(), cities)
+
+    def test_dry_run_writes_nothing(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        self._legacy_rows()
+        call_command("migrate_location_data", "--dry-run", stdout=StringIO())
+        self.assertEqual(Country.objects.count(), 0)
+        self.assertEqual(City.objects.count(), 0)
+        self.assertIsNone(Location.objects.get(city_ar="الكوفة").country_id)
+
+
+class PopulateCountriesCommandTests(TestCase):
+    """populate_countries creates a Country per distinct Location country, trims
+    and de-duplicates whitespace variants, and is idempotent."""
+
+    def test_creates_distinct_countries_and_is_idempotent(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        Location.objects.bulk_create([
+            Location(city_ar="الكوفة", country_ar="العراق", country_en="Iraq"),
+            Location(city_ar="البصرة", country_ar="العراق"),      # same country
+            Location(city_ar="القاهرة", country_ar=" مصر "),       # whitespace variant
+            Location(city_ar="مكة", country_ar="مصر"),             # collapses with above
+            Location(city_ar="مدينة", country_ar=""),              # no country → skipped
+        ])
+
+        call_command("populate_countries", stdout=StringIO())
+
+        self.assertEqual(Country.objects.count(), 2)
+        self.assertTrue(Country.objects.filter(name_ar="العراق").exists())
+        self.assertTrue(Country.objects.filter(name_ar="مصر").exists())
+        self.assertEqual(Country.objects.get(name_ar="العراق").name_en, "Iraq")
+
+        call_command("populate_countries", stdout=StringIO())  # re-run
+        self.assertEqual(Country.objects.count(), 2)
+
+    def test_dry_run_writes_nothing(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        Location.objects.bulk_create([Location(city_ar="الكوفة", country_ar="العراق")])
+        call_command("populate_countries", "--dry-run", stdout=StringIO())
+        self.assertEqual(Country.objects.count(), 0)
+
+
+class RecitersTemplateTests(TestCase):
+    """The downloadable Excel example round-trips back through the wizard."""
+
+    def test_template_builds_and_scans_back(self):
+        import io
+
+        from . import import_reciters_wizard as wiz
+
+        data = wiz.build_template_xlsx()
+        self.assertTrue(data)
+
+        rows, stats, _ = wiz.scan_csv_file(io.BytesIO(data), "reciters_import_example.xlsx")
+        self.assertEqual(len(rows), 2)
+        # Row 1: full city + country.
+        self.assertEqual(rows[0]["birth_loc"], {"city_ar": "الكوفة", "country_ar": "العراق"})
+        # Row 2: region-only birthplace, country-only death location.
+        self.assertEqual(rows[1]["birth_loc"], {"city_ar": "", "country_ar": "الحجاز"})
+        self.assertEqual(rows[1]["death_loc"], {"city_ar": "", "country_ar": "مصر"})
 
 
 class BiographyLiveDuplicateAdminTests(TestCase):

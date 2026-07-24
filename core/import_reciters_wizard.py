@@ -13,47 +13,74 @@ from django.db import transaction
 
 from .arabic_date_parser import parse_arabic_date
 from .csv_import import _normalize_ar, _find_location_candidates
-from .models import Attribute, Biography, Location, Reading, Source, TeacherStudentRelationship
+from .models import Attribute, Biography, Country, Location, Reading, Source, TeacherStudentRelationship
 from .search import normalize_arabic
 
 _COLUMN_KEYWORDS = {
-    "alias":       ["شهره", "شهرة"],
-    "full_name":   ["اسم الكامل", "الاسم الكامل"],
-    "birth_date":  ["تاريخ الميلاد", "ميلاد"],
-    "birthplace":  ["مكان الميلاد"],
-    "death_date":  ["تاريخ الوفاة", "وفاة"],
-    "death_place": ["مكان الوفاة"],
-    "teachers":    ["شيوخ", "شيوخه"],
-    "students":    ["تلاميذ", "تلاميذه"],
-    "attributes":  ["صفات", "تصنيفات"],
-    "source":      ["مصدر"],
-    "status":      ["حاله الترجمه", "حالة الترجمة", "معتمد"],
+    "alias":         ["شهره", "شهرة"],
+    "full_name":     ["اسم الكامل", "الاسم الكامل"],
+    "birth_date":    ["تاريخ الميلاد", "ميلاد"],
+    "birth_city":    ["مدينة الميلاد", "مدينه الميلاد"],
+    "birth_country": ["دولة الميلاد", "دوله الميلاد", "بلد الميلاد"],
+    "death_date":    ["تاريخ الوفاة", "وفاة"],
+    "death_city":    ["مدينة الوفاة", "مدينه الوفاة"],
+    "death_country": ["دولة الوفاة", "دوله الوفاة", "بلد الوفاة"],
+    "teachers":      ["شيوخ", "شيوخه"],
+    "students":      ["تلاميذ", "تلاميذه"],
+    "attributes":    ["صفات", "تصنيفات"],
+    "source":        ["مصدر"],
+    "status":        ["حاله الترجمه", "حالة الترجمة", "معتمد"],
 }
 
 _ATTR_SEPS = re.compile(r"[،,;؛/]")
 _NAME_SEPS = re.compile(r"[،,;؛\n]")
-_LOC_RE = re.compile(r"^([^(]+)\s*\(([^)]+)\)\s*$")
+_DASHES = ("-", "–", "")
+
+
+def _clean_cell(text):
+    text = (text or "").strip()
+    return "" if text in _DASHES else text
+
+
+# Keys are resolved in this order so the specific city/country columns claim
+# their header before the greedy bare "ميلاد"/"وفاة" date keywords can match it
+# (both "مدينة الميلاد" and "دولة الميلاد" contain "ميلاد").
+_DETECTION_ORDER = [
+    "alias", "full_name",
+    "birth_city", "birth_country", "death_city", "death_country",
+    "birth_date", "death_date",
+    "teachers", "students", "attributes", "source", "status",
+]
 
 
 def _detect_columns(headers):
     mapping = {}
+    used = set()
     norm_headers = [_normalize_ar(h) for h in headers]
-    for key, keywords in _COLUMN_KEYWORDS.items():
+    for key in _DETECTION_ORDER:
+        keywords = _COLUMN_KEYWORDS[key]
         for i, nh in enumerate(norm_headers):
+            if i in used:
+                continue
             if any(_normalize_ar(kw) in nh for kw in keywords):
                 mapping[key] = i
+                used.add(i)
                 break
     return mapping
 
 
-def _parse_loc(text):
-    if not text or text.strip() in ("-", "–", ""):
+def _loc_from_cols(city, country):
+    """Build a location spec from separate city and country cells.
+
+    Returns None when both are empty. Either side may be empty: a country with
+    no city, or a city with no (yet) country. A region (e.g. الحجاز، الشام)
+    simply arrives in the country column and is treated like any country.
+    """
+    city = _clean_cell(city)
+    country = _clean_cell(country)
+    if not city and not country:
         return None
-    text = text.strip()
-    m = _LOC_RE.match(text)
-    if m:
-        return {"city_ar": m.group(1).strip(), "country_ar": m.group(2).strip()}
-    return {"city_ar": text, "country_ar": ""}
+    return {"city_ar": city, "country_ar": country}
 
 
 def _split_names(text):
@@ -112,8 +139,135 @@ def _is_approved(status_text):
     return "معتمد" in normalized or "approved" in normalized.lower()
 
 
-def scan_csv_file(file_obj):
-    """Read an uploaded Django InMemoryUploadedFile, parse CSV, scan all rows."""
+# Column headers for the downloadable example template. Each header contains the
+# keyword that ``_detect_columns`` matches on, so the filled file uploads back
+# cleanly. Order is display order (RTL).
+_TEMPLATE_COLUMNS = [
+    ("full_name",     "الاسم الكامل"),
+    ("alias",         "الشهرة"),
+    ("birth_date",    "تاريخ الميلاد"),
+    ("birth_city",    "مدينة الميلاد"),
+    ("birth_country", "دولة الميلاد"),
+    ("death_date",    "تاريخ الوفاة"),
+    ("death_city",    "مدينة الوفاة"),
+    ("death_country", "دولة الوفاة"),
+    ("teachers",      "أبرز شيوخه"),
+    ("students",      "أبرز تلاميذه"),
+    ("attributes",    "صفات وتصنيفات"),
+    ("source",        "المصدر"),
+    ("status",        "حالة الترجمة"),
+]
+
+# Two illustrative rows: a full city+country entry, then the special cases —
+# a region in the country column and a country with no city.
+_TEMPLATE_EXAMPLE_ROWS = [
+    {
+        "full_name":     "عاصم بن أبي النجود الأسدي",
+        "alias":         "عاصم الكوفي",
+        "birth_date":    "",
+        "birth_city":    "الكوفة",
+        "birth_country": "العراق",
+        "death_date":    "١٢٧هـ",
+        "death_city":    "الكوفة",
+        "death_country": "العراق",
+        "teachers":      "زر بن حبيش، أبو عبد الرحمن السلمي",
+        "students":      "حفص بن سليمان، شعبة بن عياش",
+        "attributes":    "١٠ك، قراء الكوفة",
+        "source":        "غاية النهاية في طبقات القراء",
+        "status":        "معتمد",
+    },
+    {
+        "full_name":     "مثال: منطقة بدون مدينة، ووفاة بدولة بدون مدينة",
+        "alias":         "",
+        "birth_date":    "",
+        "birth_city":    "",            # unknown city — region only in the country column
+        "birth_country": "الحجاز",      # a region is entered like any country
+        "death_date":    "",
+        "death_city":    "",            # unknown city
+        "death_country": "مصر",         # country with no city
+        "teachers":      "",
+        "students":      "",
+        "attributes":    "",
+        "source":        "",
+        "status":        "غير معتمد",
+    },
+]
+
+
+def build_template_xlsx():
+    """Return the bytes of an .xlsx example for the reciters wizard.
+
+    The sheet carries the exact Arabic headers the wizard detects, two example
+    rows (covering city+country, region-only and country-only locations), and
+    advisory dropdowns (country + approval status) sourced from the database so
+    the user can enter data cleanly. The filled file uploads back into the
+    wizard directly (the upload step also accepts .xlsx).
+    """
+    from openpyxl import Workbook
+    from openpyxl.utils import get_column_letter
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    keys = [key for key, _h in _TEMPLATE_COLUMNS]
+    headers = [h for _k, h in _TEMPLATE_COLUMNS]
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "التراجم"
+    ws.sheet_view.rightToLeft = True
+    ws.append(headers)
+    for example in _TEMPLATE_EXAMPLE_ROWS:
+        ws.append([example.get(k, "") for k in keys])
+
+    # Hidden sheet holding dropdown option lists.
+    lists = wb.create_sheet("Lists")
+    countries = sorted({
+        c for c in Country.objects.values_list("name_ar", flat=True) if c and c.strip()
+    })
+    if not countries:  # fresh DB — fall back to any country text on locations
+        countries = sorted({
+            c.strip() for c in Location.objects.values_list("country_ar", flat=True)
+            if c and c.strip()
+        })
+
+    def _write_list(col_idx, values):
+        letter = get_column_letter(col_idx)
+        for i, value in enumerate(values, start=1):
+            lists.cell(row=i, column=col_idx, value=value)
+        if not values:
+            return None
+        return f"Lists!${letter}$1:${letter}${len(values)}"
+
+    country_ref = _write_list(1, countries)
+    status_ref = _write_list(2, ["معتمد", "غير معتمد"])
+    lists.sheet_state = "hidden"
+
+    last_row = 500 + 1  # header + data rows the dropdowns cover
+
+    def _add_dropdown(key, source_ref):
+        if not source_ref or key not in keys:
+            return
+        letter = get_column_letter(keys.index(key) + 1)
+        dv = DataValidation(
+            type="list", formula1=source_ref, allow_blank=True,
+            showErrorMessage=False,  # advisory only — new values may be typed
+        )
+        dv.add(f"{letter}2:{letter}{last_row}")
+        ws.add_data_validation(dv)
+
+    _add_dropdown("birth_country", country_ref)
+    _add_dropdown("death_country", country_ref)
+    _add_dropdown("status", status_ref)
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()
+
+
+def scan_csv_file(file_obj, filename=""):
+    """Read an uploaded Django file, parse it (CSV or .xlsx), scan all rows."""
+    name = (filename or getattr(file_obj, "name", "") or "").lower()
+    if name.endswith(".xlsx"):
+        return _scan_raw_rows(_read_xlsx_rows(file_obj))
     text = file_obj.read()
     if isinstance(text, bytes):
         try:
@@ -121,6 +275,18 @@ def scan_csv_file(file_obj):
         except UnicodeDecodeError:
             text = text.decode("cp1256", errors="replace")
     return scan_csv_text(text)
+
+
+def _read_xlsx_rows(file_obj):
+    """Read an uploaded .xlsx into a list of rows (each a list of trimmed strings)."""
+    from openpyxl import load_workbook
+
+    wb = load_workbook(file_obj, read_only=True, data_only=True)
+    ws = wb.active
+    rows = []
+    for raw in ws.iter_rows(values_only=True):
+        rows.append(["" if c is None else str(c).strip() for c in raw])
+    return rows
 
 
 def scan_csv_text(text):
@@ -131,7 +297,11 @@ def scan_csv_text(text):
     stats: summary counts dict.
     csv_text: the original text (stored in session for re-parse if needed).
     """
-    raw_rows = list(csv.reader(io.StringIO(text)))
+    return _scan_raw_rows(list(csv.reader(io.StringIO(text))), text)
+
+
+def _scan_raw_rows(raw_rows, text=""):
+    """Scan already-parsed rows (list of lists). Shared by the CSV and xlsx paths."""
     if len(raw_rows) < 2:
         return [], {"total": 0}, text
 
@@ -158,9 +328,11 @@ def scan_csv_text(text):
             "alias_ar":       get("alias"),
             "full_name_ar":   full_name,
             "birth_date_raw": get("birth_date"),
-            "birthplace_raw": get("birthplace"),
+            "birth_city_raw":    get("birth_city"),
+            "birth_country_raw": get("birth_country"),
             "death_date_raw": get("death_date"),
-            "death_place_raw":get("death_place"),
+            "death_city_raw":    get("death_city"),
+            "death_country_raw": get("death_country"),
             "teachers_raw":   get("teachers"),
             "students_raw":   get("students"),
             "attributes_raw": get("attributes"),
@@ -178,12 +350,14 @@ def scan_csv_text(text):
         if row["death_needs_confirm"]:
             stats["ambiguous_dates"] += 1
 
-        birth_loc = _parse_loc(row["birthplace_raw"])
-        death_loc = _parse_loc(row["death_place_raw"])
+        birth_loc = _loc_from_cols(row["birth_city_raw"], row["birth_country_raw"])
+        death_loc = _loc_from_cols(row["death_city_raw"], row["death_country_raw"])
         row["birth_loc"] = birth_loc
         row["death_loc"] = death_loc
-        row["birth_loc_needs_country"] = bool(birth_loc and not birth_loc["country_ar"])
-        row["death_loc_needs_country"] = bool(death_loc and not death_loc["country_ar"])
+        # Only a city with no country needs resolving now that country is its own
+        # column (unlikely, but the wizard still asks the user just in case).
+        row["birth_loc_needs_country"] = bool(birth_loc and birth_loc["city_ar"] and not birth_loc["country_ar"])
+        row["death_loc_needs_country"] = bool(death_loc and death_loc["city_ar"] and not death_loc["country_ar"])
 
         if row["birth_loc_needs_country"]:
             stats["missing_countries"] += 1

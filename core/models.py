@@ -243,7 +243,129 @@ class Biography(models.Model):
         self._snapshot_dates()
 
 
+class Country(models.Model):
+    """A country. Regions (e.g. الحجاز، الشام) are stored here too — historically
+    they play the country role in the data, so they are ordinary Country rows."""
+
+    name_ar = models.CharField(_("Name (Arabic)"), max_length=255, unique=True)
+    name_en = models.CharField(_("Name (English)"), max_length=255, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        lang = get_language()
+        if lang and lang.startswith("ar"):
+            return self.name_ar
+        return self.name_en or self.name_ar
+
+    class Meta:
+        verbose_name = _("Country")
+        verbose_name_plural = _("Countries")
+        ordering = ["name_ar"]
+
+
+class City(models.Model):
+    """A city belonging to (at most) one country. ``country`` is nullable so
+    legacy rows with an unknown country are never lost."""
+
+    name_ar = models.CharField(_("Name (Arabic)"), max_length=255)
+    name_en = models.CharField(_("Name (English)"), max_length=255, blank=True)
+    country = models.ForeignKey(
+        "Country", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="cities", verbose_name=_("Country"),
+    )
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        lang = get_language()
+        name = self.name_ar if (lang and lang.startswith("ar")) else (self.name_en or self.name_ar)
+        if self.country_id:
+            return f"{name} - {self.country}"
+        return name
+
+    class Meta:
+        verbose_name = _("City")
+        verbose_name_plural = _("Cities")
+        ordering = ["name_ar"]
+        constraints = [
+            models.UniqueConstraint(fields=["country", "name_ar"], name="unique_city_per_country")
+        ]
+
+
+def resolve_location_relations(location):
+    """Keep a :class:`Location`'s normalized FKs and its denormalized text fields
+    in sync, in either direction. Called from ``Location.save``.
+
+    * FKs set  → mirror their names into ``city_ar``/``country_ar``/… ; if a city
+      is set but no country, inherit ``city.country``.
+    * only text fields set (legacy ``get_or_create(city_ar=…, country_ar=…)``)
+      → get_or_create the matching ``Country``/``City`` and populate the FKs.
+
+    Returns True if any FK was changed (so ``save`` can persist it).
+    """
+    changed = False
+
+    # FK-authoritative path: text fields follow the related objects.
+    if location.city_id or location.country_id:
+        if location.city_id and not location.country_id and location.city.country_id:
+            location.country = location.city.country
+            changed = True
+        if location.city_id:
+            location.city_ar = location.city.name_ar
+            location.city_en = location.city.name_en
+        else:
+            location.city_ar = ""
+            location.city_en = ""
+        if location.country_id:
+            location.country_ar = location.country.name_ar
+            location.country_en = location.country.name_en
+        else:
+            location.country_ar = ""
+            location.country_en = ""
+        return changed
+
+    # Legacy text-authoritative path: backfill the FKs from the text fields.
+    country_ar = (location.country_ar or "").strip()
+    city_ar = (location.city_ar or "").strip()
+    country = None
+    if country_ar:
+        country, _ = Country.objects.get_or_create(
+            name_ar=country_ar,
+            defaults={"name_en": (location.country_en or "").strip()},
+        )
+        location.country = country
+        changed = True
+    if city_ar:
+        city, _ = City.objects.get_or_create(
+            country=country, name_ar=city_ar,
+            defaults={"name_en": (location.city_en or "").strip()},
+        )
+        location.city = city
+        changed = True
+    return changed
+
+
 class Location(models.Model):
+    """A place a biography references (birthplace / hometown / death location).
+
+    Normalized relations live in the ``city`` / ``country`` FKs; the ``*_ar`` /
+    ``*_en`` text columns are a denormalized mirror kept in sync by ``save`` so
+    that admin search/filter/ordering, the public-site filters, CSV export and
+    templates keep reading the text columns unchanged.
+    """
+
+    city = models.ForeignKey(
+        "City", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="locations", verbose_name=_("City"),
+    )
+    country = models.ForeignKey(
+        "Country", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="locations", verbose_name=_("Country"),
+    )
+
     city_ar = models.CharField(_("City (Arabic)"), max_length=255)
     city_en = models.CharField(_("City (English)"), max_length=255, blank=True)
     country_ar = models.CharField(_("Country (Arabic)"), max_length=255,)
@@ -251,6 +373,10 @@ class Location(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        resolve_location_relations(self)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         lang = get_language()
