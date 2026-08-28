@@ -80,7 +80,7 @@
         <p class="text-white opacity-50 text-sm mb-3">{% trans "Share this biography" %}</p>
         <ul class="list-none flex items-center justify-center gap-2">
           <li class="inline">
-            <a href="https://wa.me/?text={{ share_title|urlencode }}%20{{ share_url|urlencode:"" }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on WhatsApp' %}" title="{% trans 'Share on WhatsApp' %}"
+            <a href="whatsapp://send?text={{ share_title|urlencode }}%20{{ share_url|urlencode:"" }}" data-action="share/whatsapp/share" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on WhatsApp' %}" title="{% trans 'Share on WhatsApp' %}"
               class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-green-600 hover:border-green-600 transition duration-500">
               <i class="fa-brands fa-whatsapp"></i>
             </a>
