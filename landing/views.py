@@ -199,6 +199,18 @@ def biography_detail(request, pk):
 
     site_settings = SiteSettings.objects.first()
 
+    lang = get_language() or "ar"
+    if lang == "ar":
+        share_title = (
+            biography.alias_ar or biography.alias_en
+            or biography.full_name_ar or biography.full_name_en or ""
+        )
+    else:
+        share_title = (
+            biography.alias_en or biography.alias_ar
+            or biography.full_name_en or biography.full_name_ar or ""
+        )
+
     context = {
         "biography": biography,
         "dates": _bio_dates(biography),
@@ -209,6 +221,8 @@ def biography_detail(request, pk):
         "esnads": esnads,
         "site_settings": site_settings,
         "user": request.user,
+        "share_url": request.build_absolute_uri(request.path),
+        "share_title": share_title,
     }
     return render(request, "biography.html", context)
 

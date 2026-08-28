@@ -61,14 +61,14 @@
       <ul class="list-none text-white opacity-50 text-lg">
         {% if biography.birthplace or biography.birth_hijri_year or biography.birth_greg_year %}
         <li class="inline mx-2">
-          <span>{% if LANGUAGE_CODE == 'ar' %}{% if biography.is_female %}وُلدت{% else %}وُلد{% endif %}{% else %}{% trans "Born" %}{% endif %}:</span>
+          <span>{% if LANGUAGE_CODE == 'ar' %}{% if biography.is_female %}وُلدت في{% else %}وُلد في{% endif %}{% else %}{% trans "Born" %}{% endif %}:</span>
           {% if biography.birthplace %}{{ biography.birthplace }}{% endif %}
           {% if biography.birth_hijri_year %}({{ biography.birth_hijri_year }} {% if LANGUAGE_CODE == 'ar' %}هـ{% else %}AH{% endif %}){% elif biography.birth_greg_year %}({{ biography.birth_greg_year }} {% if LANGUAGE_CODE == 'ar' %}م{% else %}CE{% endif %}){% endif %}
         </li>
         {% endif %}
         {% if biography.death_location or biography.death_hijri_year or biography.death_greg_year %}
         <li class="inline mx-2">
-          <span>{% if LANGUAGE_CODE == 'ar' %}{% if biography.is_female %}توفيت{% else %}توفي{% endif %}{% else %}{% trans "Died" %}{% endif %}:</span>
+          <span>{% if LANGUAGE_CODE == 'ar' %}{% if biography.is_female %}توفيت في{% else %}توفي في{% endif %}{% else %}{% trans "Died" %}{% endif %}:</span>
           {% if biography.death_location %}{{ biography.death_location }}{% endif %}
           {% if biography.death_hijri_year %}({{ biography.death_hijri_year }} {% if LANGUAGE_CODE == 'ar' %}هـ{% else %}AH{% endif %}){% elif biography.death_greg_year %}({{ biography.death_greg_year }} {% if LANGUAGE_CODE == 'ar' %}م{% else %}CE{% endif %}){% endif %}
         </li>
@@ -76,30 +76,29 @@
       </ul>
 
       <!-- Share -->
-      {% with share_url=request.build_absolute_uri share_title=biography.alias_ar|default:biography.alias_en|default:biography.full_name_ar|default:biography.full_name_en %}
       <div class="mt-6">
         <p class="text-white opacity-50 text-sm mb-3">{% trans "Share this biography" %}</p>
         <ul class="list-none flex items-center justify-center gap-2">
           <li class="inline">
-            <a href="https://wa.me/?text={{ share_title|urlencode }}%20{{ share_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on WhatsApp' %}" title="{% trans 'Share on WhatsApp' %}"
+            <a href="whatsapp://send?text={{ share_title|urlencode }}%20{{ share_url|urlencode:"" }}" data-action="share/whatsapp/share" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on WhatsApp' %}" title="{% trans 'Share on WhatsApp' %}"
               class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-green-600 hover:border-green-600 transition duration-500">
               <i class="fa-brands fa-whatsapp"></i>
             </a>
           </li>
           <li class="inline">
-            <a href="https://t.me/share/url?url={{ share_url|urlencode }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Telegram' %}" title="{% trans 'Share on Telegram' %}"
+            <a href="https://t.me/share/url?url={{ share_url|urlencode:"" }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Telegram' %}" title="{% trans 'Share on Telegram' %}"
               class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-sky-500 hover:border-sky-500 transition duration-500">
               <i class="fa-brands fa-telegram"></i>
             </a>
           </li>
           <li class="inline">
-            <a href="https://twitter.com/intent/tweet?url={{ share_url|urlencode }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on X' %}" title="{% trans 'Share on X' %}"
+            <a href="https://x.com/intent/tweet?url={{ share_url|urlencode:"" }}&text={{ share_title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on X' %}" title="{% trans 'Share on X' %}"
               class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-black hover:border-black transition duration-500">
               <i class="fa-brands fa-x-twitter"></i>
             </a>
           </li>
           <li class="inline">
-            <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Facebook' %}" title="{% trans 'Share on Facebook' %}"
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode:"" }}" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Share on Facebook' %}" title="{% trans 'Share on Facebook' %}"
               class="size-9 inline-flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-blue-600 hover:border-blue-600 transition duration-500">
               <i class="fa-brands fa-facebook-f"></i>
             </a>
@@ -112,7 +111,6 @@
           </li>
         </ul>
       </div>
-      {% endwith %}
     </div>
     <!--end grid-->
   </div>
