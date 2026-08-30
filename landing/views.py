@@ -502,11 +502,15 @@ def contact_form(request):
             return JsonResponse({'error': 'Please fill out all fields.'}, status=400)
 
         # Send email
+        settings = SiteSettings.objects.first()
+        recipient_email = settings.contact_email if settings and settings.contact_email else None
+        if not recipient_email:
+            return JsonResponse({'error': 'Contact email is not configured.'}, status=500)
         send_mail(
             subject,
             comments,
             email,
-            ['kalghanimdev@gmail.com'], #change email id 
+            [recipient_email],
             fail_silently=False,
         )
 
