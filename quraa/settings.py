@@ -31,7 +31,10 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(',')
 
-CSRF_TRUSTED_ORIGINS = ['http://13.62.62.34']
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://13.62.62.34,https://quraacenter.com,https://www.quraacenter.com',
+).split(',')
 
 # Application definition
 
