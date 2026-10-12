@@ -1,8 +1,11 @@
 import logging
 from difflib import SequenceMatcher
-from django.core.mail import send_mail
 
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
+from django.core.validators import validate_email
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -490,31 +493,40 @@ def search_results(request):
     return render(request, "search-results.html", context)
 
 def contact_form(request):
-    if request.method == 'POST':
-        # Extract form data from request
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        subject = request.POST.get('subject')
-        comments = request.POST.get('comments')
+    """Send a contact-form message to the site inbox.
 
-        # Check if any field is empty
-        if not all([name, email, subject, comments]):
-            return JsonResponse({'error': 'Please fill out all fields.'}, status=400)
+    Mail is sent from DEFAULT_FROM_EMAIL (SMTP providers such as Gmail refuse
+    to send as the visitor's address); the visitor's email goes in Reply-To.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request.'}, status=405)
 
-        # Send email
-        settings = SiteSettings.objects.first()
-        recipient_email = settings.contact_email if settings and settings.contact_email else None
-        if not recipient_email:
-            return JsonResponse({'error': 'Contact email is not configured.'}, status=500)
-        send_mail(
-            subject,
-            comments,
-            email,
-            [recipient_email],
-            fail_silently=False,
-        )
+    name = request.POST.get('name', '').strip()
+    email = request.POST.get('email', '').strip()
+    subject = request.POST.get('subject', '').strip()
+    comments = request.POST.get('comments', '').strip()
 
-        return JsonResponse({'message': 'Success! Your message has been sent.'})
+    if not all([name, email, subject, comments]):
+        return JsonResponse({'success': False, 'error': 'Please fill out all fields.'}, status=400)
+    try:
+        validate_email(email)
+    except ValidationError:
+        return JsonResponse({'success': False, 'error': 'Invalid email address.'}, status=400)
 
-    # GET request or invalid form submission
-    return JsonResponse({'error': 'Invalid request.'}, status=400)
+    site_settings = SiteSettings.objects.first()
+    recipient_email = (site_settings and site_settings.contact_email) or settings.SITE_EMAIL
+
+    message = EmailMessage(
+        subject=f"[Contact] {subject}",
+        body=f"Name: {name}\nEmail: {email}\n\n{comments}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[recipient_email],
+        reply_to=[email],
+    )
+    try:
+        message.send(fail_silently=False)
+    except Exception:
+        logger.exception("Contact form email failed")
+        return JsonResponse({'success': False, 'error': 'Could not send email.'}, status=500)
+
+    return JsonResponse({'success': True, 'message': 'Success! Your message has been sent.'})

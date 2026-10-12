@@ -321,7 +321,7 @@ When adding features:
 * **CSRF:** `CSRF_TRUSTED_ORIGINS` is currently hardcoded to `http://13.62.62.34`. Update it for the production domain and prefer loading it from the environment.
 * **File uploads:** `DATA_UPLOAD_MAX_MEMORY_SIZE = 100 MB`, `FILE_UPLOAD_MAX_MEMORY_SIZE = 5 MB`. Ensure the reverse proxy (`nginx`, etc.) matches these limits.
 * **AWS credentials:** stored in environment variables; the bucket ACL is disabled (`AWS_DEFAULT_ACL = None`) and file overwrite is disabled.
-* **Email:** the contact form uses Django’s `send_mail` with a hardcoded recipient address. In production, configure `EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, and related settings via the environment or a local settings file.
+* **Email:** all site mail (contact form, password reset, `ADMINS` error reports) is sent from `DEFAULT_FROM_EMAIL` to `SITE_EMAIL` (default `trajemqurraa@gmail.com`). The contact form sends to `SiteSettings.contact_email` if set, else `SITE_EMAIL`, with the visitor in `Reply-To`. SMTP is used whenever `EMAIL_HOST` is set (even with `DEBUG=True`); otherwise mail prints to the console. Set `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` (a Gmail App Password) in `.env`.
 * **Admin access:** the admin language switcher uses Django’s built-in `set_language` view. Keep CSRF protection enabled.
 * **User permissions:** only superusers can change `user_type`, groups, and permissions. Non-superusers see those fields as read-only.
 * **Environment file:** `.env` is git-ignored. Do not commit it or any other file containing credentials.

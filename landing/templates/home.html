@@ -389,7 +389,7 @@
           <div class="p-6 rounded-md shadow bg-white dark:bg-slate-900">
             {% comment %} form validation {% endcomment %}
             <!-- Form -->
-            <form method="post" name="myForm" id="myForm" onsubmit="return validateForm();" action="{% url 'landing:contact_form' %}">
+            <form method="post" name="myForm" id="myForm" action="{% url 'landing:contact_form' %}">
               {% csrf_token %}
               <div id="error-msg" class="mb-0"></div>
               <div id="simple-msg"></div>
@@ -415,7 +415,7 @@
 
               <!-- JavaScript for Form Validation -->
               <script>
-                function validateForm() {
+                function validateContactForm() {
                   var name = document.getElementById("name").value.trim();
                   var email = document.getElementById("email").value.trim();
                   var subject = document
