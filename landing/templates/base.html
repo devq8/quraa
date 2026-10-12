@@ -263,66 +263,44 @@
   <!-- JAVASCRIPTS -->
 
   <script>
-    var submitBtn = document.getElementById("submit");
-    if (submitBtn) {
-    submitBtn.addEventListener("click", function() {
-      var name = document.getElementById("name").value;
-      var email = document.getElementById("email").value;
-      var subject = document.getElementById("subject").value;
-      var comments = document.getElementById("comments").value;
-
-      var errors = {};
-
-      if (!name) {
-        errors["name"] = "You must enter your name.";
-      }
-      if (!email) {
-        errors["email"] = "Please enter a valid email address.";
-      } else if (!email.includes("@")) {
-        errors["email"] =
-          "You have entered an invalid email address. Please try again.";
-      }
-      if (!subject) {
-        errors["subject"] = "Please enter a subject.";
-      }
-      if (!comments) {
-        errors["comments"] = "Please enter your message.";
+    // Contact form: validate (validateContactForm() in home.html), then post the
+    // form data to the contact endpoint and show the result without leaving the page.
+    var contactForm = document.getElementById("myForm");
+    if (contactForm) {
+    contactForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      if (typeof validateContactForm === "function" && !validateContactForm()) {
+        return;
       }
 
-      if (Object.keys(errors).length > 0) {
-        Object.keys(errors).forEach(function(key) {
-          document.getElementById(key + "Error").textContent = errors[key];
-        });
-      } else {
-        document.getElementById("error-msg").textContent = ""; // Clear any previous error message
-        fetch("", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": "{{ csrf_token }}",
-            },
-            body: JSON.stringify({
-              name: name,
-              email: email,
-              subject: subject,
-              comments: comments,
-            }),
-          })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              document.getElementById("simple-msg").innerHTML =
-                '<div class="success_message">{% trans "Email Sent Successfully." %}</div>';
-            } else {
-              document.getElementById("simple-msg").innerHTML =
-                '<div class="error_message">{% trans "Error sending email. Please try again later." %}</div>';
-            }
-          })
-          .catch((error) => {
-            document.getElementById("simple-msg").innerHTML =
+      var submitBtn = document.getElementById("submit");
+      var simpleMsg = document.getElementById("simple-msg");
+      simpleMsg.innerHTML = "";
+      if (submitBtn) submitBtn.disabled = true;
+
+      fetch(contactForm.action, {
+          method: "POST",
+          body: new FormData(contactForm),
+          headers: { "X-Requested-With": "XMLHttpRequest" },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            simpleMsg.innerHTML =
+              '<div class="success_message">{% trans "Email Sent Successfully." %}</div>';
+            contactForm.reset();
+          } else {
+            simpleMsg.innerHTML =
               '<div class="error_message">{% trans "Error sending email. Please try again later." %}</div>';
-          });
-      }
+          }
+        })
+        .catch(() => {
+          simpleMsg.innerHTML =
+            '<div class="error_message">{% trans "Error sending email. Please try again later." %}</div>';
+        })
+        .finally(() => {
+          if (submitBtn) submitBtn.disabled = false;
+        });
     });
     }
   </script>
