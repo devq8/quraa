@@ -211,12 +211,19 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "null": {"class": "logging.NullHandler"},
     },
     "root": {"handlers": ["console"], "level": "INFO"},
     "loggers": {
         "django.request": {
             "handlers": ["console"],
             "level": "ERROR",
+            "propagate": False,
+        },
+        # Bots probing the server IP with fake Host headers; Django already
+        # rejects them with 400, so don't email the admins about each one.
+        "django.security.DisallowedHost": {
+            "handlers": ["null"],
             "propagate": False,
         },
     },

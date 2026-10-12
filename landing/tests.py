@@ -59,3 +59,15 @@ class ContactFormTests(TestCase):
 
     def test_get_not_allowed(self):
         self.assertEqual(self.client.get(self.url).status_code, 405)
+
+
+@override_settings(
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    ALLOWED_HOSTS=["quraacenter.com"],
+    DEBUG=False,
+)
+class DisallowedHostTests(TestCase):
+    def test_bad_host_is_rejected_without_emailing_admins(self):
+        response = self.client.get("/", HTTP_HOST="vivaldi.com")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
