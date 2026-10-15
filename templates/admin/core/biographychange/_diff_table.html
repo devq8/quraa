@@ -1,0 +1,23 @@
+{% load i18n %}
+<table class="bio-diff">
+  <thead><tr>
+    <th>{% trans "Field" %}</th>
+    {% if show_current %}<th>{% trans "Live now" %}</th>{% endif %}
+    <th>{% trans "Before" %}</th>
+    <th>{% trans "After" %}</th>
+  </tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr{% if row.conflict %} class="conflict"{% endif %}>
+      <th>{{ row.label }}{% if row.conflict %} ⚠{% endif %}</th>
+      {% if show_current %}
+      <td>{% if row.current %}<ul>{% for line in row.current %}<li>{{ line }}</li>{% endfor %}</ul>{% else %}<span class="empty">—</span>{% endif %}</td>
+      {% endif %}
+      <td>{% if row.before %}<ul>{% for line, gone in row.before %}<li{% if gone %} class="removed"{% endif %}>{{ line }}</li>{% endfor %}</ul>{% else %}<span class="empty">—</span>{% endif %}</td>
+      <td>{% if row.after %}<ul>{% for line, new in row.after %}<li{% if new %} class="added"{% endif %}>{{ line }}</li>{% endfor %}</ul>{% else %}<span class="empty">—</span>{% endif %}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4" class="empty">{% trans "No field changes." %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

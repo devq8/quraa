@@ -2880,3 +2880,129 @@ msgstr "المستخدمون"
 
 #~ msgid "Terminal narrator"
 #~ msgstr "الراوي الأعلى"
+
+msgid "Deleted"
+msgstr "حذف"
+
+msgid "Pending review"
+msgstr "بانتظار المراجعة"
+
+msgid "Approved"
+msgstr "معتمد"
+
+msgid "Rejected"
+msgstr "مرفوض"
+
+msgid "Applied directly"
+msgstr "مطبَّق مباشرة"
+
+msgid "Biography name"
+msgstr "اسم الترجمة"
+
+msgid "Action"
+msgstr "الإجراء"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Before"
+msgstr "قبل"
+
+msgid "After"
+msgstr "بعد"
+
+msgid "Changed fields"
+msgstr "الحقول المعدلة"
+
+msgid "Submitted at"
+msgstr "تاريخ الإرسال"
+
+msgid "Reviewed By"
+msgstr "راجعه"
+
+msgid "Reviewed at"
+msgstr "تاريخ المراجعة"
+
+msgid "Review note"
+msgstr "ملاحظة المراجعة"
+
+msgid "Biography Change"
+msgstr "تعديل ترجمة"
+
+msgid "Biography Changes (Review & History)"
+msgstr "تعديلات التراجم (المراجعة والسجل)"
+
+msgid "Can approve biography changes"
+msgstr "يمكنه اعتماد تعديلات التراجم"
+
+msgid "Review"
+msgstr "المراجعة"
+
+msgid "Has changes pending review"
+msgstr "لديها تعديلات بانتظار المراجعة"
+
+msgid "Your changes were sent for review. They will show on the website after an admin approves them."
+msgstr "أُرسلت تعديلاتك للمراجعة، وستظهر في الموقع بعد اعتمادها من المشرف."
+
+msgid "The biography was saved as unpublished. It will be published after an admin approves it."
+msgstr "حُفظت الترجمة غير منشورة، وستُنشر بعد اعتمادها من المشرف."
+
+msgid "The change was approved and is now live."
+msgstr "اعتُمد التعديل وأصبح ظاهرًا في الموقع."
+
+msgid "The change was rejected."
+msgstr "رُفض التعديل."
+
+msgid "This change was already reviewed or its biography no longer exists."
+msgstr "هذا التعديل تمت مراجعته مسبقًا أو أن الترجمة لم تعد موجودة."
+
+msgid "Approve selected pending changes"
+msgstr "اعتماد التعديلات المحددة"
+
+msgid "Reject selected pending changes"
+msgstr "رفض التعديلات المحددة"
+
+msgid "%(count)d change(s) approved."
+msgstr "تم اعتماد %(count)d تعديل."
+
+msgid "%(count)d change(s) rejected."
+msgstr "تم رفض %(count)d تعديل."
+
+msgid "deleted"
+msgstr "محذوف"
+
+msgid "Summary"
+msgstr "الملخص"
+
+msgid "This biography was added by a user. It is saved but not published. Approving publishes it on the website."
+msgstr "أضاف مستخدمٌ هذه الترجمة، وهي محفوظة لكن غير منشورة. الاعتماد ينشرها في الموقع."
+
+msgid "Some fields were changed by someone else after this change was sent (marked in red). Approving will overwrite them."
+msgstr "بعض الحقول عدّلها شخص آخر بعد إرسال هذا التعديل (باللون الأحمر). الاعتماد سيستبدلها."
+
+msgid "optional"
+msgstr "اختياري"
+
+msgid "Approve and publish"
+msgstr "اعتماد ونشر"
+
+msgid "Reject"
+msgstr "رفض"
+
+msgid "Live now"
+msgstr "المنشور حاليًا"
+
+msgid "No field changes."
+msgstr "لا توجد تعديلات على الحقول."
+
+msgid "Changes waiting for admin review"
+msgstr "تعديلات بانتظار مراجعة المشرف"
+
+msgid "The form below shows the live (approved) data."
+msgstr "النموذج أدناه يعرض البيانات المنشورة (المعتمدة)."
+
+msgid "Change history"
+msgstr "سجل التعديلات"
+
+msgid "Open the full list"
+msgstr "فتح القائمة كاملة"

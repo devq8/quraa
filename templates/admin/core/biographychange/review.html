@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+{% include "admin/core/biographychange/_diff_style.html" %}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans "Home" %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; #{{ change.pk }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module aligned">
+    <h2>{% trans "Summary" %}</h2>
+    <div class="form-row"><label>{% trans "Biography" %}:</label>
+      <div class="readonly">
+        {% if change.biography_id %}<a href="{% url 'admin:core_biography_change' change.biography_id %}">{{ change.biography_label }}</a>
+        {% else %}{{ change.biography_label }}{% endif %}
+      </div></div>
+    <div class="form-row"><label>{% trans "Action" %}:</label><div class="readonly">{{ change.get_action_display }}</div></div>
+    <div class="form-row"><label>{% trans "Status" %}:</label><div class="readonly"><strong>{{ change.get_status_display }}</strong></div></div>
+    <div class="form-row"><label>{% trans "Submitted By" %}:</label><div class="readonly">{{ change.submitted_by|default:"—" }} · {{ change.submitted_at }}</div></div>
+    {% if change.reviewed_at %}
+    <div class="form-row"><label>{% trans "Reviewed By" %}:</label><div class="readonly">{{ change.reviewed_by|default:"—" }} · {{ change.reviewed_at }}</div></div>
+    {% endif %}
+    {% if change.review_note %}
+    <div class="form-row"><label>{% trans "Review note" %}:</label><div class="readonly">{{ change.review_note|linebreaksbr }}</div></div>
+    {% endif %}
+  </div>
+
+  {% if change.action == "create" and change.status == "pending" %}
+  <p class="help">{% trans "This biography was added by a user. It is saved but not published. Approving publishes it on the website." %}</p>
+  {% endif %}
+  {% if has_conflicts %}
+  <p class="errornote">{% trans "Some fields were changed by someone else after this change was sent (marked in red). Approving will overwrite them." %}</p>
+  {% endif %}
+
+  {% include "admin/core/biographychange/_diff_table.html" with rows=rows show_current=show_current %}
+
+  {% if can_decide %}
+  <form method="post" action="{% url 'admin:core_biographychange_decide' change.pk %}" class="module" style="padding:1em;margin-top:1em;">
+    {% csrf_token %}
+    <label for="id_review_note"><strong>{% trans "Review note" %}</strong> ({% trans "optional" %})</label><br>
+    <textarea id="id_review_note" name="review_note" rows="3" style="width:100%;max-width:40em;"></textarea>
+    <div class="submit-row" style="margin-top:.8em;">
+      <input type="submit" name="approve" class="default" value="{% trans 'Approve and publish' %}">
+      <input type="submit" name="reject" value="{% trans 'Reject' %}" style="background:#ba2121;color:#fff;">
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

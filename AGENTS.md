@@ -249,6 +249,14 @@ Admin templates (`templates/admin/`) add a language switcher and custom form blo
 
 ---
 
+## Biography review gate and audit trail
+
+* Every biography save from the admin is stored as a `core.BiographyChange` with JSON `before`/`after` snapshots (fields, attributes, hometowns, teachers, students, sources, esnads). Logic lives in `core/review.py`.
+* Users with `core.approve_biographychange` (superusers always) apply edits directly (status `direct`).
+* Other users' edits are saved inside a savepoint, snapshotted, rolled back, and stored as `pending`. New biographies by these users are saved unpublished; approving publishes them. They cannot delete biographies, edit `published`, use import/merge tools, or edit esnads outside the biography form.
+* Admin list "Biography Changes (Review & History)" shows pending items first; approve/reject from the detail page or list actions. Approving warns when a field changed after submission.
+* The biography change form shows pending changes and the change history per field.
+
 ## Search implementation
 
 Public biography search (`landing.views.search_results`) works as follows:
