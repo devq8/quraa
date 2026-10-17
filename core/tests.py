@@ -3,12 +3,13 @@ import io
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 from openpyxl import load_workbook
 
-from . import csv_import
-from .models import Attribute, Biography, City, Country, Location
+from . import csv_import, review
+from .models import Attribute, Biography, BiographyChange, City, Country, Location, Source
 
 
 class NormalizedLocationTests(TestCase):
@@ -420,3 +421,151 @@ class BiographyImportRecitersAdminTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "غير منشور")
         self.assertNotContains(response, ">unpublished<")
+
+
+
+def _form_data(response):
+    """POST data equal to what the admin change form would submit unchanged."""
+    data = {}
+    forms = [response.context["adminform"].form]
+
+    def collect(formsets):
+        for inline in formsets:
+            formset = inline.formset
+            forms.append(formset.management_form)
+            forms.extend(formset.forms)
+            # nested_admin keeps nested formsets on each inline form.
+            for form in formset.forms:
+                collect(getattr(form, "nested_formsets", []) or [])
+
+    collect(response.context["inline_admin_formsets"])
+    for form in forms:
+        for bound in form:
+            if bound.field.widget.needs_multipart_form:
+                continue
+            value = bound.value()
+            if value is None or value is False:
+                continue
+            if value is True:
+                value = "on"
+            data[bound.html_name] = value
+    return data
+
+
+class BiographyReviewTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.admin = User.objects.create_user(
+            email="admin@example.com", password="pw", user_type="admin",
+        )
+        self.staff = User.objects.create_user(
+            email="staff@example.com", password="pw", user_type="staff",
+        )
+        self.staff.user_permissions.set(
+            Permission.objects.filter(content_type__app_label="core")
+            .exclude(codename="approve_biographychange")
+        )
+        self.bio = Biography.objects.create(full_name_ar="محمد", published=True)
+        self.url = reverse("admin:core_biography_change", args=[self.bio.pk])
+
+    def _edit(self, user, **changes):
+        self.client.force_login(user)
+        data = _form_data(self.client.get(self.url))
+        data.update(changes)
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 302, getattr(response, "context", None) and response.context["errors"])
+        return response
+
+    def test_admin_edit_is_live_and_logged(self):
+        self._edit(self.admin, full_name_ar="أحمد")
+        self.bio.refresh_from_db()
+        self.assertEqual(self.bio.full_name_ar, "أحمد")
+        change = BiographyChange.objects.get()
+        self.assertEqual(change.status, BiographyChange.Status.DIRECT)
+        self.assertEqual(change.changed_fields, ["full_name_ar"])
+        self.assertEqual(change.before["full_name_ar"], "محمد")
+
+    def test_staff_edit_waits_for_approval(self):
+        self._edit(
+            self.staff, full_name_ar="أحمد",
+            **{"sources-TOTAL_FORMS": "1", "sources-0-name_ar": "كتاب"},
+        )
+        self.bio.refresh_from_db()
+        self.assertEqual(self.bio.full_name_ar, "محمد")
+        self.assertFalse(Source.objects.exists())
+
+        change = BiographyChange.objects.get()
+        self.assertEqual(change.status, BiographyChange.Status.PENDING)
+        self.assertEqual(set(change.changed_fields), {"full_name_ar", "sources"})
+
+        # Review page and list render for the approver.
+        self.client.force_login(self.admin)
+        page = self.client.get(reverse("admin:core_biographychange_change", args=[change.pk]))
+        self.assertContains(page, "أحمد")
+        self.assertContains(self.client.get(reverse("admin:core_biographychange_changelist")), "#")
+
+        self.client.post(reverse("admin:core_biographychange_decide", args=[change.pk]), {"approve": "1"})
+        self.bio.refresh_from_db()
+        self.assertEqual(self.bio.full_name_ar, "أحمد")
+        self.assertEqual(list(self.bio.sources.values_list("name_ar", flat=True)), ["كتاب"])
+        change.refresh_from_db()
+        self.assertEqual(change.status, BiographyChange.Status.APPROVED)
+        self.assertEqual(change.reviewed_by, self.admin)
+
+    def test_reject_keeps_live_data(self):
+        self._edit(self.staff, full_name_ar="أحمد")
+        change = BiographyChange.objects.get()
+        self.client.force_login(self.admin)
+        self.client.post(reverse("admin:core_biographychange_decide", args=[change.pk]), {"reject": "1"})
+        self.bio.refresh_from_db()
+        self.assertEqual(self.bio.full_name_ar, "محمد")
+        change.refresh_from_db()
+        self.assertEqual(change.status, BiographyChange.Status.REJECTED)
+        # The biography form lists the entry in its change history.
+        self.assertContains(
+            self.client.get(self.url),
+            reverse("admin:core_biographychange_change", args=[change.pk]),
+        )
+
+    def test_staff_cannot_approve(self):
+        self._edit(self.staff, full_name_ar="أحمد")
+        change = BiographyChange.objects.get()
+        response = self.client.post(
+            reverse("admin:core_biographychange_decide", args=[change.pk]), {"approve": "1"},
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_staff_create_is_unpublished_until_approved(self):
+        self.client.force_login(self.staff)
+        add_url = reverse("admin:core_biography_add")
+        data = _form_data(self.client.get(add_url))
+        data.update(full_name_ar="جديد", published="on")
+        self.assertEqual(self.client.post(add_url, data).status_code, 302)
+        new = Biography.objects.get(full_name_ar="جديد")
+        self.assertFalse(new.published)
+        change = BiographyChange.objects.get(biography=new)
+        self.assertEqual(change.action, BiographyChange.Action.CREATE)
+        self.assertTrue(review.approve(change, self.admin))
+        new.refresh_from_db()
+        self.assertTrue(new.published)
+
+    def test_conflict_detected(self):
+        self._edit(self.staff, full_name_ar="أحمد")
+        change = BiographyChange.objects.get()
+        Biography.objects.filter(pk=self.bio.pk).update(full_name_ar="علي")
+        self.assertEqual(review.conflicts(change), ["full_name_ar"])
+
+    def test_staff_cannot_delete(self):
+        self.client.force_login(self.staff)
+        response = self.client.post(
+            reverse("admin:core_biography_delete", args=[self.bio.pk]), {"post": "yes"},
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Biography.objects.filter(pk=self.bio.pk).exists())
+
+    def test_admin_delete_is_logged(self):
+        self.client.force_login(self.admin)
+        self.client.post(reverse("admin:core_biography_delete", args=[self.bio.pk]), {"post": "yes"})
+        change = BiographyChange.objects.get()
+        self.assertEqual(change.action, BiographyChange.Action.DELETE)
+        self.assertEqual(change.biography_label, "محمد")

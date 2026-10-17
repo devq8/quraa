@@ -3,6 +3,7 @@
 
 {% block extrahead %}
 {{ block.super }}
+{% include "admin/core/biographychange/_diff_style.html" %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   var inline = Array.from(
@@ -140,8 +141,39 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 {% endblock %}
 
+{% block form_top %}
+{{ block.super }}
+{% if pending_changes %}
+<div class="module" style="padding:1em;margin-bottom:1em;border:1px solid #d97706;background:#fff7ed;">
+  <strong>{% trans "Changes waiting for admin review" %}: {{ pending_changes|length }}.</strong>
+  {% trans "The form below shows the live (approved) data." %}
+  <ul style="margin:.5em 0 0;">
+    {% for c in pending_changes %}
+    <li><a href="{% url 'admin:core_biographychange_change' c.pk %}">#{{ c.pk }} · {{ c.get_action_display }} · {{ c.submitted_by|default:"—" }} · {{ c.submitted_at }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block after_related_objects %}
 {{ block.super }}
+
+{% if change_history %}
+<fieldset class="module collapse">
+  <h2>{% trans "Change history" %} ({{ change_history_count }})</h2>
+  <p style="padding:0 .6em;"><a href="{{ change_history_url }}">{% trans "Open the full list" %}</a></p>
+  {% for item in change_history %}
+  <div style="padding:.4em .6em;border-top:1px solid #eee;">
+    <a href="{% url 'admin:core_biographychange_change' item.change.pk %}"><strong>#{{ item.change.pk }}</strong></a>
+    · {{ item.change.get_action_display }} · <strong>{{ item.change.get_status_display }}</strong>
+    · {{ item.change.submitted_by|default:"—" }} · {{ item.change.submitted_at }}
+    {% if item.change.reviewed_by and item.change.status != "direct" %} · {% trans "Reviewed By" %}: {{ item.change.reviewed_by }}{% endif %}
+    {% include "admin/core/biographychange/_diff_table.html" with rows=item.rows show_current=False %}
+  </div>
+  {% endfor %}
+</fieldset>
+{% endif %}
 
 {% if original %}
 <fieldset class="module aligned collapse">

@@ -3,16 +3,18 @@ from adminsortable2.admin import SortableAdminBase, SortableInlineAdminMixin
 from django import forms
 from django.contrib import admin
 from django.contrib import messages
-from django.db import models
+from django.core.exceptions import PermissionDenied
+from django.db import models, transaction
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _, get_language
-from . import biography_export, csv_import
+from . import biography_export, csv_import, review
 from .models import (
-    Attribute, Biography, City, Country,
+    Attribute, Biography, BiographyChange, City, Country,
     Esnad, EsnadLink,
     EsnadTemplate, EsnadTemplateLink,
     Location, Reading, Source, TeacherStudentRelationship,
@@ -124,6 +126,19 @@ class EsnadInline(nested_admin.NestedStackedInline):
     verbose_name_plural = _("Transmission Chains")
 
 
+class PendingReviewFilter(admin.SimpleListFilter):
+    title = _("Review")
+    parameter_name = "review"
+
+    def lookups(self, request, model_admin):
+        return (("pending", _("Has changes pending review")),)
+
+    def queryset(self, request, queryset):
+        if self.value() == "pending":
+            return queryset.filter(changes__status=BiographyChange.Status.PENDING).distinct()
+        return queryset
+
+
 @admin.register(Biography)
 class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
     list_display = (
@@ -132,7 +147,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         "death_hijri_year", "death_greg_year",
         "birthplace", "get_hometowns", "death_location",
     )
-    list_filter = ("birthplace", "hometown", "death_location", "attributes", "published", "is_featured")
+    list_filter = (PendingReviewFilter, "birthplace", "hometown", "death_location", "attributes", "published", "is_featured")
     search_fields = ("full_name_ar", "full_name_en", "alias_ar", "alias_en")
 
     @admin.display(description=_("Hometown"))
@@ -255,7 +270,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         return response
 
     def import_csv_view(self, request):
-        if not self.has_add_permission(request):
+        if not self.has_add_permission(request) or not review.can_approve(request.user):
             messages.error(request, _("You do not have permission to import biographies."))
             return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
 
@@ -418,7 +433,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         return JsonResponse({"results": results})
 
     def merge_confirm_view(self, request):
-        if not self.has_change_permission(request):
+        if not self.has_change_permission(request) or not review.can_approve(request.user):
             messages.error(request, _("You do not have permission to merge biographies."))
             return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
 
@@ -512,7 +527,7 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
         """Multi-step wizard for importing biographies from a custom Arabic CSV."""
         from . import import_reciters_wizard as wiz
 
-        if not self.has_add_permission(request):
+        if not self.has_add_permission(request) or not review.can_approve(request.user):
             messages.error(request, _("You do not have permission to import biographies."))
             return HttpResponseRedirect(reverse("admin:core_biography_changelist"))
 
@@ -860,21 +875,125 @@ class BiographyAdmin(SortableAdminBase, nested_admin.NestedModelAdmin):
             formfield.label_from_instance = _label
         return formfield
 
+    # --- Review gate & audit trail (see core.review) ---------------------
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        if not review.can_approve(request.user):
+            # Publishing is decided by the approver.
+            readonly.append("published")
+        return readonly
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if not review.can_approve(request.user):
+            actions.pop("merge_biographies_action", None)
+            actions.pop("delete_selected", None)
+        return actions
+
+    def has_delete_permission(self, request, obj=None):
+        # Deleting cannot wait for review, so only approvers may delete.
+        return review.can_approve(request.user) and super().has_delete_permission(request, obj)
+
     def save_model(self, request, obj, form, change):
         if not change:
             obj.submitted_by = request.user
         obj.last_modified_by = request.user
+        if change:
+            request._bio_before = review.snapshot(Biography.objects.get(pk=obj.pk))
+            if not review.can_approve(request.user):
+                # Everything saved from here on is rolled back in save_related()
+                # and kept as a pending change instead.
+                request._bio_savepoint = transaction.savepoint()
+        else:
+            request._bio_before = {}
         super().save_model(request, obj, form, change)
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        obj = form.instance
+        after = review.snapshot(Biography.objects.get(pk=obj.pk))
+        savepoint = getattr(request, "_bio_savepoint", None)
+        if savepoint is not None:
+            transaction.savepoint_rollback(savepoint)
+        gated = not review.can_approve(request.user)
+        request._bio_change = review.record(
+            obj,
+            BiographyChange.Action.UPDATE if change else BiographyChange.Action.CREATE,
+            request._bio_before,
+            after,
+            request.user,
+            BiographyChange.Status.PENDING if gated else BiographyChange.Status.DIRECT,
+        )
+
+    def _is_pending(self, request):
+        entry = getattr(request, "_bio_change", None)
+        return entry is not None and entry.status == BiographyChange.Status.PENDING
+
+    def log_change(self, request, obj, message):
+        if self._is_pending(request):
+            return None  # Nothing was changed yet; the pending entry is the record.
+        return super().log_change(request, obj, message)
+
+    def response_change(self, request, obj):
+        if self._is_pending(request):
+            self.message_user(
+                request,
+                _("Your changes were sent for review. They will show on the website after an admin approves them."),
+                messages.WARNING,
+            )
+            return HttpResponseRedirect(reverse("admin:core_biography_change", args=[obj.pk]))
+        return super().response_change(request, obj)
+
+    def response_add(self, request, obj, post_url_continue=None):
+        if self._is_pending(request):
+            self.message_user(
+                request,
+                _("The biography was saved as unpublished. It will be published after an admin approves it."),
+                messages.WARNING,
+            )
+        return super().response_add(request, obj, post_url_continue)
+
+    def delete_model(self, request, obj):
+        self._record_delete(request, obj)
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            self._record_delete(request, obj)
+        super().delete_queryset(request, queryset)
+
+    def _record_delete(self, request, obj):
+        review.record(
+            obj, BiographyChange.Action.DELETE, review.snapshot(obj), {},
+            request.user, BiographyChange.Status.DIRECT,
+        )
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         extra_context = extra_context or {}
-        if object_id:
+        if object_id and review.can_approve(request.user):
             extra_context["biography_esnads"] = (
                 Esnad.objects.filter(biography_id=object_id).order_by("id")
             )
             template_ordering = _lang_ordering(("name_ar",), ("name_en", "name_ar"))
             extra_context["esnad_templates"] = (
                 EsnadTemplate.objects.only("id", "name_ar", "name_en").order_by(*template_ordering)
+            )
+        if object_id and str(object_id).isdigit():
+            history = (
+                BiographyChange.objects.filter(biography_id=object_id)
+                .select_related("submitted_by", "reviewed_by")
+            )
+            extra_context["pending_changes"] = [
+                c for c in history if c.status == BiographyChange.Status.PENDING
+            ]
+            extra_context["change_history"] = [
+                {"change": c, "rows": review.diff_rows(c)} for c in history[:30]
+            ]
+            extra_context["change_history_count"] = history.count()
+            extra_context["change_history_url"] = (
+                reverse("admin:core_biographychange_changelist")
+                + f"?biography__id__exact={object_id}"
             )
         return super().changeform_view(request, object_id, form_url, extra_context)
 
@@ -1049,6 +1168,16 @@ class EsnadAdmin(SortableAdminBase, admin.ModelAdmin):
             )
         return super().changeform_view(request, object_id, form_url, extra_context)
 
+    # Users whose edits need review change chains on the biography form only.
+    def has_add_permission(self, request):
+        return review.can_approve(request.user) and super().has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        return review.can_approve(request.user) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return review.can_approve(request.user) and super().has_delete_permission(request, obj)
+
     def apply_template_view(self, request, object_id):
         if request.method != "POST":
             return HttpResponseRedirect(reverse("admin:core_esnad_change", args=[object_id]))
@@ -1149,3 +1278,152 @@ class EsnadTemplateAdmin(SortableAdminBase, admin.ModelAdmin):
     @admin.display(description=_("Narrators"))
     def link_count(self, obj):
         return obj.links.count()
+
+
+@admin.register(BiographyChange)
+class BiographyChangeAdmin(admin.ModelAdmin):
+    """Review queue and audit trail for biography edits. Entries are read-only;
+    approvers apply or reject pending entries from the detail page or with the
+    list actions."""
+
+    list_display = (
+        "id", "biography_link", "action", "status_badge", "fields_summary",
+        "submitted_by", "submitted_at", "reviewed_by", "reviewed_at",
+    )
+    list_display_links = ("id",)
+    list_filter = ("status", "action", ("submitted_by", admin.RelatedOnlyFieldListFilter))
+    search_fields = ("biography_label", "biography__full_name_ar", "biography__full_name_en")
+    list_select_related = ("biography", "submitted_by", "reviewed_by")
+    date_hierarchy = "submitted_at"
+    actions = ["approve_selected", "reject_selected"]
+
+    _STATUS_COLORS = {
+        BiographyChange.Status.PENDING: "#d97706",
+        BiographyChange.Status.APPROVED: "#16a34a",
+        BiographyChange.Status.REJECTED: "#dc2626",
+        BiographyChange.Status.DIRECT: "#6b7280",
+    }
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not review.can_approve(request.user):
+            qs = qs.filter(submitted_by=request.user)
+        # Pending entries first, newest first inside each group.
+        return qs.annotate(
+            _pending_first=models.Case(
+                models.When(status=BiographyChange.Status.PENDING, then=0),
+                default=1, output_field=models.IntegerField(),
+            )
+        ).order_by("_pending_first", "-submitted_at", "-id")
+
+    def has_module_permission(self, request):
+        return request.user.is_active and request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return self.has_module_permission(request)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False  # The audit trail is never edited.
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if not review.can_approve(request.user):
+            actions.pop("approve_selected", None)
+            actions.pop("reject_selected", None)
+        return actions
+
+    @admin.display(description=_("Biography"), ordering="biography_label")
+    def biography_link(self, obj):
+        if obj.biography_id:
+            url = reverse("admin:core_biography_change", args=[obj.biography_id])
+            return format_html('<a href="{}">{}</a>', url, obj.biography_label)
+        return obj.biography_label
+
+    @admin.display(description=_("Status"), ordering="status")
+    def status_badge(self, obj):
+        return format_html(
+            '<span style="color:#fff;background:{};padding:2px 8px;border-radius:10px;white-space:nowrap">{}</span>',
+            self._STATUS_COLORS.get(obj.status, "#6b7280"), obj.get_status_display(),
+        )
+
+    @admin.display(description=_("Changed fields"))
+    def fields_summary(self, obj):
+        labels = [str(review.field_label(k)) for k in obj.changed_fields]
+        if len(labels) > 4:
+            labels = labels[:4] + [f"+{len(obj.changed_fields) - 4}"]
+        return "، ".join(labels) if (get_language() or "").startswith("ar") else ", ".join(labels)
+
+    # --- review pages -----------------------------------------------------
+
+    def get_urls(self):
+        custom = [
+            path(
+                "<int:object_id>/decide/",
+                self.admin_site.admin_view(self.decide_view),
+                name="core_biographychange_decide",
+            ),
+        ]
+        return custom + super().get_urls()
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        change = self.get_object(request, object_id)
+        if change is None:
+            return self._get_obj_does_not_exist_redirect(request, self.opts, object_id)
+        pending = change.status == BiographyChange.Status.PENDING
+        rows = review.diff_rows(change, with_current=pending)
+        context = {
+            **self.admin_site.each_context(request),
+            "title": str(change),
+            "opts": self.opts,
+            "change": change,
+            "rows": rows,
+            "show_current": pending and change.action == BiographyChange.Action.UPDATE,
+            "has_conflicts": any(r["conflict"] for r in rows),
+            "can_decide": pending and review.can_approve(request.user),
+        }
+        return TemplateResponse(request, "admin/core/biographychange/review.html", context)
+
+    def decide_view(self, request, object_id):
+        if request.method != "POST":
+            return HttpResponseRedirect(reverse("admin:core_biographychange_change", args=[object_id]))
+        if not review.can_approve(request.user):
+            raise PermissionDenied
+        change = self.get_object(request, object_id)
+        if change is None:
+            return self._get_obj_does_not_exist_redirect(request, self.opts, object_id)
+        note = request.POST.get("review_note", "").strip()
+        if "approve" in request.POST:
+            ok = review.approve(change, request.user, note)
+            done = _("The change was approved and is now live.")
+        else:
+            ok = review.reject(change, request.user, note)
+            done = _("The change was rejected.")
+        if ok:
+            self.message_user(request, done, messages.SUCCESS)
+        else:
+            self.message_user(request, _("This change was already reviewed or its biography no longer exists."), messages.ERROR)
+        return HttpResponseRedirect(reverse("admin:core_biographychange_changelist"))
+
+    def _decide_selected(self, request, queryset, func, done_msg):
+        if not review.can_approve(request.user):
+            raise PermissionDenied
+        # Oldest first so later edits of the same field win.
+        done = sum(
+            1 for change in queryset.filter(status=BiographyChange.Status.PENDING).order_by("submitted_at", "id")
+            if func(change, request.user)
+        )
+        self.message_user(request, done_msg % {"count": done}, messages.SUCCESS)
+
+    @admin.action(description=_("Approve selected pending changes"))
+    def approve_selected(self, request, queryset):
+        self._decide_selected(request, queryset, review.approve, _("%(count)d change(s) approved."))
+
+    @admin.action(description=_("Reject selected pending changes"))
+    def reject_selected(self, request, queryset):
+        self._decide_selected(request, queryset, review.reject, _("%(count)d change(s) rejected."))

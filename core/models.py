@@ -703,3 +703,54 @@ class TeacherStudentRelationship(models.Model):
 
     def __str__(self):
         return f"{self.teacher} → {self.student}"
+
+
+class BiographyChange(models.Model):
+    """Audit trail entry for one edit of a biography, and the approval gate
+    for edits made by users who cannot publish directly (see core.review)."""
+
+    class Action(models.TextChoices):
+        CREATE = "create", _("Created")
+        UPDATE = "update", _("Updated")
+        DELETE = "delete", _("Deleted")
+
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending review")
+        APPROVED = "approved", _("Approved")
+        REJECTED = "rejected", _("Rejected")
+        DIRECT = "direct", _("Applied directly")
+
+    biography = models.ForeignKey(
+        "Biography", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="changes", verbose_name=_("Biography"),
+    )
+    # Kept so the entry stays readable after the biography is deleted.
+    biography_label = models.CharField(_("Biography name"), max_length=300, blank=True)
+    action = models.CharField(_("Action"), max_length=10, choices=Action.choices)
+    status = models.CharField(_("Status"), max_length=10, choices=Status.choices, db_index=True)
+    before = models.JSONField(_("Before"), default=dict, blank=True)
+    after = models.JSONField(_("After"), default=dict, blank=True)
+    changed_fields = models.JSONField(_("Changed fields"), default=list, blank=True)
+
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="submitted_biography_changes", verbose_name=_("Submitted By"),
+    )
+    submitted_at = models.DateTimeField(_("Submitted at"), db_index=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="reviewed_biography_changes", verbose_name=_("Reviewed By"),
+    )
+    reviewed_at = models.DateTimeField(_("Reviewed at"), null=True, blank=True)
+    review_note = models.TextField(_("Review note"), blank=True)
+
+    class Meta:
+        verbose_name = _("Biography Change")
+        verbose_name_plural = _("Biography Changes (Review & History)")
+        ordering = ["-submitted_at", "-id"]
+        permissions = [
+            ("approve_biographychange", _("Can approve biography changes")),
+        ]
+
+    def __str__(self):
+        return f"#{self.pk} {self.get_action_display()} — {self.biography_label}"
